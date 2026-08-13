@@ -124,8 +124,11 @@
   min-width: 240px;
   min-height: 0;
   overflow-y: auto;
-  display: flex;
-  flex-direction: column;
+  /* Bewusst KEIN display:flex hier: als Flex-Container hätten die Kind-Panels (die
+     wegen overflow:hidden keine Mindesthöhen-Untergrenze mehr haben) auf 0px
+     zusammengedrückt werden können, während die VLAN-Tabelle den ganzen Platz belegt.
+     Normaler Blockfluss + overflow-y:auto lässt jedes Kind seine natürliche/gesetzte
+     Höhe behalten und scrollt bei Bedarf als Ganzes. */
 }
 
 .vlan-table-toolbar {
