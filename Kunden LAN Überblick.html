@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kunden LAN Überblick</title>
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+
+<div class="app">
+  <header class="app-header">
+    <h1>Kunden LAN Überblick</h1>
+  </header>
+
+  <aside class="app-sidebar">
+    <h2>Switches importieren</h2>
+    <div class="dropzone" id="import-dropzone">
+      Textfiles hierher ziehen oder klicken<br>
+      <span class="hint">Ein File pro Switch, alle show-Kommandos hintereinander</span>
+    </div>
+    <input type="file" id="import-file-input" multiple accept=".txt,.log" hidden>
+    <div id="import-errors"></div>
+    <div id="import-switch-list"></div>
+  </aside>
+
+  <main class="app-main">
+    <div class="view-tabs">
+      <button class="view-tab active" data-view="topology">Topologie</button>
+      <button class="view-tab" data-view="vlans">VLAN-Tabelle</button>
+    </div>
+
+    <section id="view-topology" class="view-panel active">
+      <div class="topology-toolbar">
+        <h2>Topologie</h2>
+        <label class="toggle-switch">
+          <input type="checkbox" id="link-mode-toggle">
+          Einzelne Verbindungen statt Port-Channel-Bündel anzeigen
+        </label>
+      </div>
+      <div class="topology-wrapper">
+        <svg id="topology-canvas"></svg>
+      </div>
+    </section>
+
+    <section id="view-vlans" class="view-panel">
+      <h2>VLAN-Tabelle</h2>
+      <div id="vlan-table-wrapper"></div>
+      <div id="network-detail-panel" class="detail-panel"></div>
+      <div id="mac-detail-panel" class="detail-panel"></div>
+    </section>
+  </main>
+</div>
+
+<script src="js/core/namespace.js"></script>
+<script src="js/core/state.js"></script>
+<script src="js/core/dom-utils.js"></script>
+<script src="js/core/topology.js"></script>
+<script src="js/parsers/splitter.js"></script>
+<script src="js/parsers/show-version.js"></script>
+<script src="js/parsers/column-utils.js"></script>
+<script src="js/parsers/cdp.js"></script>
+<script src="js/parsers/etherchannel.js"></script>
+<script src="js/parsers/port-utils.js"></script>
+<script src="js/parsers/vlan.js"></script>
+<script src="js/parsers/ip-route.js"></script>
+<script src="js/parsers/ip-interface-brief.js"></script>
+<script src="js/parsers/mac-table.js"></script>
+<script src="js/core/vlan-model.js"></script>
+<script src="js/core/mac-model.js"></script>
+<script src="js/views/import.js"></script>
+<script src="js/views/topology.js"></script>
+<script src="js/views/vlan-table.js"></script>
+<script src="js/views/mac-detail.js"></script>
+<script src="js/views/network-detail.js"></script>
+<script src="js/views/tabs.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
