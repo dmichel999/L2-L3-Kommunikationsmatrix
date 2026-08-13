@@ -1,0 +1,113 @@
+ACC1#show version
+Cisco IOS Software, WS-C3850-24T Software (WS-C3850-24T-UNIVERSALK9-M), Version 16.9.8, RELEASE SOFTWARE (fc1)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2022 by Cisco Systems, Inc.
+Compiled Tue 12-Jul-22 14:22 by mcpre
+
+ROM: Bootstrap program is WS-C3850-24T boot loader
+
+ACC1 uptime is 33 weeks, 5 days, 2 hours, 18 minutes
+System returned to ROM by power-on
+System image file is "flash:ws-c3850-24t-universalk9.16.09.08.SPA.bin"
+
+cisco WS-C3850-24T (ARM) processor with 524288K bytes of memory.
+Processor board ID FCW2114A001
+Base ethernet MAC Address       : 00:1A:01:00:01:00
+Configuration register is 0xF
+
+ACC1#show cdp neighbor
+Capability Codes: R - Router, T - Trans Bridge, B - Source Route Bridge
+                  S - Switch, H - Host, I - IGMP, r - Repeater, P - Phone,
+                  D - Remote, C - CVTA, M - Two-port Mac Relay
+
+Device ID         Local Intrfce      Holdtme    Capability   Platform  Port ID
+CORE1.customer.local
+                  Gig 1/0/1          160        S I          N9K-C9318 Eth1/3
+
+Total cdp entries displayed : 1
+
+ACC1#show etherchannel summary
+Flags:  D - down        P - bundled in port-channel
+        I - stand-alone s - suspended
+        H - Hot-standby (LACP only)
+        R - Layer3      S - Layer2
+        U - in use      f - failed to allocate aggregator
+        M - not in use, minimum links not met
+        u - unsuitable for bundling
+        w - waiting to be aggregated
+        d - default port
+
+Number of channel-groups in use: 0
+Number of aggregators:            0
+
+Group  Port-channel  Protocol    Ports
+------+-------------+-----------+-----------------------------------------------
+
+ACC1#show vlan
+VLAN Name                              Status    Ports
+---- --------------------------------- --------- ------------------------------
+1    default                           active
+10   Users                             active    Gi1/0/2, Gi1/0/3, Gi1/0/4
+                                                 Gi1/0/5, Gi1/0/6, Gi1/0/7
+                                                 Gi1/0/8, Gi1/0/9, Gi1/0/10
+                                                 Gi1/0/11, Gi1/0/12, Gi1/0/13
+                                                 Gi1/0/14, Gi1/0/15, Gi1/0/16
+                                                 Gi1/0/17, Gi1/0/18, Gi1/0/19
+                                                 Gi1/0/20, Gi1/0/21, Gi1/0/22
+                                                 Gi1/0/23, Gi1/0/24
+30   Voice                             active    Gi1/0/14
+40   WiFi                              active    Gi1/0/15
+99   Mgmt                              active
+
+VLAN Type  SAID       MTU   Parent RingNo BridgeNo Stp  BrdgMode Trans1 Trans2
+---- ----- ---------- ----- ------ ------ -------- ---- -------- ------ ------
+1    enet  100001
+10   enet  100010
+30   enet  100030
+40   enet  100040
+99   enet  100099
+
+ACC1#show mac address-table
+          Mac Address Table
+-------------------------------------------
+
+Vlan    Mac Address       Type        Ports
+----    -----------       --------    -----
+  10    aaaa.bbbb.0678    DYNAMIC     Gi1/0/2
+  10    aaaa.bbbb.0679    DYNAMIC     Gi1/0/3
+  10    aaaa.bbbb.067a    DYNAMIC     Gi1/0/4
+  30    aaaa.bbbb.06c8    DYNAMIC     Gi1/0/14
+  40    aaaa.bbbb.06f0    DYNAMIC     Gi1/0/15
+  10    aaaa.bbbb.06b3    DYNAMIC     Gi1/0/1
+   1    aaaa.bbbb.0000    STATIC      CPU
+
+ACC1#show ip interface brief
+Interface              IP-Address      OK? Method Status                Protocol
+Vlan99                 10.10.99.11     YES manual up                    up
+
+ACC1#show arp
+Protocol  Address          Age (min)  Hardware Addr   Type   Interface
+Internet  10.10.99.11              8   0011.2233.4400  ARPA   Vlan99
+
+ACC1#show ip route
+Codes: L - local, C - connected, S - static
+Gateway of last resort is not set
+
+C        10.10.99.0/24 is directly connected, Vlan99
+L        10.10.99.11/32 is directly connected, Vlan99
+
+ACC1#show interfaces trunk
+Port        Mode             Encapsulation  Status        Native vlan
+Gi1/0/1     on               802.1q         trunking      99
+
+Port        Vlans allowed on trunk
+Gi1/0/1     1-4094
+
+Port        Vlans allowed and active in management domain
+Gi1/0/1     1,10,30,40,99
+
+ACC1#show ip interface
+Vlan99 is up, line protocol is up
+  Internet address is 10.10.99.11/24
+  Outgoing access list is not set
+  Inbound  access list is not set

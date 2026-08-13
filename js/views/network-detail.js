@@ -32,7 +32,7 @@ function renderNetworkDetail() {
     : ' <span class="hint">(Maske nicht gesichert — keine passende connected Route gefunden, nur aus "show ip interface brief")</span>';
 
   panel.innerHTML = `
-    <h3>VLAN-Interface für ${KLU.dom.escapeHtml(cidr)}</h3>
+    <p><strong>VLAN-Interface für ${KLU.dom.escapeHtml(cidr)}</strong></p>
     <p class="hint">VLAN ${vlan.vlanId} (${KLU.dom.escapeHtml(vlan.name) || '–'})</p>
     <p>SVI auf: <strong>${switchNames}</strong>${maskHint}</p>
   `;

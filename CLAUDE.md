@@ -2,7 +2,7 @@
 
 ## Überblick
 
-Neues Projekt, Konzeptphase — Zweck und Feature-Umfang noch offen.
+Browser-basiertes Analyse-Tool für Kunden-LANs (Catalyst/Nexus) aus `show`-Kommando-Textmitschriften: Topologie, VLAN-Tabelle, L3-Kommunikationsmatrix, MAC-/IP-Suche u.a. Kein Server, keine KI im Loop — Details siehe `docs/features.md` (Spec), `docs/architecture.md` (technische Entscheidungen), `docs/releases.md` (Versionshistorie).
 
 ## Repo-Hosting
 

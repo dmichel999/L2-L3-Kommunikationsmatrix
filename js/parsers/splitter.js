@@ -10,11 +10,14 @@ const COMMAND_MAP = [
   { key: 'macAddressTable', patterns: [/^show mac address-table$/i, /^show mac-address-table$/i] },
   { key: 'ipInterfaceBrief', patterns: [/^show ip interface brief$/i] },
   { key: 'arp', patterns: [/^show arp$/i, /^show ip arp$/i] },
-  { key: 'ipRoute', patterns: [/^show ip route$/i] }
+  { key: 'ipRoute', patterns: [/^show ip route$/i] },
+  { key: 'interfacesTrunk', patterns: [/^show interfaces trunk$/i, /^show interface trunk$/i] },
+  { key: 'ipInterfaceFull', patterns: [/^show ip interface$/i] }
 ];
 
-// Prompt + Kommando-Echo, z.B. "SW1#show version" oder "SW1>show ip route"
-const PROMPT_LINE = /^\S+[#>]\s*(show\s+\S.*)$/i;
+// Prompt + Kommando-Echo, z.B. "SW1#show version" oder "SW1>show ip route".
+// Gruppe 1 (Hostname) wird als Fallback genutzt, wenn "show version" in der Datei fehlt.
+const PROMPT_LINE = /^(\S+)[#>]\s*(show\s+\S.*)$/i;
 const MORE_PROMPT = /--\s*More\s*--/i;
 
 function normalizeCommand(text) {
@@ -37,12 +40,13 @@ function cleanBlockLines(lines) {
 
 /**
  * @param {string} rawText Inhalt einer Switch-Textdatei (mehrere "show"-Kommandos nacheinander)
- * @returns {{ commands: Record<string,string>, unrecognized: string[] }}
+ * @returns {{ commands: Record<string,string>, unrecognized: string[], promptHostname: string|null }}
  */
 KLU.parsers.splitCommands = function (rawText) {
   const lines = rawText.replace(/\r\n?/g, '\n').split('\n');
   const commands = {};
   const unrecognized = [];
+  let promptHostname = null;
 
   let currentKey = null;
   let currentCommandText = null;
@@ -64,7 +68,8 @@ KLU.parsers.splitCommands = function (rawText) {
     const match = PROMPT_LINE.exec(line.trim());
     if (match) {
       flush();
-      currentCommandText = match[1];
+      if (!promptHostname) promptHostname = match[1];
+      currentCommandText = match[2];
       currentKey = matchCommandKey(currentCommandText);
       continue;
     }
@@ -72,5 +77,5 @@ KLU.parsers.splitCommands = function (rawText) {
   }
   flush();
 
-  return { commands, unrecognized };
+  return { commands, unrecognized, promptHostname };
 };

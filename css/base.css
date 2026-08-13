@@ -12,10 +12,16 @@
   --error-bg: #fbe9e8;
   --catalyst: #2e7d32;
   --nexus: #6a1b9a;
+  --firewall: #b3261e;
+  --wlc: #005f9e;
+  --ap: #b4690e;
+  --unknown-device: #6b7480;
 }
 
+/* System-Einstellung ("System" in der Theme-Auswahl) — greift nur, solange kein data-theme
+   explizit gesetzt ist. :root[data-theme="light"] deaktiviert diesen Block bewusst. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #14171a;
     --surface: #1e2226;
     --border: #333941;
@@ -29,7 +35,32 @@
     --error-bg: #3a1d1b;
     --catalyst: #6fbf73;
     --nexus: #b17fd6;
+    --firewall: #e0776e;
+    --wlc: #4da3e0;
+    --ap: #e0a458;
+    --unknown-device: #9aa3ad;
   }
+}
+
+/* Explizite Auswahl "Dunkel" in der Theme-Auswahl — greift unabhängig von der Systemeinstellung. */
+:root[data-theme="dark"] {
+  --bg: #14171a;
+  --surface: #1e2226;
+  --border: #333941;
+  --text: #e6e9ec;
+  --text-muted: #9aa3ad;
+  --accent: #4da3e0;
+  --accent-contrast: #0b1720;
+  --warning: #e0a458;
+  --warning-bg: #3a2c15;
+  --error: #e0776e;
+  --error-bg: #3a1d1b;
+  --catalyst: #6fbf73;
+  --nexus: #b17fd6;
+  --firewall: #e0776e;
+  --wlc: #4da3e0;
+  --ap: #e0a458;
+  --unknown-device: #9aa3ad;
 }
 
 * { box-sizing: border-box; }

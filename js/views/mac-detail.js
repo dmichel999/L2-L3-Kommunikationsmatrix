@@ -25,7 +25,7 @@ function renderMacDetail() {
   `).join('');
 
   panel.innerHTML = `
-    <h3>MAC-Adressen in VLAN ${vlanId}</h3>
+    <div class="panel-body-toolbar"><strong>VLAN ${vlanId}</strong><button class="mac-csv-export">CSV exportieren</button></div>
     <p class="hint">Uplinks zwischen Switches und VLAN-Interface-eigene MACs sind ausgeblendet.</p>
     ${entries.length
       ? `<table class="vlan-table"><thead><tr><th>Switch</th><th>Port</th><th>MAC-Adresse</th></tr></thead><tbody>${rows}</tbody></table>`
@@ -37,6 +37,18 @@ KLU.views.macDetail = {
   init() {
     KLU.on('vlan:selected', renderMacDetail);
     KLU.on('switches:changed', renderMacDetail);
+
+    document.getElementById('mac-detail-panel')?.addEventListener('click', e => {
+      if (!e.target.closest('.mac-csv-export')) return;
+      const vlanId = KLU.state.selectedVlan;
+      if (vlanId == null) return;
+      const switches = KLU.state.getSwitches();
+      const graph = KLU.topology.buildGraph(switches);
+      const entries = KLU.macModel.getEntriesForVlan(switches, vlanId, graph);
+      const csv = KLU.csvExport.toCsv(['Switch', 'Port', 'MAC-Adresse'], entries.map(en => [en.hostname, en.port, en.macAddress]));
+      KLU.csvExport.download(`mac-vlan-${vlanId}.csv`, csv);
+    });
+
     renderMacDetail();
   }
 };

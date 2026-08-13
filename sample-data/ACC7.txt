@@ -1,0 +1,89 @@
+ACC7#show version
+Cisco IOS Software, WS-C2960X-48TS-L Software (WS-C2960X-48TS-L-UNIVERSALK9-M), Version 16.9.8, RELEASE SOFTWARE (fc1)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2022 by Cisco Systems, Inc.
+Compiled Tue 12-Jul-22 14:22 by mcpre
+
+ROM: Bootstrap program is WS-C2960X-48TS-L boot loader
+
+ACC7 uptime is 33 weeks, 5 days, 2 hours, 18 minutes
+System returned to ROM by power-on
+System image file is "flash:ws-c2960x-48ts-l-universalk9.16.09.08.SPA.bin"
+
+cisco WS-C2960X-48TS-L (ARM) processor with 524288K bytes of memory.
+Processor board ID FOC2115B007
+Base ethernet MAC Address       : 00:1A:07:00:01:00
+Configuration register is 0xF
+
+ACC7#show cdp neighbor
+Capability Codes: R - Router, T - Trans Bridge, B - Source Route Bridge
+                  S - Switch, H - Host, I - IGMP, r - Repeater, P - Phone,
+                  D - Remote, C - CVTA, M - Two-port Mac Relay
+
+Device ID         Local Intrfce      Holdtme    Capability   Platform  Port ID
+CORE2.customer.local
+                  Gig 1/0/1          160        S I          N9K-C9318 Eth1/5
+
+Total cdp entries displayed : 1
+
+ACC7#show etherchannel summary
+Flags:  D - down        P - bundled in port-channel
+        I - stand-alone s - suspended
+        H - Hot-standby (LACP only)
+        R - Layer3      S - Layer2
+        U - in use      f - failed to allocate aggregator
+        M - not in use, minimum links not met
+        u - unsuitable for bundling
+        w - waiting to be aggregated
+        d - default port
+
+Number of channel-groups in use: 0
+Number of aggregators:            0
+
+Group  Port-channel  Protocol    Ports
+------+-------------+-----------+-----------------------------------------------
+
+ACC7#show vlan
+VLAN Name                              Status    Ports
+---- --------------------------------- --------- ------------------------------
+1    default                           active
+10   Users                             active    Gi1/0/17, Gi1/0/18
+30   Voice                             active    Gi1/0/20
+40   WiFi                              active    Gi1/0/21
+99   Mgmt                              active
+
+VLAN Type  SAID       MTU   Parent RingNo BridgeNo Stp  BrdgMode Trans1 Trans2
+---- ----- ---------- ----- ------ ------ -------- ---- -------- ------ ------
+1    enet  100001
+10   enet  100010
+30   enet  100030
+40   enet  100040
+99   enet  100099
+
+ACC7#show mac address-table
+          Mac Address Table
+-------------------------------------------
+
+Vlan    Mac Address       Type        Ports
+----    -----------       --------    -----
+  10    aaaa.bbbb.06d8    DYNAMIC     Gi1/0/17
+  10    aaaa.bbbb.06d9    DYNAMIC     Gi1/0/18
+  30    aaaa.bbbb.0728    DYNAMIC     Gi1/0/20
+  40    aaaa.bbbb.0750    DYNAMIC     Gi1/0/21
+  10    aaaa.bbbb.0713    DYNAMIC     Gi1/0/1
+   1    aaaa.bbbb.0000    STATIC      CPU
+
+ACC7#show ip interface brief
+Interface              IP-Address      OK? Method Status                Protocol
+Vlan99                 10.10.99.17     YES manual up                    up
+
+ACC7#show arp
+Protocol  Address          Age (min)  Hardware Addr   Type   Interface
+Internet  10.10.99.17              8   0011.2233.4400  ARPA   Vlan99
+
+ACC7#show ip route
+Codes: L - local, C - connected, S - static
+Gateway of last resort is not set
+
+C        10.10.99.0/24 is directly connected, Vlan99
+L        10.10.99.17/32 is directly connected, Vlan99

@@ -1,4 +1,6 @@
-// Kunden LAN Überblick — VLAN-Tabelle: VLAN-ID/Name, IP-Netz(e) je SVI-Switch, Switches mit VLAN
+// Kunden LAN Überblick — VLAN-Tabelle: VLAN-ID/Name, IP-Netz(e) je SVI-Switch. "Switches mit
+// VLAN" ist nicht als eigene Spalte sichtbar (bewusst entfernt, Platzgrund) — bleibt aber im
+// CSV-Export enthalten und ist über Klick auf ein IP-Netz weiterhin abrufbar (Feature 4).
 KLU.views = KLU.views || {};
 
 function hostnameOf(switchId) {
@@ -13,6 +15,19 @@ function renderNetworkCell(vlanId, networks) {
     const maskHint = n.maskKnown ? '' : ' <span class="hint" title="Keine connected Route gefunden, Maske unbekannt">(Maske?)</span>';
     return `<div class="vlan-network${selected ? ' selected' : ''}" data-network-key="${KLU.dom.escapeHtml(key)}"><code>${KLU.dom.escapeHtml(n.cidr)}</code>${maskHint}</div>`;
   }).join('');
+}
+
+function buildVlanCsvRows(vlans) {
+  const rows = [];
+  for (const v of vlans) {
+    const switchNames = v.switchesWithVlan.map(hostnameOf).join(', ');
+    if (v.networks.length === 0) {
+      rows.push([v.vlanId, v.name || '', '', '', switchNames]);
+      continue;
+    }
+    for (const n of v.networks) rows.push([v.vlanId, v.name || '', n.cidr, n.maskKnown ? 'ja' : 'nein', switchNames]);
+  }
+  return rows;
 }
 
 function renderVlanTable() {
@@ -31,14 +46,13 @@ function renderVlanTable() {
       <td>${v.vlanId}</td>
       <td>${KLU.dom.escapeHtml(v.name) || '<span class="hint">–</span>'}</td>
       <td>${renderNetworkCell(v.vlanId, v.networks)}</td>
-      <td>${v.switchesWithVlan.map(hostnameOf).map(KLU.dom.escapeHtml).join(', ')}</td>
     </tr>
   `).join('');
 
   wrapper.innerHTML = `
     <table class="vlan-table">
       <thead>
-        <tr><th>VLAN</th><th>Name</th><th>IP-Netz</th><th>Switches mit VLAN</th></tr>
+        <tr><th>VLAN</th><th>Name</th><th>IP-Netz</th></tr>
       </thead>
       <tbody>${rows}</tbody>
     </table>
@@ -59,8 +73,14 @@ KLU.views.vlanTable = {
       if (row) KLU.state.selectVlan(parseInt(row.dataset.vlanId, 10));
     });
 
+    document.getElementById('vlan-csv-export')?.addEventListener('click', () => {
+      const vlans = KLU.vlanModel.build(KLU.state.getSwitches());
+      const csv = KLU.csvExport.toCsv(['VLAN', 'Name', 'IP-Netz', 'Maske bekannt', 'Switches'], buildVlanCsvRows(vlans));
+      KLU.csvExport.download('vlan-tabelle.csv', csv);
+    });
+
     KLU.on('switches:changed', renderVlanTable);
-    KLU.on('view:changed', view => { if (view === 'vlans') renderVlanTable(); });
+    KLU.on('view:changed', view => { if (view === 'network') renderVlanTable(); });
     KLU.on('vlan:selected', renderVlanTable);
     KLU.on('network:selected', renderVlanTable);
     renderVlanTable();

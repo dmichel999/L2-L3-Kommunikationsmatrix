@@ -1,10 +1,12 @@
 // Kunden LAN Überblick — Parser für "show vlan" (erste Tabelle: VLAN/Name/Status/Ports).
-// Format ist auf Catalyst und Nexus identisch. Port-Listen können auf Folgezeilen umbrechen;
-// nach der ersten Leerzeile endet die Tabelle (danach folgt bei Catalyst/Nexus je eine
-// zweite Tabelle mit anderen Spalten, die uns hier nicht interessiert).
+// Format ist auf Catalyst und Nexus identisch. Port-Listen können auf Folgezeilen umbrechen.
+// Manche Exporte (z.B. Copy/Paste aus bestimmten Terminal-Tools) fügen nach JEDER Zeile eine
+// Leerzeile ein — Leerzeilen dürfen daher NICHT als Tabellenende gewertet werden. Das echte
+// Ende der ersten Tabelle ist die zweite Tabelle ("VLAN Type SAID ...", andere Spalten).
 KLU.parsers = KLU.parsers || {};
 
 const VLAN_HEADER_RE = /^VLAN\s+Name\s+Status\s+Ports/i;
+const VLAN_SECOND_TABLE_RE = /^VLAN\s+Type\b/i;
 const VLAN_ROW_RE = /^(\d+)\s/;
 
 function findVlanColumnOffsets(headerLine) {
@@ -33,19 +35,15 @@ KLU.parsers.parseVlan = function (text) {
 
   const entries = [];
   let current = null;
-  let started = false;
 
   for (let i = headerIdx + 1; i < lines.length; i++) {
     const line = lines[i];
-    if (/^-+\s+-+/.test(line.trim())) continue; // Trennzeile "---- ---- ..."
-
-    if (!line.trim()) {
-      if (started) break; // Leerzeile nach Tabellenstart -> Ende der ersten Tabelle
-      continue;
-    }
+    const trimmed = line.trim();
+    if (!trimmed) continue; // Leerzeile ignorieren, kein Tabellenende-Signal
+    if (/^-+\s+-+/.test(trimmed)) continue; // Trennzeile "---- ---- ..."
+    if (VLAN_SECOND_TABLE_RE.test(trimmed)) break; // zweite Tabelle beginnt -> Ende
 
     if (VLAN_ROW_RE.test(line)) {
-      started = true;
       current = {
         vlanId: parseInt(KLU.parsers.sliceCol(line, cols.vlanId, cols.name), 10),
         vlanName: KLU.parsers.sliceCol(line, cols.name, cols.status),

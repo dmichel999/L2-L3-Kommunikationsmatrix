@@ -4,7 +4,10 @@ KLU.state = {
   switches: new Map(),
   linkMode: 'aggregated', // 'aggregated' | 'individual'
   selectedVlan: null,
-  selectedNetwork: null
+  selectedNetwork: null,
+  showPortLabels: false,
+  selectedSwitchFocus: null,
+  hiddenDeviceTypes: new Set()
 };
 
 KLU.state.addSwitch = function (sw) {
@@ -30,4 +33,38 @@ KLU.state.selectVlan = function (vlanId) {
 KLU.state.selectNetwork = function (key) {
   KLU.state.selectedNetwork = KLU.state.selectedNetwork === key ? null : key;
   KLU.emit('network:selected', KLU.state.selectedNetwork);
+};
+
+KLU.state.setShowPortLabels = function (value) {
+  KLU.state.showPortLabels = value;
+  KLU.emit('portLabels:changed', value);
+};
+
+// nodeId = Topologie-Knoten-ID (Switch- oder externer Geräte-Knoten); erneuter Klick hebt Fokus auf
+KLU.state.selectSwitchFocus = function (nodeId) {
+  KLU.state.selectedSwitchFocus = KLU.state.selectedSwitchFocus === nodeId ? null : nodeId;
+  KLU.emit('switchFocus:selected', KLU.state.selectedSwitchFocus);
+};
+
+KLU.state.toggleDeviceTypeVisibility = function (deviceType) {
+  if (KLU.state.hiddenDeviceTypes.has(deviceType)) KLU.state.hiddenDeviceTypes.delete(deviceType);
+  else KLU.state.hiddenDeviceTypes.add(deviceType);
+  KLU.emit('deviceTypeVisibility:changed', deviceType);
+};
+
+// Verschiebt draggedId an die Position von targetId in der Import-Liste (Drag & Drop-Sortierung).
+// Map-Iterationsreihenfolge = Insertion-Reihenfolge, daher reicht ein Neuaufbau der Map.
+KLU.state.reorderSwitches = function (draggedId, targetId) {
+  if (draggedId === targetId) return;
+  const entries = Array.from(KLU.state.switches.entries());
+  const fromIdx = entries.findIndex(([id]) => id === draggedId);
+  const toIdx = entries.findIndex(([id]) => id === targetId);
+  if (fromIdx === -1 || toIdx === -1) return;
+  const [moved] = entries.splice(fromIdx, 1);
+  // Entfernen verschiebt alle nachfolgenden Indizes um 1 nach vorn — lag draggedId VOR targetId,
+  // muss der Ziel-Index deshalb um 1 korrigiert werden, sonst landet der Eintrag einen Slot zu weit.
+  const insertIdx = fromIdx < toIdx ? toIdx - 1 : toIdx;
+  entries.splice(insertIdx, 0, moved);
+  KLU.state.switches = new Map(entries);
+  KLU.emit('switches:changed', null);
 };

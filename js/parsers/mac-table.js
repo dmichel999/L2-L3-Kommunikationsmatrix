@@ -19,7 +19,10 @@ KLU.parsers.parseMacAddressTable = function (text) {
     if (/^-+$|^-+\+/.test(line)) continue; // Trennzeile
     if (/^(Vlan\b|Legend|Mac Address Table|VLAN\s)/i.test(line)) continue;
 
-    line = line.replace(/^\*\s*/, ''); // Nexus "primary entry"-Markierung
+    // Nexus stellt der Zeile eine Legend-Markierung voran (z.B. "*" primary entry, "+" primary
+    // entry via vPC Peer-Link, "G" Gateway-MAC) — generisch ein einzelnes Nicht-Ziffer-Zeichen
+    // am Anfang entfernen, sonst würde die VLAN-Spalte als NaN erkannt und der Eintrag verworfen.
+    line = line.replace(/^[^\d\s]\s*/, '');
 
     const tokens = line.split(/\s+/);
     if (tokens.length < 4) continue;

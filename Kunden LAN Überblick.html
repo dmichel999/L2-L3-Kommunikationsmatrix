@@ -1,8 +1,10 @@
+<!-- thought up by human, coded by ai -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'self';">
 <title>Kunden LAN Überblick</title>
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/layout.css">
@@ -13,50 +15,150 @@
 <div class="app">
   <header class="app-header">
     <h1>Kunden LAN Überblick</h1>
+    <div id="dashboard-stats" class="dashboard-stats"></div>
+    <div class="global-search">
+      <input type="text" id="global-search-input" placeholder="MAC, IP oder Hostname suchen …">
+      <div id="global-search-results" class="global-search-results"></div>
+    </div>
+    <label class="theme-select-label">
+      Darstellung
+      <select id="theme-select">
+        <option value="system">System</option>
+        <option value="light">Hell</option>
+        <option value="dark">Dunkel</option>
+      </select>
+    </label>
   </header>
 
-  <aside class="app-sidebar">
-    <h2>Switches importieren</h2>
-    <div class="dropzone" id="import-dropzone">
-      Textfiles hierher ziehen oder klicken<br>
-      <span class="hint">Ein File pro Switch, alle show-Kommandos hintereinander</span>
+  <aside class="app-sidebar" id="app-sidebar">
+    <div class="panel">
+      <div class="panel-header">
+        <button class="panel-collapse-btn" aria-expanded="true">▾</button>
+        <h2>Switches importieren</h2>
+      </div>
+      <div class="panel-body">
+        <div class="dropzone" id="import-dropzone">
+          Textfiles oder Word-Dokumente hierher ziehen oder klicken<br>
+          <span class="hint">Ein File pro Switch, alle show-Kommandos hintereinander</span>
+        </div>
+        <input type="file" id="import-file-input" multiple accept=".txt,.log,.docx" hidden>
+        <div id="import-errors"></div>
+      </div>
     </div>
-    <input type="file" id="import-file-input" multiple accept=".txt,.log" hidden>
-    <div id="import-errors"></div>
-    <div id="import-switch-list"></div>
+    <div class="panel">
+      <div class="panel-header">
+        <button class="panel-collapse-btn" aria-expanded="true">▾</button>
+        <h2>Importierte Switches</h2>
+      </div>
+      <div class="panel-body">
+        <div id="import-switch-list"></div>
+      </div>
+    </div>
   </aside>
+  <div class="sidebar-resizer" id="sidebar-resize-handle"></div>
 
   <main class="app-main">
     <div class="view-tabs">
-      <button class="view-tab active" data-view="topology">Topologie</button>
-      <button class="view-tab" data-view="vlans">VLAN-Tabelle</button>
+      <button class="view-tab active" data-view="network">Netzwerk</button>
+      <button class="view-tab" data-view="matrix">Kommunikationsmatrix</button>
+      <button class="view-tab" data-view="versions">Versionen</button>
     </div>
 
-    <section id="view-topology" class="view-panel active">
-      <div class="topology-toolbar">
-        <h2>Topologie</h2>
-        <label class="toggle-switch">
-          <input type="checkbox" id="link-mode-toggle">
-          Einzelne Verbindungen statt Port-Channel-Bündel anzeigen
-        </label>
-      </div>
-      <div class="topology-wrapper">
-        <svg id="topology-canvas"></svg>
+    <section id="view-network" class="view-panel active">
+      <div class="split-pane">
+        <div class="split-pane-left" id="topology-panel">
+          <div class="topology-toolbar">
+            <h2>Topologie</h2>
+            <span class="topology-zoom-controls">
+              <button id="topology-zoom-out" title="Herauszoomen">−</button>
+              <button id="topology-zoom-reset" title="Zoom zurücksetzen">100%</button>
+              <button id="topology-zoom-in" title="Hineinzoomen">+</button>
+              <button id="topology-fullscreen-toggle" title="Vollbild">⛶</button>
+            </span>
+            <div class="topology-settings">
+              <button id="topology-settings-toggle" aria-expanded="false" title="Ansichtsoptionen">⚙ Ansicht</button>
+              <div class="topology-settings-popover" id="topology-settings-popover">
+                <label class="toggle-switch">
+                  <input type="checkbox" id="link-mode-toggle">
+                  Einzelne Verbindungen statt Port-Channel-Bündel anzeigen
+                </label>
+                <label class="toggle-switch" title="Werden erst ab ca. 150% Zoom eingeblendet, sonst bei vielen Verbindungen unlesbar überlappend">
+                  <input type="checkbox" id="port-label-toggle">
+                  Portbezeichnungen anzeigen (ab Zoom &gt;150%)
+                </label>
+                <hr>
+                <span id="topology-legend" class="topology-legend"></span>
+              </div>
+            </div>
+          </div>
+          <div class="topology-wrapper">
+            <svg id="topology-canvas"></svg>
+          </div>
+          <p class="hint">Knoten verschiebbar (Drag), Mausrad zum Zoomen. Klick auf einen Switch-Knoten filtert auf dessen Verbindungen, Klick auf eine VLAN-Zeile hebt die zugehörigen Switches hervor.</p>
+        </div>
+        <div class="split-resizer" id="network-split-resizer"></div>
+        <div class="split-pane-right">
+          <div class="vlan-table-toolbar">
+            <h2>VLAN-Tabelle</h2>
+            <button id="vlan-csv-export">CSV exportieren</button>
+          </div>
+          <div id="vlan-table-wrapper"></div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <button class="panel-collapse-btn" aria-expanded="true">▾</button>
+              <h3>Netzwerk-Details</h3>
+            </div>
+            <div class="panel-body" id="network-detail-panel"></div>
+            <div class="panel-resize-handle"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <button class="panel-collapse-btn" aria-expanded="true">▾</button>
+              <h3>Trunk-Warnungen</h3>
+            </div>
+            <div class="panel-body" id="trunk-panel"></div>
+            <div class="panel-resize-handle"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <button class="panel-collapse-btn" aria-expanded="true">▾</button>
+              <h3>MAC-Adressen</h3>
+            </div>
+            <div class="panel-body" id="mac-detail-panel"></div>
+            <div class="panel-resize-handle"></div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section id="view-vlans" class="view-panel">
-      <h2>VLAN-Tabelle</h2>
-      <div id="vlan-table-wrapper"></div>
-      <div id="network-detail-panel" class="detail-panel"></div>
-      <div id="mac-detail-panel" class="detail-panel"></div>
+    <section id="view-matrix" class="view-panel">
+      <h2>L3-Kommunikationsmatrix</h2>
+      <p class="hint">Zeigt, ob zwei VLAN-Netze laut Routing-Tabelle erreichbar sind (✓ = gemeinsamer Switch mit beiden SVIs bekannt, ? = nicht ermittelbar). ⚠ ACL = auf einer beteiligten SVI ist eine Access-List konfiguriert — Regeln werden nicht ausgewertet, bitte manuell prüfen.</p>
+      <div id="matrix-wrapper"></div>
+    </section>
+
+    <section id="view-versions" class="view-panel">
+      <h2>Versionsübersicht</h2>
+      <div id="version-table-wrapper"></div>
     </section>
   </main>
+
+  <footer class="app-footer">
+    <span>thought up by human, coded by ai</span>
+    <img src="assets/Bechtle_AI_Generated_Label_light_EN.svg" id="ai-label-icon" alt="KI-generierter Inhalt" class="ai-label-icon">
+    <span id="app-footer-version" class="app-footer-version"></span>
+  </footer>
 </div>
 
+<script src="lib/jszip.min.js"></script>
 <script src="js/core/namespace.js"></script>
+<script src="js/core/theme.js"></script>
 <script src="js/core/state.js"></script>
 <script src="js/core/dom-utils.js"></script>
+<script src="js/core/csv-export.js"></script>
 <script src="js/core/topology.js"></script>
 <script src="js/parsers/splitter.js"></script>
 <script src="js/parsers/show-version.js"></script>
@@ -67,14 +169,29 @@
 <script src="js/parsers/vlan.js"></script>
 <script src="js/parsers/ip-route.js"></script>
 <script src="js/parsers/ip-interface-brief.js"></script>
+<script src="js/parsers/ip-interface-full.js"></script>
+<script src="js/parsers/interfaces-trunk.js"></script>
 <script src="js/parsers/mac-table.js"></script>
+<script src="js/parsers/arp.js"></script>
+<script src="js/parsers/docx.js"></script>
 <script src="js/core/vlan-model.js"></script>
 <script src="js/core/mac-model.js"></script>
+<script src="js/core/trunk-model.js"></script>
+<script src="js/core/reachability-model.js"></script>
 <script src="js/views/import.js"></script>
 <script src="js/views/topology.js"></script>
 <script src="js/views/vlan-table.js"></script>
 <script src="js/views/mac-detail.js"></script>
 <script src="js/views/network-detail.js"></script>
+<script src="js/views/trunk-panel.js"></script>
+<script src="js/views/reachability-matrix.js"></script>
+<script src="js/views/version-overview.js"></script>
+<script src="js/views/dashboard-stats.js"></script>
+<script src="js/views/global-search.js"></script>
+<script src="js/views/split-pane.js"></script>
+<script src="js/views/sidebar-resize.js"></script>
+<script src="js/views/collapsible-panel.js"></script>
+<script src="js/views/theme-toggle.js"></script>
 <script src="js/views/tabs.js"></script>
 <script src="js/app.js"></script>
 </body>

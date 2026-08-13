@@ -1,7 +1,22 @@
 // Kunden LAN Überblick — Import-View: Mehrfach-Datei-Upload, Parsing, Switch-Liste
 KLU.views = KLU.views || {};
 
-const EXPECTED_COMMANDS = ['version', 'cdpNeighbor', 'portChannel', 'vlan', 'macAddressTable', 'ipInterfaceBrief', 'arp', 'ipRoute'];
+const EXPECTED_COMMANDS = ['version', 'cdpNeighbor', 'portChannel', 'vlan', 'macAddressTable', 'ipInterfaceBrief', 'arp', 'ipRoute', 'interfacesTrunk', 'ipInterfaceFull'];
+
+// Für den Hover-Popup bei fehlenden Kommandos (Feature 11 der Erweiterung, siehe features.md):
+// welches Feature/welche Ansicht ist ohne dieses Kommando für diesen Switch eingeschränkt.
+const COMMAND_FEATURE_IMPACT = {
+  version: 'Plattform-/Hostname-Erkennung unsicher (Fallback über Prompt-Zeile + Kommandonamen aktiv)',
+  cdpNeighbor: 'Topologie: Verbindungen dieses Switches fehlen komplett',
+  portChannel: 'Topologie: Port-Channel-Bündelung für diesen Switch nicht erkennbar, Links erscheinen einzeln',
+  vlan: 'VLAN-Tabelle: VLANs dieses Switches fehlen komplett',
+  macAddressTable: 'MAC-Ansicht: gelernte MAC-Adressen dieses Switches fehlen',
+  ipInterfaceBrief: 'VLAN-Tabelle: SVI-Fallback-Zuordnung ohne Maske für diesen Switch nicht möglich',
+  arp: 'Globale Suche: IP-Suche über ARP für diesen Switch liefert keine Treffer',
+  ipRoute: 'VLAN-Tabelle/Matrix: IP-Netz+Maske für SVIs dieses Switches nicht ermittelbar',
+  interfacesTrunk: 'Trunk-Ansicht: Native-VLAN-Mismatch-Prüfung für Links dieses Switches nicht möglich',
+  ipInterfaceFull: 'Kommunikationsmatrix: ACL-Hinweis-Flag für SVIs dieses Switches nicht verfügbar'
+};
 
 function readFileAsText(file) {
   return new Promise((resolve, reject) => {
@@ -10,6 +25,27 @@ function readFileAsText(file) {
     reader.onerror = () => reject(reader.error);
     reader.readAsText(file);
   });
+}
+
+function readFileAsArrayBuffer(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+function isDocx(file) {
+  return /\.docx$/i.test(file.name) || file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+}
+
+async function extractFileText(file) {
+  if (isDocx(file)) {
+    const buffer = await readFileAsArrayBuffer(file);
+    return KLU.parsers.extractDocxText(buffer);
+  }
+  return readFileAsText(file);
 }
 
 function uniqueSwitchId(baseId) {
@@ -23,15 +59,30 @@ function uniqueSwitchId(baseId) {
 }
 
 async function processFile(file) {
-  const text = await readFileAsText(file);
-  const { commands, unrecognized } = KLU.parsers.splitCommands(text);
+  const text = await extractFileText(file);
+  const { commands, unrecognized, promptHostname } = KLU.parsers.splitCommands(text);
 
-  if (!commands.version) {
-    return { error: `${file.name}: keine "show version"-Ausgabe gefunden — Datei übersprungen.` };
+  if (Object.keys(commands).length === 0) {
+    return { error: `${file.name}: keine erkennbaren show-Kommandos gefunden — Datei übersprungen.` };
   }
 
-  const version = KLU.parsers.parseVersion(commands.version);
   const fallbackId = file.name.replace(/\.[^.]+$/, '');
+  let version;
+  let platformGuessed = false;
+
+  if (commands.version) {
+    version = KLU.parsers.parseVersion(commands.version);
+  } else {
+    // "show version" fehlt in der Datei -> Hostname aus der Prompt-Zeile, Plattform aus den
+    // vorhandenen Kommandonamen ableiten (z.B. "show ip arp" ist nexus-spezifisch).
+    platformGuessed = true;
+    version = {
+      hostname: promptHostname,
+      platform: KLU.parsers.inferPlatformFromCommandNames(text) || 'catalyst',
+      model: null
+    };
+  }
+
   const baseId = version.hostname || fallbackId;
   const id = uniqueSwitchId(baseId);
 
@@ -41,21 +92,52 @@ async function processFile(file) {
   const ipRouteConnected = commands.ipRoute ? KLU.parsers.parseIpRoute(commands.ipRoute, version.platform) : [];
   const ipInterfaceBrief = commands.ipInterfaceBrief ? KLU.parsers.parseIpInterfaceBrief(commands.ipInterfaceBrief) : [];
   const macTable = commands.macAddressTable ? KLU.parsers.parseMacAddressTable(commands.macAddressTable) : [];
+  const trunks = commands.interfacesTrunk ? KLU.parsers.parseInterfacesTrunk(commands.interfacesTrunk) : [];
+  const ipInterfaceFull = commands.ipInterfaceFull ? KLU.parsers.parseIpInterfaceFull(commands.ipInterfaceFull) : [];
+  const arpEntries = commands.arp ? KLU.parsers.parseArp(commands.arp) : [];
   const missingCommands = EXPECTED_COMMANDS.filter(k => !(k in commands));
 
   const sw = {
     id,
     hostname: version.hostname || fallbackId,
     platform: version.platform,
+    platformGuessed,
     model: version.model,
+    osVersion: version.osVersion,
     fileName: file.name,
     raw: commands,
-    parsed: { cdpNeighbors, portChannels, vlans, ipRouteConnected, ipInterfaceBrief, macTable },
+    parsed: { cdpNeighbors, portChannels, vlans, ipRouteConnected, ipInterfaceBrief, macTable, trunks, ipInterfaceFull, arpEntries },
     missingCommands,
     unrecognized
   };
 
   return { switch: sw };
+}
+
+// Plattform-Korrektur durch den User (Feature 11): betrifft nur "show ip route", da dessen
+// Parser-Variante (Catalyst/Nexus) vom Feld abhängt — alle anderen Parser sind formatgleich.
+function setSwitchPlatform(id, platform) {
+  const sw = KLU.state.switches.get(id);
+  if (!sw || sw.platform === platform) return;
+  sw.platform = platform;
+  sw.platformGuessed = false;
+  sw.parsed.ipRouteConnected = sw.raw.ipRoute ? KLU.parsers.parseIpRoute(sw.raw.ipRoute, platform) : [];
+  KLU.emit('switches:changed', null);
+}
+
+function renderMissingCommandsPopup(sw) {
+  if (!sw.missingCommands.length) return '';
+  const rows = sw.missingCommands.map(k => `
+    <div class="feature-impact-row"><code>${KLU.dom.escapeHtml(k)}</code><span>${KLU.dom.escapeHtml(COMMAND_FEATURE_IMPACT[k] || '')}</span></div>
+  `).join('');
+  return `
+    <span class="switch-warning switch-warning-hover">⚠ ${sw.missingCommands.length} fehlend
+      <div class="feature-impact-popup">
+        <strong>Fehlende Kommandos für ${KLU.dom.escapeHtml(sw.hostname)}:</strong>
+        ${rows}
+      </div>
+    </span>
+  `;
 }
 
 function renderSwitchList() {
@@ -70,10 +152,15 @@ function renderSwitchList() {
 
   list.innerHTML = switches.map(sw => `
     <div class="switch-row" data-id="${KLU.dom.escapeHtml(sw.id)}">
-      <span class="switch-platform badge badge-${sw.platform === 'nexus' ? 'nexus' : 'catalyst'}">${KLU.dom.escapeHtml(sw.platform)}</span>
+      <span class="switch-row-handle" draggable="true" title="Ziehen zum Umsortieren">⠿</span>
+      <select class="switch-platform-select badge-${sw.platform === 'nexus' ? 'nexus' : 'catalyst'}" data-id="${KLU.dom.escapeHtml(sw.id)}" title="Erkannte Plattform bestätigen oder korrigieren">
+        <option value="catalyst"${sw.platform === 'catalyst' ? ' selected' : ''}>Catalyst</option>
+        <option value="nexus"${sw.platform === 'nexus' ? ' selected' : ''}>Nexus</option>
+      </select>
       <span class="switch-hostname">${KLU.dom.escapeHtml(sw.hostname)}</span>
       <span class="switch-model">${KLU.dom.escapeHtml(sw.model) || '–'}</span>
-      ${sw.missingCommands.length ? `<span class="switch-warning" title="Fehlende Kommandos: ${KLU.dom.escapeHtml(sw.missingCommands.join(', '))}">⚠ ${sw.missingCommands.length} fehlend</span>` : ''}
+      ${sw.platformGuessed ? '<span class="switch-warning" title="Kein \'show version\' in der Datei — Plattform anhand der verwendeten Kommandonamen vermutet, bitte prüfen">⚠ Plattform vermutet</span>' : ''}
+      ${renderMissingCommandsPopup(sw)}
       <button class="btn-remove" data-id="${KLU.dom.escapeHtml(sw.id)}">Entfernen</button>
     </div>
   `).join('');
@@ -121,6 +208,37 @@ KLU.views.import = {
     list?.addEventListener('click', e => {
       const btn = e.target.closest('.btn-remove');
       if (btn) KLU.state.removeSwitch(btn.dataset.id);
+    });
+
+    list?.addEventListener('change', e => {
+      const select = e.target.closest('.switch-platform-select');
+      if (select) setSwitchPlatform(select.dataset.id, select.value);
+    });
+
+    // Sortierung der Import-Liste per Drag & Drop, Ziehgriff statt der ganzen Zeile, damit
+    // Klicks auf Plattform-Dropdown/Entfernen-Button nicht mit dem Drag-Start kollidieren.
+    list?.addEventListener('dragstart', e => {
+      const row = e.target.closest('.switch-row');
+      if (!row) return;
+      e.dataTransfer.setData('text/plain', row.dataset.id);
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    list?.addEventListener('dragover', e => {
+      const row = e.target.closest('.switch-row');
+      if (!row) return;
+      e.preventDefault();
+      row.classList.add('drag-over');
+    });
+    list?.addEventListener('dragleave', e => {
+      e.target.closest('.switch-row')?.classList.remove('drag-over');
+    });
+    list?.addEventListener('drop', e => {
+      const row = e.target.closest('.switch-row');
+      if (!row) return;
+      e.preventDefault();
+      row.classList.remove('drag-over');
+      const draggedId = e.dataTransfer.getData('text/plain');
+      KLU.state.reorderSwitches(draggedId, row.dataset.id);
     });
 
     KLU.on('switches:changed', renderSwitchList);

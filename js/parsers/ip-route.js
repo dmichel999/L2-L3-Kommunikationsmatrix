@@ -21,10 +21,18 @@ function parseIpRouteNexus(text) {
     if (!netMatch) continue;
     for (let j = i + 1; j < lines.length; j++) {
       const line = lines[j].trim();
-      if (!line || /^\d+\.\d+\.\d+\.\d+\/\d+,/.test(line)) break; // nächste Route ohne via -> abbrechen
+      if (!line) continue; // Leerzeile überspringen statt abzubrechen (manche Exporte fügen nach jeder Zeile eine ein)
+      if (/^\d+\.\d+\.\d+\.\d+\/\d+,/.test(line)) break; // nächste Route ohne via gefunden -> abbrechen
+
       const viaMatch = /^\*via\s+\S+,\s*([\w./-]+),/.exec(line);
       if (viaMatch) {
-        result.push({ network: netMatch[1], interface: viaMatch[1] });
+        // Nur "direct" (das eigentliche VLAN-Netz), nicht "local" (die eigene /32-Adresse
+        // des Routers auf diesem Interface) oder statische Routen über ein anderes Interface.
+        // Kein Zeilenende-Anker: manche NX-OS-Versionen hängen an "direct" noch weitere Felder
+        // an (z.B. Redistribution-Tags) — \b verhindert Fehltreffer wie "directive".
+        if (/,\s*direct\b/.test(line)) {
+          result.push({ network: netMatch[1], interface: viaMatch[1] });
+        }
         break;
       }
     }
