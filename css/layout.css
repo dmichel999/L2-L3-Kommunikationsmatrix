@@ -131,6 +131,19 @@
      Höhe behalten und scrollt bei Bedarf als Ganzes. */
 }
 
+#vlan-table-wrapper {
+  max-height: 280px;
+  overflow-y: auto;
+  margin-bottom: 8px;
+}
+
+/* Standardhöhe der drei rechten Detail-Panels (Netzwerk-Details/Trunk-Warnungen/
+   MAC-Adressen) — alle drei starten gleich groß, der Ziehgriff (siehe
+   collapsible-panel.js) setzt danach eine Inline-Höhe, die diesen Wert überschreibt. */
+.panel-body-resizable {
+  height: 180px;
+}
+
 .vlan-table-toolbar {
   display: flex;
   align-items: center;
