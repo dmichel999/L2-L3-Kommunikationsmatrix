@@ -103,3 +103,15 @@ IP Route Table for VRF "default"
     *via 10.10.10.2, Vlan10, [0/0], direct
 10.10.99.0/24, ubest/mbest: 1/0, attached
     *via 10.10.99.2, Vlan99, [0/0], direct
+
+CORE2# show hsrp
+Vlan10 - Group 10 (HSRP-V1)  (Vlan10)
+  Local state is Standby, priority 100 (Cfged 100)
+  Forwarding threshold(for vPC), lower: 1  upper: 100
+  Hellotime 3 sec, holdtime 10 sec
+  Virtual IP address is 10.10.10.254 (Cfged)
+  Active router is 10.10.10.1, priority 110
+  Standby router is local
+  Virtual mac address is 0000.0c07.ac0a (Default MAC)
+  2 state changes, last state change 3d02h
+  IP redundancy name is hsrp-Vl10-10 (default)

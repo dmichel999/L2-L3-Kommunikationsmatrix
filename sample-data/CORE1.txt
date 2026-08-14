@@ -240,3 +240,15 @@ Interface        Role Sts Cost      Prio.Nbr Type
 ---------------- ---- --- --------- -------- --------------------------------
 Eth1/1           Desg FWD 2         128.1    P2p
 Eth1/9           Desg FWD 4         128.9    P2p
+
+CORE1# show hsrp
+Vlan10 - Group 10 (HSRP-V1)  (Vlan10)
+  Local state is Active, priority 110 (Cfged 110)
+  Forwarding threshold(for vPC), lower: 1  upper: 110
+  Hellotime 3 sec, holdtime 10 sec
+  Virtual IP address is 10.10.10.254 (Cfged)
+  Active router is local
+  Standby router is 10.10.10.2, priority 100 expires in 00:00:09
+  Virtual mac address is 0000.0c07.ac0a (Default MAC)
+  2 state changes, last state change 3d02h
+  IP redundancy name is hsrp-Vl10-10 (default)

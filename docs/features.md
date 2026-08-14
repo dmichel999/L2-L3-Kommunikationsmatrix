@@ -30,6 +30,7 @@ Rein client-seitig (HTML/JS, kein Build-System, kein npm), analog `Config Anonym
 | Trunk/Native-VLAN | `show interfaces trunk` | `show interface trunk` |
 | ACL-Vorhandensein je SVI | `show ip interface` (voll, nicht `brief`) | `show ip interface` (voll, nicht `brief`) |
 | STP Root-Bridge/blockierte Ports | `show spanning-tree` | `show spanning-tree` |
+| FHRP-Rolle (Active/Standby) je SVI | `show standby` (HSRP) / `show vrrp` | `show hsrp` / `show vrrp` |
 
 ## Feature 1: Topologie-Grafik
 
@@ -62,7 +63,7 @@ Zeigt: Switch + Switchport für jede gelernte MAC-Adresse in diesem VLAN (aus `s
 
 ## Feature 4: Klick auf IP-Netz → SVI-Switch-Ansicht
 
-Zeigt, auf welchem Switch (und ggf. mehreren bei HSRP/VRRP) das VLAN-Interface für dieses Netz konfiguriert ist — abgeleitet aus derselben Quelle wie Feature 2.
+Zeigt, auf welchem Switch (und ggf. mehreren bei HSRP/VRRP) das VLAN-Interface für dieses Netz konfiguriert ist — abgeleitet aus derselben Quelle wie Feature 2. Sind für das VLAN zusätzlich `show standby`/`show hsrp`/`show vrrp`-Daten vorhanden, wird pro Switch die FHRP-Rolle ergänzt (z.B. "CORE1 (Active), CORE2 (Standby)") statt nur die reine Switch-Liste zu zeigen (siehe Feature 19).
 
 ## Feature 5: L3-Kommunikationsmatrix
 
@@ -132,9 +133,13 @@ Pro importiertem Switch in der Sidebar-Liste: Plattform-Badge ist jetzt ein Drop
 
 Neuer Parser `spanning-tree.js` für `show spanning-tree` (Catalyst + Nexus, identisches Format). Neues Panel "STP: Root-Bridge & blockierte Ports" (rechte Seite, unterhalb Trunk-Warnungen): pro VLAN, welcher importierte Switch die Root-Bridge ist (Abgleich über die Bridge-MAC-Adresse — meldet kein importierter Switch eine passende Adresse, wird "unbekannt (Adresse)" angezeigt statt es zu verschweigen) sowie eine Liste aller Ports mit STP-Status `BLK` (blockiert, typischer Loop-Präventionspunkt bei redundanten Links). Reine Anzeige, keine Bewertung, ob die Root-Bridge-Wahl "sinnvoll" ist (das erfordert Netzwerk-Kontextwissen, das die App nicht hat).
 
+## Feature 19: HSRP/VRRP Active/Standby-Rolle je SVI
+
+Neuer Parser `fhrp.js` für `show standby` (Catalyst HSRP), `show hsrp` (Nexus HSRP) und `show vrrp` (beide Plattformen) — alle drei teilen dasselbe Grundmuster ("VlanNN - Group G" + "state is <Wort>"), ein Parser genügt. Erweitert die bestehende Netzwerk-Details-Ansicht (Feature 4): bei mehreren SVIs für dasselbe Netz wird jetzt zusätzlich die gemeldete Rolle je Switch angezeigt (z.B. "CORE1 (Active), CORE2 (Standby)") statt nur die reine Switch-Liste. Bewusst kein neues Panel — die Detailtiefe ergänzt die bereits vorhandene "alle beteiligten Switches"-Anzeige direkt.
+
 ## Entschieden
 
-- **Mehrere SVIs pro Netz (HSRP/VRRP):** Alle beteiligten Switches anzeigen, keine automatische Aktiv/Standby-Erkennung.
+- **Mehrere SVIs pro Netz (HSRP/VRRP):** Alle beteiligten Switches anzeigen, seit Feature 19 zusätzlich mit Active/Standby-Rolle sofern `show standby`/`show hsrp`/`show vrrp` importiert wurde.
 - **Persistenz:** Keine — Analyse ist pro Sitzung flüchtig, kein Speichern des Analyse-Stands.
 - **L3-Matrix-Tiefe:** Nur Routing-Reachability über gemeinsame Switches, ACL nur als Flag. Volle Regelauswertung (`show ip interface` + `show access-lists` + Matching gegen Subnetze) ist deutlich aufwändiger und explizit nicht Teil dieses Feature-Pakets.
 - **Trunk-erlaubte-VLANs:** Als Roh-String übernommen statt Bereiche wie "1-4094" zu 4094 Einzelwerten zu expandieren — reine Anzeige, für die Mismatch-Prüfung wird nur das Native-VLAN ausgewertet.
@@ -143,7 +148,6 @@ Neuer Parser `spanning-tree.js` für `show spanning-tree` (Catalyst + Nexus, ide
 
 Bewusst zurückgestellt (nicht umgesetzt), für einen späteren Auftrag:
 
-- **HSRP/VRRP Active/Standby-Rolle je SVI** (`show standby`/`show vrrp`) — bestehende Lösung (alle beteiligten Switches anzeigen) funktioniert schon korrekt, es fehlt nur die Detailtiefe (wer ist aktiv).
 - **Freie/ungenutzte Ports** — Kapazitätsplanung ist ein anderer Anwendungsfall als "Kommunikationsmatrix".
 - **Interface-Fehler/Duplex-Mismatch** (`show interfaces`) — deckt sich mit dem vorhandenen Skill `network-interface-health`, eher dort lösen statt im Tool nachbauen.
 - **PDF/HTML-Report-Export** — nice-to-have für Kundenlieferung, aber nicht analysekritisch.

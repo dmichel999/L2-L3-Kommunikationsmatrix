@@ -52,6 +52,13 @@ Nur **CORE1** und **ACC5** enthalten `show spanning-tree`.
 - VLAN 1 hat auf CORE1 keinen eigenen `show spanning-tree`-Block → Root-Bridge für VLAN 1
   muss als "unbekannt (Adresse)" angezeigt werden, nicht als Fehler.
 
+## Erweiterung (HSRP-Testdaten)
+
+Nur **CORE1** und **CORE2** enthalten `show hsrp` — beide für VLAN 10 (Users), Gruppe 10,
+virtuelle IP 10.10.10.254. CORE1 meldet sich als Active (Priorität 110), CORE2 als Standby
+(Priorität 100). Klick auf das IP-Netz 10.10.10.0/24 in der VLAN-Tabelle muss in den
+Netzwerk-Details "CORE1 (Active), CORE2 (Standby)" zeigen statt nur die reine Switch-Liste.
+
 ## Import
 
 App öffnen → alle 10 `.txt`-Dateien aus diesem Ordner per Drag & Drop oder Datei-Auswahl importieren.

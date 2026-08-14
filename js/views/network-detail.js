@@ -1,5 +1,7 @@
 // Kunden LAN Überblick — IP-Netz-Ansicht für das ausgewählte Netz (Feature 4):
 // zeigt, auf welchem/welchen Switch(es) das VLAN-Interface für dieses Netz konfiguriert ist.
+// Bei mehreren SVIs (HSRP/VRRP) wird zusätzlich die Active/Standby-Rolle je Switch angezeigt,
+// sofern show standby/show hsrp/show vrrp importiert wurde (Backlog-Feature "FHRP-Rolle je SVI").
 KLU.views = KLU.views || {};
 
 function renderNetworkDetail() {
@@ -23,8 +25,13 @@ function renderNetworkDetail() {
     return;
   }
 
+  const fhrpForVlan = KLU.fhrpModel.build(KLU.state.getSwitches()).find(r => r.vlanId === vlanId);
   const switchNames = network.switches
-    .map(id => KLU.state.switches.get(id)?.hostname || id)
+    .map(id => {
+      const hostname = KLU.state.switches.get(id)?.hostname || id;
+      const fhrpState = fhrpForVlan?.entries.find(e => e.switchId === id)?.state;
+      return fhrpState ? `${hostname} (${fhrpState})` : hostname;
+    })
     .map(KLU.dom.escapeHtml)
     .join(', ');
   const maskHint = network.maskKnown
