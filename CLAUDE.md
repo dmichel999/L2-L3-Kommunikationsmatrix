@@ -11,6 +11,6 @@ Seit 2026-08-14 dual-remote (Kurskorrektur — vorher bewusst Gitea-only, abweic
 | Remote | URL |
 |---|---|
 | `origin` (GitHub) | `git@github.com:dmichel999/L2-L3-Kommunikationsmatrix.git` |
-| `bechtle-gitea` | `https://shdefbgsweb01.bechtle.net/git/denis.michel/Kunden-LAN--berblick.git` (Umbenennung auf Gitea-Seite ausstehend) |
+| `bechtle-gitea` | `https://shdefbgsweb01.bechtle.net/git/denis.michel/L2-L3-Kommunikationsmatrix.git` |
 
 Ehemaliger Projektname: "Kunden LAN Überblick" (bis 2026-08-14).
