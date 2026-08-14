@@ -4,6 +4,11 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/), Versionierun
 
 > Versionshistorie beginnt bei `0.1.0`, passend zum bereits im Code vorhandenen `KLU.version` (`js/core/namespace.js`) — dieses Dokument wurde nachträglich für ein bereits laufendes Projekt angelegt.
 
+## [0.8.0] - 2026-08-14
+
+### Added
+- Multi-Standort-Gruppierung: optionaler Toggle gruppiert Topologie-Knoten nach Hostname-Präfix (vor erstem "-"/"_"), visuell per Layout-Clusterung + Label-Suffix — funktioniert nur bei entsprechender Namenskonvention (dokumentierte Einschränkung)
+
 ## [0.7.0] - 2026-08-14
 
 ### Added

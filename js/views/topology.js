@@ -20,7 +20,10 @@ const DEVICE_TYPE_LABELS = {
   unknown: 'Unbekanntes Gerät'
 };
 
-function computeLayout(nodes, edges, width, height) {
+// groupMap (nodeId -> Gruppen-Label) ist optional: wenn gesetzt, werden Knoten derselben Gruppe
+// leicht zueinander gezogen und Knoten unterschiedlicher Gruppen leicht auseinandergedrückt, statt
+// eines komplett eigenen Cluster-Layout-Algorithmus (Multi-Standort-Gruppierung, siehe features.md).
+function computeLayout(nodes, edges, width, height, groupMap) {
   const positions = new Map(nodes.map(n => [n.id, { x: width / 2 + (Math.random() - 0.5) * 200, y: height / 2 + (Math.random() - 0.5) * 200 }]));
   const k = 110;
 
@@ -32,7 +35,11 @@ function computeLayout(nodes, edges, width, height) {
         const a = positions.get(nodes[i].id), b = positions.get(nodes[j].id);
         const dx = a.x - b.x, dy = a.y - b.y;
         const dist = Math.sqrt(dx * dx + dy * dy) || 0.01;
-        const force = (k * k) / dist;
+        let force = (k * k) / dist;
+        if (groupMap) {
+          const sameGroup = groupMap.get(nodes[i].id) === groupMap.get(nodes[j].id);
+          force *= sameGroup ? 0.3 : 1.6; // gleiche Gruppe näher zusammen, andere weiter auseinander
+        }
         const fx = (dx / dist) * force, fy = (dy / dist) * force;
         forces.get(nodes[i].id).x += fx; forces.get(nodes[i].id).y += fy;
         forces.get(nodes[j].id).x -= fx; forces.get(nodes[j].id).y -= fy;
@@ -62,10 +69,10 @@ function computeLayout(nodes, edges, width, height) {
   return positions;
 }
 
-function getPositions(nodes, edgesForLayout, width, height) {
-  const nodeIdsKey = nodes.map(n => n.id).sort().join(',');
+function getPositions(nodes, edgesForLayout, width, height, groupMap) {
+  const nodeIdsKey = nodes.map(n => n.id).sort().join(',') + (groupMap ? '|grouped' : '');
   if (cachedPositions && cachedNodeIds === nodeIdsKey) return cachedPositions;
-  cachedPositions = computeLayout(nodes, edgesForLayout, width, height);
+  cachedPositions = computeLayout(nodes, edgesForLayout, width, height, groupMap);
   cachedNodeIds = nodeIdsKey;
   return cachedPositions;
 }
@@ -184,7 +191,8 @@ function renderTopology() {
     return;
   }
 
-  const positions = getPositions(graph.nodes, graph.edgesAggregated, width, height);
+  const groupMap = KLU.state.siteGroupingActive ? KLU.siteGroupModel.buildNodeGroupMap(graph.nodes) : null;
+  const positions = getPositions(graph.nodes, graph.edgesAggregated, width, height, groupMap);
   const activeEdges = KLU.state.linkMode === 'individual' ? graph.edgesIndividual : graph.edgesAggregated;
   const edgesByPair = groupEdgesByPair(activeEdges);
 
@@ -256,7 +264,8 @@ function renderTopology() {
     const g = svgEl('g', { class: classes, transform: `translate(${pos.x},${pos.y})`, 'data-node-id': node.id });
     g.appendChild(nodeShapeElement(node.deviceType));
     const label = svgEl('text', { y: 36, 'text-anchor': 'middle', class: 'topology-node-label' });
-    label.textContent = node.hostname || node.id;
+    const groupSuffix = groupMap ? ` · ${groupMap.get(node.id)}` : '';
+    label.textContent = (node.hostname || node.id) + groupSuffix;
     g.appendChild(label);
     const title = svgEl('title', {});
     title.textContent = `${node.hostname || node.id} (${DEVICE_TYPE_LABELS[node.deviceType] || node.deviceType})`;
@@ -384,6 +393,9 @@ KLU.views.topology = {
     const failureSimToggle = document.getElementById('failure-sim-toggle');
     failureSimToggle?.addEventListener('change', () => KLU.state.setFailureSimActive(failureSimToggle.checked));
 
+    const siteGroupingToggle = document.getElementById('site-grouping-toggle');
+    siteGroupingToggle?.addEventListener('change', () => KLU.state.setSiteGroupingActive(siteGroupingToggle.checked));
+
     // Ansichtsoptionen (Aggregiert/Einzeln, Portbezeichnungen, Geräte-Typ-Legende/-Filter) in ein
     // Popover ausgelagert, statt permanent 2-3 Zeilen Toolbar-Höhe zu belegen (Nutzer-Feedback).
     const settingsToggle = document.getElementById('topology-settings-toggle');
@@ -432,6 +444,7 @@ KLU.views.topology = {
     KLU.on('portLabels:changed', renderTopology); // Feature 9: Portbezeichnungen an Kanten
     KLU.on('deviceTypeVisibility:changed', renderTopology); // Geräte-Typ-Filter in der Legende
     KLU.on('failureSim:changed', renderTopology); // Redundanz-/Ausfall-Simulation
+    KLU.on('siteGrouping:changed', renderTopology); // Multi-Standort-Gruppierung
 
     window.addEventListener('resize', renderTopology);
     if (svg) { initDrag(svg); initZoom(svg); }

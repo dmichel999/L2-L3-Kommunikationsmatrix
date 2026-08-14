@@ -9,7 +9,8 @@ KLU.state = {
   selectedSwitchFocus: null,
   hiddenDeviceTypes: new Set(),
   failureSimActive: false,
-  failureSimTarget: null // { type: 'node'|'edge', id: string } | null
+  failureSimTarget: null, // { type: 'node'|'edge', id: string } | null
+  siteGroupingActive: false
 };
 
 KLU.state.addSwitch = function (sw) {
@@ -66,6 +67,11 @@ KLU.state.setFailureSimTarget = function (target) {
   const same = current && target && current.type === target.type && current.id === target.id;
   KLU.state.failureSimTarget = same ? null : target;
   KLU.emit('failureSim:changed', KLU.state.failureSimTarget);
+};
+
+KLU.state.setSiteGroupingActive = function (value) {
+  KLU.state.siteGroupingActive = value;
+  KLU.emit('siteGrouping:changed', value);
 };
 
 // Verschiebt draggedId an die Position von targetId in der Import-Liste (Drag & Drop-Sortierung).

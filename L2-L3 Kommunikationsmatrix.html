@@ -92,6 +92,10 @@
                   <input type="checkbox" id="failure-sim-toggle">
                   🔌 Ausfall-Simulation
                 </label>
+                <label class="toggle-switch" title="Gruppiert Knoten nach Hostname-Präfix vor dem ersten &quot;-&quot;/&quot;_&quot; (z.B. &quot;FRA1-CORE1&quot; → Standort &quot;FRA1&quot;). Funktioniert nur, wenn eure Namenskonvention das abbildet.">
+                  <input type="checkbox" id="site-grouping-toggle">
+                  🏢 Standort-Gruppierung
+                </label>
                 <hr>
                 <span id="topology-legend" class="topology-legend"></span>
               </div>
@@ -219,6 +223,7 @@
 <script src="js/core/fhrp-model.js"></script>
 <script src="js/core/duplicate-model.js"></script>
 <script src="js/core/failure-sim-model.js"></script>
+<script src="js/core/site-group-model.js"></script>
 <script src="js/views/import.js"></script>
 <script src="js/views/topology.js"></script>
 <script src="js/views/vlan-table.js"></script>

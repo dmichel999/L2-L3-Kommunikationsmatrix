@@ -169,6 +169,12 @@ Nutzt bewusst dieselbe Kantenliste, die gerade angezeigt wird (`KLU.state.linkMo
 
 **Bewusste Vereinfachung:** reine Graph-Erreichbarkeit, keine Kenntnis von dynamischem Routing, STP-Konvergenzzeit oder tatsächlicher Bandbreite/Performance — die Frage ist ausschließlich "wer wäre danach noch über den bekannten Layer-2/Port-Channel-Pfad erreichbar", nicht "wie lange dauert der Failover" oder "welche Performance-Einbußen gäbe es".
 
+## Feature 26: Multi-Standort-Gruppierung
+
+Toggle "🏢 Standort-Gruppierung" in den Topologie-Ansichtsoptionen. `js/core/site-group-model.js` leitet je Knoten ein Gruppen-Label rein aus dem Hostname ab (alles vor dem ersten `-`/`_`, z.B. "FRA1-CORE1" → Gruppe "FRA1"); ist im Hostname kein Trenner vorhanden, wird **keine** Gruppierung erfunden — der Knoten bildet eine Einzel-Gruppe mit sich selbst (sichtbar am Label-Suffix, das dann identisch zum Hostname ist). Aktiv verändert es zwei Dinge: das Kraft-Layout zieht Knoten derselben Gruppe leicht zueinander und drückt unterschiedliche Gruppen leicht auseinander (`computeLayout()`), und jedes Knoten-Label bekommt das Gruppen-Label als Suffix angehängt (" · GRUPPE").
+
+**Bewusst fragile Heuristik (wie im Backlog vermerkt):** funktioniert nur, wenn die tatsächliche Kunden-Namenskonvention einen Standort-/Gebäude-Präfix vor einem Trenner enthält — bei Hostnamen ohne dieses Muster (wie im mitgelieferten `sample-data/`-Testdatensatz, der bewusst keine Standort-Präfixe nutzt) zeigt das Feature korrekterweise keine sichtbare Clusterung, das ist kein Bug. Keine Auswertung von CDP-Location-Daten (dafür wäre `show cdp neighbor detail`/`show cdp entry` nötig, ein anderes, aktuell nicht geparstes Kommando).
+
 ## Entschieden
 
 - **Mehrere SVIs pro Netz (HSRP/VRRP):** Alle beteiligten Switches anzeigen, seit Feature 19 zusätzlich mit Active/Standby-Rolle sofern `show standby`/`show hsrp`/`show vrrp` importiert wurde.
@@ -183,5 +189,4 @@ Bewusst zurückgestellt (nicht umgesetzt), für einen späteren Auftrag:
 - **Freie/ungenutzte Ports** — Kapazitätsplanung ist ein anderer Anwendungsfall als "Kommunikationsmatrix".
 - **Interface-Fehler/Duplex-Mismatch** (`show interfaces`) — deckt sich mit dem vorhandenen Skill `network-interface-health`, eher dort lösen statt im Tool nachbauen.
 - **Security-Hygiene-Checks** (ungenutzte Ports ohne Port-Security, VLAN 1 als Default in Nutzung, unautorisierte Trunks) — Scope-Überschneidung mit Skill `network-config-validation`, eher dort lösen statt im Tool nachbauen.
-- **Multi-Standort-Gruppierung** (Topologie nach Gebäude/Etage clustern) — fragile Heuristik, da Hostnamen-/CDP-Location-Konventionen je Kunde unterschiedlich sind.
 - **Anonymisierungs-Option** (analog Config Anonymizer) — nur nötig, falls eine Analyse mit Dritten geteilt wird; noch kein konkreter Bedarf.
