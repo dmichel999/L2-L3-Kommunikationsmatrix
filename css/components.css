@@ -192,6 +192,32 @@
 .topology-settings-popover.open { display: flex; }
 .topology-settings-popover hr { border: none; border-top: 1px solid var(--border); margin: 2px 0; width: 100%; }
 
+.panel-visibility-menu {
+  position: relative;
+}
+
+.panel-visibility-popover {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 30;
+  margin-top: 4px;
+  width: max-content;
+  max-width: min(280px, 90vw);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  padding: 10px 12px;
+  flex-direction: column;
+  gap: 6px;
+}
+.panel-visibility-popover.open { display: flex; }
+.panel-visibility-popover .toggle-switch { white-space: nowrap; }
+
+.panel-hidden { display: none; }
+
 .topology-legend {
   display: flex;
   flex-direction: column;

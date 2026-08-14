@@ -149,6 +149,10 @@ Neues Panel "Duplicate-Erkennung" (rechte Seite, unterhalb STP): nutzt ausschlie
 
 Reine Diagnose-Anzeige, keine automatische Bewertung, welcher der beiden Einträge "der richtige" ist.
 
+## Feature 22: Panel-Sichtbarkeits-Menü
+
+Button "☰ Panels" in der VLAN-Tabellen-Toolbar öffnet ein Popover mit einer Checkbox je rechtem Detail-Panel (MAC-Adressen/Trunk-Warnungen/STP/Duplicate-Erkennung/Netzwerk-Details) — bei wachsender Panel-Zahl sonst zu viel permanenter Platzverbrauch. Deaktivierte Panels werden komplett ausgeblendet (nicht nur eingeklappt wie beim bestehenden Collapse-Button). Reine UI-Präferenz ohne Kundendatenbezug → wie die Theme-Auswahl bewusst NICHT flüchtig, in `localStorage` gemerkt.
+
 ## Entschieden
 
 - **Mehrere SVIs pro Netz (HSRP/VRRP):** Alle beteiligten Switches anzeigen, seit Feature 19 zusätzlich mit Active/Standby-Rolle sofern `show standby`/`show hsrp`/`show vrrp` importiert wurde.

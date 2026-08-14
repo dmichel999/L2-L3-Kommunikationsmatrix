@@ -4,6 +4,12 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/), Versionierun
 
 > Versionshistorie beginnt bei `0.1.0`, passend zum bereits im Code vorhandenen `KLU.version` (`js/core/namespace.js`) — dieses Dokument wurde nachträglich für ein bereits laufendes Projekt angelegt.
 
+## [0.5.0] - 2026-08-14
+
+### Added
+- Panel-Sichtbarkeits-Menü ("☰ Panels"): rechte Detail-Panels einzeln ein-/ausblendbar, Präferenz in `localStorage` gemerkt
+- `index.html`-Weiterleitung für GitHub-Pages-Hosting (Repo-Wurzel-URL funktioniert jetzt ohne Umbenennung der Haupt-HTML-Datei)
+
 ## [0.4.0] - 2026-08-14
 
 ### Added

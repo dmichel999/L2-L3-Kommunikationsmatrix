@@ -101,11 +101,19 @@
         <div class="split-pane-right">
           <div class="vlan-table-toolbar">
             <h2>VLAN-Tabelle</h2>
-            <button id="vlan-csv-export">CSV exportieren</button>
+            <div class="vlan-table-toolbar-actions">
+              <button id="vlan-csv-export">CSV exportieren</button>
+              <div class="panel-visibility-menu">
+                <button id="panel-visibility-toggle" aria-expanded="false" title="Panels ein-/ausblenden">☰ Panels</button>
+                <div class="panel-visibility-popover" id="panel-visibility-popover">
+                  <div id="panel-visibility-list"></div>
+                </div>
+              </div>
+            </div>
           </div>
           <div id="vlan-table-wrapper"></div>
 
-          <div class="panel">
+          <div class="panel" data-panel-key="mac">
             <div class="panel-header">
               <button class="panel-collapse-btn" aria-expanded="true">▾</button>
               <h3>MAC-Adressen</h3>
@@ -114,7 +122,7 @@
             <div class="panel-resize-handle"></div>
           </div>
 
-          <div class="panel">
+          <div class="panel" data-panel-key="trunk">
             <div class="panel-header">
               <button class="panel-collapse-btn" aria-expanded="true">▾</button>
               <h3>Trunk-Warnungen</h3>
@@ -123,7 +131,7 @@
             <div class="panel-resize-handle"></div>
           </div>
 
-          <div class="panel">
+          <div class="panel" data-panel-key="stp">
             <div class="panel-header">
               <button class="panel-collapse-btn" aria-expanded="true">▾</button>
               <h3>STP: Root-Bridge &amp; blockierte Ports</h3>
@@ -132,7 +140,7 @@
             <div class="panel-resize-handle"></div>
           </div>
 
-          <div class="panel">
+          <div class="panel" data-panel-key="duplicate">
             <div class="panel-header">
               <button class="panel-collapse-btn" aria-expanded="true">▾</button>
               <h3>Duplicate-Erkennung</h3>
@@ -141,7 +149,7 @@
             <div class="panel-resize-handle"></div>
           </div>
 
-          <div class="panel">
+          <div class="panel" data-panel-key="network">
             <div class="panel-header">
               <button class="panel-collapse-btn" aria-expanded="true">▾</button>
               <h3>Netzwerk-Details</h3>
@@ -219,6 +227,7 @@
 <script src="js/views/collapsible-panel.js"></script>
 <script src="js/views/theme-toggle.js"></script>
 <script src="js/views/report-export.js"></script>
+<script src="js/views/panel-visibility.js"></script>
 <script src="js/views/tabs.js"></script>
 <script src="js/app.js"></script>
 </body>
