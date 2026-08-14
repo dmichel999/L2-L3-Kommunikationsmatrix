@@ -21,6 +21,12 @@ open "L2-L3 Kommunikationsmatrix.html"
 
 Bechtle-intern gibt es zusätzlich ein Gitea-Mirror-Repo (siehe `CLAUDE.md`).
 
+## Live-Version (GitHub Pages)
+
+Kein Klonen nötig: **https://dmichel999.github.io/L2-L3-Kommunikationsmatrix/** (sobald in den Repo-Einstellungen aktiviert, siehe unten) öffnet die App direkt im Browser — funktioniert wie die lokale Datei, es findet weiterhin kein Server-Roundtrip statt, jede Analyse läuft rein im Browser des Nutzers.
+
+**Einmalig aktivieren:** GitHub-Repo → Settings → Pages → "Deploy from a branch" → Branch `main`, Ordner `/ (root)` → Save. Das Repo ist öffentlich, die Seite ist danach für jeden mit dem Link erreichbar (wie das Repo selbst bereits ist) — es werden dabei nur die App-Dateien ausgeliefert, keine importierten/hochgeladenen Kundendaten.
+
 Zum Ausprobieren ohne eigene Daten: alle `.txt`-Dateien aus `sample-data/` importieren (Details siehe `sample-data/README.md`).
 
 ## Unterstützte Kommandos
