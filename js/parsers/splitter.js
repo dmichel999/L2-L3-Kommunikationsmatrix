@@ -12,7 +12,8 @@ const COMMAND_MAP = [
   { key: 'arp', patterns: [/^show arp$/i, /^show ip arp$/i] },
   { key: 'ipRoute', patterns: [/^show ip route$/i] },
   { key: 'interfacesTrunk', patterns: [/^show interfaces trunk$/i, /^show interface trunk$/i] },
-  { key: 'ipInterfaceFull', patterns: [/^show ip interface$/i] }
+  { key: 'ipInterfaceFull', patterns: [/^show ip interface$/i] },
+  { key: 'spanningTree', patterns: [/^show spanning-tree$/i] }
 ];
 
 // Prompt + Kommando-Echo, z.B. "SW1#show version" oder "SW1>show ip route".

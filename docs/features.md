@@ -29,6 +29,7 @@ Rein client-seitig (HTML/JS, kein Build-System, kein npm), analog `Config Anonym
 | Routing (für Netz+Maske) | `show ip route` | `show ip route` |
 | Trunk/Native-VLAN | `show interfaces trunk` | `show interface trunk` |
 | ACL-Vorhandensein je SVI | `show ip interface` (voll, nicht `brief`) | `show ip interface` (voll, nicht `brief`) |
+| STP Root-Bridge/blockierte Ports | `show spanning-tree` | `show spanning-tree` |
 
 ## Feature 1: Topologie-Grafik
 
@@ -127,6 +128,10 @@ Pro importiertem Switch in der Sidebar-Liste: Plattform-Badge ist jetzt ein Drop
 - **Toolbar-Redesign:** Aggregiert/Einzeln-Toggle, Portbezeichnungen-Toggle und die Geräte-Typ-Legende/-Filter waren permanent sichtbar und nahmen bei schmaleren Fenstern 2–3 Zeilen Höhe ein. Jetzt in einem Popover ("⚙ Ansicht", Klick öffnet/schließt, Klick außerhalb schließt) — die sichtbare Toolbar ist auf Titel + Zoom-Controls + Vollbild + den Popover-Button reduziert (eine Zeile, unabhängig von Fenstergröße).
 - **KI-Kennzeichnung (Pflicht laut `MASTERPROMPT.md` für alle `Cisco/`-Projekte):** Footer zeigt den Text-Hinweis "thought up by human, coded by ai" sowie das offizielle Bechtle-AI-Label als Icon (`assets/Bechtle_AI_Generated_Label_{light,dark}_EN.svg`, lokal vendort, keine externe Nachladung). Icon folgt automatisch dem aktuell dargestellten Theme (inkl. Live-Wechsel bei OS-Theme-Änderung im "System"-Modus). Gleicher Text-Kommentar zusätzlich in der Haupt-HTML-Datei und `js/app.js`.
 
+## Feature 18: STP Root-Bridge + blockierte Ports
+
+Neuer Parser `spanning-tree.js` für `show spanning-tree` (Catalyst + Nexus, identisches Format). Neues Panel "STP: Root-Bridge & blockierte Ports" (rechte Seite, unterhalb Trunk-Warnungen): pro VLAN, welcher importierte Switch die Root-Bridge ist (Abgleich über die Bridge-MAC-Adresse — meldet kein importierter Switch eine passende Adresse, wird "unbekannt (Adresse)" angezeigt statt es zu verschweigen) sowie eine Liste aller Ports mit STP-Status `BLK` (blockiert, typischer Loop-Präventionspunkt bei redundanten Links). Reine Anzeige, keine Bewertung, ob die Root-Bridge-Wahl "sinnvoll" ist (das erfordert Netzwerk-Kontextwissen, das die App nicht hat).
+
 ## Entschieden
 
 - **Mehrere SVIs pro Netz (HSRP/VRRP):** Alle beteiligten Switches anzeigen, keine automatische Aktiv/Standby-Erkennung.
@@ -138,7 +143,6 @@ Pro importiertem Switch in der Sidebar-Liste: Plattform-Badge ist jetzt ein Drop
 
 Bewusst zurückgestellt (nicht umgesetzt), für einen späteren Auftrag:
 
-- **STP Root-Bridge/blockierte Ports** (`show spanning-tree`) — wertvoll, aber eigener Parser + eigenes Konzept nötig, kein Nebeneffekt der aktuellen Features.
 - **HSRP/VRRP Active/Standby-Rolle je SVI** (`show standby`/`show vrrp`) — bestehende Lösung (alle beteiligten Switches anzeigen) funktioniert schon korrekt, es fehlt nur die Detailtiefe (wer ist aktiv).
 - **Freie/ungenutzte Ports** — Kapazitätsplanung ist ein anderer Anwendungsfall als "Kommunikationsmatrix".
 - **Interface-Fehler/Duplex-Mismatch** (`show interfaces`) — deckt sich mit dem vorhandenen Skill `network-interface-health`, eher dort lösen statt im Tool nachbauen.

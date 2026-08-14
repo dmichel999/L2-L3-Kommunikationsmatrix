@@ -125,6 +125,15 @@
           <div class="panel">
             <div class="panel-header">
               <button class="panel-collapse-btn" aria-expanded="true">▾</button>
+              <h3>STP: Root-Bridge &amp; blockierte Ports</h3>
+            </div>
+            <div class="panel-body panel-body-resizable" id="stp-panel"></div>
+            <div class="panel-resize-handle"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <button class="panel-collapse-btn" aria-expanded="true">▾</button>
               <h3>Netzwerk-Details</h3>
             </div>
             <div class="panel-body panel-body-resizable" id="network-detail-panel"></div>
@@ -173,17 +182,20 @@
 <script src="js/parsers/interfaces-trunk.js"></script>
 <script src="js/parsers/mac-table.js"></script>
 <script src="js/parsers/arp.js"></script>
+<script src="js/parsers/spanning-tree.js"></script>
 <script src="js/parsers/docx.js"></script>
 <script src="js/core/vlan-model.js"></script>
 <script src="js/core/mac-model.js"></script>
 <script src="js/core/trunk-model.js"></script>
 <script src="js/core/reachability-model.js"></script>
+<script src="js/core/stp-model.js"></script>
 <script src="js/views/import.js"></script>
 <script src="js/views/topology.js"></script>
 <script src="js/views/vlan-table.js"></script>
 <script src="js/views/mac-detail.js"></script>
 <script src="js/views/network-detail.js"></script>
 <script src="js/views/trunk-panel.js"></script>
+<script src="js/views/stp-panel.js"></script>
 <script src="js/views/reachability-matrix.js"></script>
 <script src="js/views/version-overview.js"></script>
 <script src="js/views/dashboard-stats.js"></script>

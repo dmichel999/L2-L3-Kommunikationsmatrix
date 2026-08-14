@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   KLU.views.macDetail.init();
   KLU.views.networkDetail.init();
   KLU.views.trunkPanel.init();
+  KLU.views.stpPanel.init();
   KLU.views.reachabilityMatrix.init();
   KLU.views.versionOverview.init();
   KLU.views.dashboardStats.init();

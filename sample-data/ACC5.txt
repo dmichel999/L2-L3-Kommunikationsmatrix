@@ -89,3 +89,84 @@ Gateway of last resort is not set
 
 C        10.10.99.0/24 is directly connected, Vlan99
 L        10.10.99.15/32 is directly connected, Vlan99
+
+ACC5#show spanning-tree
+VLAN0001
+  Spanning tree enabled protocol rstp
+  Root ID    Priority    24577
+             Address     0011.2233.0001
+             Cost        4
+             Port        1 (GigabitEthernet1/0/1)
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+
+  Bridge ID  Priority    32769  (priority 32768 sys-id-ext 1)
+             Address     0011.2233.0055
+
+Interface        Role Sts Cost      Prio.Nbr Type
+---------------- ---- --- --------- -------- --------------------------------
+Gi1/0/1          Root FWD 4         128.1    P2p
+Gi1/0/2          Altn BLK 4         128.2    P2p
+
+VLAN0010
+  Spanning tree enabled protocol rstp
+  Root ID    Priority    24586
+             Address     0011.2233.0001
+             Cost        4
+             Port        1 (GigabitEthernet1/0/1)
+
+  Bridge ID  Priority    32778  (priority 32768 sys-id-ext 10)
+             Address     0011.2233.0055
+
+Interface        Role Sts Cost      Prio.Nbr Type
+---------------- ---- --- --------- -------- --------------------------------
+Gi1/0/1          Root FWD 4         128.1    P2p
+Gi1/0/2          Altn BLK 4         128.2    P2p
+Gi1/0/15         Desg FWD 4         128.15   P2p Edge
+Gi1/0/16         Desg FWD 4         128.16   P2p Edge
+
+VLAN0030
+  Spanning tree enabled protocol rstp
+  Root ID    Priority    24606
+             Address     0011.2233.0001
+             Cost        4
+             Port        1 (GigabitEthernet1/0/1)
+
+  Bridge ID  Priority    32798  (priority 32768 sys-id-ext 30)
+             Address     0011.2233.0055
+
+Interface        Role Sts Cost      Prio.Nbr Type
+---------------- ---- --- --------- -------- --------------------------------
+Gi1/0/1          Root FWD 4         128.1    P2p
+Gi1/0/2          Altn BLK 4         128.2    P2p
+Gi1/0/18         Desg FWD 4         128.18   P2p Edge
+
+VLAN0040
+  Spanning tree enabled protocol rstp
+  Root ID    Priority    24616
+             Address     0011.2233.0001
+             Cost        4
+             Port        1 (GigabitEthernet1/0/1)
+
+  Bridge ID  Priority    32808  (priority 32768 sys-id-ext 40)
+             Address     0011.2233.0055
+
+Interface        Role Sts Cost      Prio.Nbr Type
+---------------- ---- --- --------- -------- --------------------------------
+Gi1/0/1          Root FWD 4         128.1    P2p
+Gi1/0/2          Altn BLK 4         128.2    P2p
+Gi1/0/19         Desg FWD 4         128.19   P2p Edge
+
+VLAN0099
+  Spanning tree enabled protocol rstp
+  Root ID    Priority    24675
+             Address     0011.2233.0001
+             Cost        4
+             Port        1 (GigabitEthernet1/0/1)
+
+  Bridge ID  Priority    32867  (priority 32768 sys-id-ext 99)
+             Address     0011.2233.0055
+
+Interface        Role Sts Cost      Prio.Nbr Type
+---------------- ---- --- --------- -------- --------------------------------
+Gi1/0/1          Root FWD 4         128.1    P2p
+Gi1/0/2          Altn BLK 4         128.2    P2p

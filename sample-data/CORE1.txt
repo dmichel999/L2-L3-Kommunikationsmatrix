@@ -166,3 +166,77 @@ Vlan40, Interface status: protocol-up/link-up/admin-up, iod: 87
 Vlan99, Interface status: protocol-up/link-up/admin-up, iod: 88
   IP address: 10.10.99.1, IP subnet: 10.10.99.0/24
   IP broadcast address: 255.255.255.255
+
+CORE1# show spanning-tree
+VLAN0010
+  Spanning tree enabled protocol rstp
+  Root ID    Priority    24586
+             Address     0011.2233.0001
+             This bridge is the root
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+
+  Bridge ID  Priority    24586  (priority 24576 sys-id-ext 10)
+             Address     0011.2233.0001
+             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+             Aging Time  300 sec
+
+Interface        Role Sts Cost      Prio.Nbr Type
+---------------- ---- --- --------- -------- --------------------------------
+Eth1/1           Desg FWD 2         128.1    P2p
+Eth1/3           Desg FWD 4         128.3    P2p
+Eth1/9           Desg FWD 4         128.9    P2p
+
+VLAN0020
+  Spanning tree enabled protocol rstp
+  Root ID    Priority    24596
+             Address     0011.2233.0001
+             This bridge is the root
+
+  Bridge ID  Priority    24596  (priority 24576 sys-id-ext 20)
+             Address     0011.2233.0001
+
+Interface        Role Sts Cost      Prio.Nbr Type
+---------------- ---- --- --------- -------- --------------------------------
+Eth1/1           Desg FWD 2         128.1    P2p
+
+VLAN0030
+  Spanning tree enabled protocol rstp
+  Root ID    Priority    24606
+             Address     0011.2233.0001
+             This bridge is the root
+
+  Bridge ID  Priority    24606  (priority 24576 sys-id-ext 30)
+             Address     0011.2233.0001
+
+Interface        Role Sts Cost      Prio.Nbr Type
+---------------- ---- --- --------- -------- --------------------------------
+Eth1/1           Desg FWD 2         128.1    P2p
+Eth1/9           Desg FWD 4         128.9    P2p
+
+VLAN0040
+  Spanning tree enabled protocol rstp
+  Root ID    Priority    24616
+             Address     0011.2233.0001
+             This bridge is the root
+
+  Bridge ID  Priority    24616  (priority 24576 sys-id-ext 40)
+             Address     0011.2233.0001
+
+Interface        Role Sts Cost      Prio.Nbr Type
+---------------- ---- --- --------- -------- --------------------------------
+Eth1/1           Desg FWD 2         128.1    P2p
+Eth1/9           Desg FWD 4         128.9    P2p
+
+VLAN0099
+  Spanning tree enabled protocol rstp
+  Root ID    Priority    24675
+             Address     0011.2233.0001
+             This bridge is the root
+
+  Bridge ID  Priority    24675  (priority 24576 sys-id-ext 99)
+             Address     0011.2233.0001
+
+Interface        Role Sts Cost      Prio.Nbr Type
+---------------- ---- --- --------- -------- --------------------------------
+Eth1/1           Desg FWD 2         128.1    P2p
+Eth1/9           Desg FWD 4         128.9    P2p

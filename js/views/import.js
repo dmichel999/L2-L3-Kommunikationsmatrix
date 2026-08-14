@@ -1,7 +1,7 @@
 // Kunden LAN Überblick — Import-View: Mehrfach-Datei-Upload, Parsing, Switch-Liste
 KLU.views = KLU.views || {};
 
-const EXPECTED_COMMANDS = ['version', 'cdpNeighbor', 'portChannel', 'vlan', 'macAddressTable', 'ipInterfaceBrief', 'arp', 'ipRoute', 'interfacesTrunk', 'ipInterfaceFull'];
+const EXPECTED_COMMANDS = ['version', 'cdpNeighbor', 'portChannel', 'vlan', 'macAddressTable', 'ipInterfaceBrief', 'arp', 'ipRoute', 'interfacesTrunk', 'ipInterfaceFull', 'spanningTree'];
 
 // Für den Hover-Popup bei fehlenden Kommandos (Feature 11 der Erweiterung, siehe features.md):
 // welches Feature/welche Ansicht ist ohne dieses Kommando für diesen Switch eingeschränkt.
@@ -15,7 +15,8 @@ const COMMAND_FEATURE_IMPACT = {
   arp: 'Globale Suche: IP-Suche über ARP für diesen Switch liefert keine Treffer',
   ipRoute: 'VLAN-Tabelle/Matrix: IP-Netz+Maske für SVIs dieses Switches nicht ermittelbar',
   interfacesTrunk: 'Trunk-Ansicht: Native-VLAN-Mismatch-Prüfung für Links dieses Switches nicht möglich',
-  ipInterfaceFull: 'Kommunikationsmatrix: ACL-Hinweis-Flag für SVIs dieses Switches nicht verfügbar'
+  ipInterfaceFull: 'Kommunikationsmatrix: ACL-Hinweis-Flag für SVIs dieses Switches nicht verfügbar',
+  spanningTree: 'STP-Ansicht: Root-Bridge-Erkennung und blockierte Ports für diesen Switch nicht verfügbar'
 };
 
 function readFileAsText(file) {
@@ -95,6 +96,7 @@ async function processFile(file) {
   const trunks = commands.interfacesTrunk ? KLU.parsers.parseInterfacesTrunk(commands.interfacesTrunk) : [];
   const ipInterfaceFull = commands.ipInterfaceFull ? KLU.parsers.parseIpInterfaceFull(commands.ipInterfaceFull) : [];
   const arpEntries = commands.arp ? KLU.parsers.parseArp(commands.arp) : [];
+  const spanningTree = commands.spanningTree ? KLU.parsers.parseSpanningTree(commands.spanningTree) : [];
   const missingCommands = EXPECTED_COMMANDS.filter(k => !(k in commands));
 
   const sw = {
@@ -106,7 +108,7 @@ async function processFile(file) {
     osVersion: version.osVersion,
     fileName: file.name,
     raw: commands,
-    parsed: { cdpNeighbors, portChannels, vlans, ipRouteConnected, ipInterfaceBrief, macTable, trunks, ipInterfaceFull, arpEntries },
+    parsed: { cdpNeighbors, portChannels, vlans, ipRouteConnected, ipInterfaceBrief, macTable, trunks, ipInterfaceFull, arpEntries, spanningTree },
     missingCommands,
     unrecognized
   };

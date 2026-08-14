@@ -40,6 +40,18 @@ Import-Feedback-Panel (fehlende Kommandos je Switch) realistisch zu testen.
 - **ACL-Hinweis-Flag:** CORE1 VLAN 40 (WiFi) hat laut `show ip interface` eine Access-List
   (`ACL_WIFI_GUEST`) — muss in der L3-Kommunikationsmatrix als ⚠ ACL markiert werden.
 
+## Erweiterung (STP-Testdaten)
+
+Nur **CORE1** und **ACC5** enthalten `show spanning-tree`.
+
+- CORE1 ist laut eigener Bridge-Adresse für alle VLANs (10/20/30/40/99) die Root-Bridge.
+- ACC5 hängt sowohl an CORE1 (Gi1/0/1, Root/FWD) als auch an CORE2 (Gi1/0/2) — ein echter
+  physischer Loop (CORE1↔CORE2 zusätzlich über Po1 verbunden). Gi1/0/2 ist daher für alle
+  VLANs, die ACC5 führt (1/10/30/40/99), als Altn/BLK markiert — muss im STP-Panel als
+  blockierter Port bei ACC5 auftauchen.
+- VLAN 1 hat auf CORE1 keinen eigenen `show spanning-tree`-Block → Root-Bridge für VLAN 1
+  muss als "unbekannt (Adresse)" angezeigt werden, nicht als Fehler.
+
 ## Import
 
 App öffnen → alle 10 `.txt`-Dateien aus diesem Ordner per Drag & Drop oder Datei-Auswahl importieren.
