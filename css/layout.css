@@ -44,6 +44,7 @@
 }
 
 .app-header h1 { flex-shrink: 0; }
+#report-export-btn { flex-shrink: 0; }
 
 .app-sidebar {
   grid-area: sidebar;

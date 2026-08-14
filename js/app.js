@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   KLU.views.sidebarResize.init();
   KLU.views.collapsiblePanels.init('.panel');
   KLU.views.themeToggle.init();
+  KLU.views.reportExport.init();
   KLU.views.tabs.init();
 
   const footerVersion = document.getElementById('app-footer-version');

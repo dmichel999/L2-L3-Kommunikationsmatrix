@@ -1,6 +1,6 @@
 // Kunden LAN Überblick — Global Namespace + Event Bus
 const KLU = {
-  version: '0.2.0',
+  version: '0.3.0',
   _events: {},
 
   on(event, fn) {

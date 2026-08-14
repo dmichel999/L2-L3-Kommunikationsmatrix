@@ -4,6 +4,20 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/), Versionierun
 
 > Versionshistorie beginnt bei `0.1.0`, passend zum bereits im Code vorhandenen `KLU.version` (`js/core/namespace.js`) — dieses Dokument wurde nachträglich für ein bereits laufendes Projekt angelegt.
 
+## [0.3.0] - 2026-08-14
+
+### Added
+- STP Root-Bridge- und blockierte-Ports-Erkennung (`show spanning-tree`, neues Panel)
+- HSRP/VRRP Active/Standby-Rolle je SVI (`show standby`/`show hsrp`/`show vrrp`, erweitert die Netzwerk-Details-Ansicht)
+- PDF/HTML-Report-Export (eigenständige HTML-Datei, druckbar zu PDF, kein PDF-Generator-Vendor-Paket)
+
+### Changed
+- Rechte Panel-Reihenfolge: VLAN-Tabelle → MAC-Adressen → Trunk-Warnungen → STP → Netzwerk-Details
+- VLAN-Tabelle und die drei Detail-Panels haben jetzt eine begrenzte bzw. gleiche Standardhöhe (vorher: VLAN-Tabelle wuchs unbegrenzt und verdrängte die Panels)
+
+### Fixed
+- Netzwerk-Details/Trunk-Warnungen/MAC-Adressen konnten bei vielen VLANs auf 0px zusammengedrückt werden (`.split-pane-right` war fälschlich ein Flex-Container, `.panel` hatte durch `overflow:hidden` keine Mindesthöhe mehr)
+
 ## [0.2.0] - 2026-08-13
 
 ### Added
