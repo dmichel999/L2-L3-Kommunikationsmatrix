@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — FHRP-Modell: fasst HSRP/VRRP-Status aller Switches je VLAN zusammen,
+// L2-L3 Kommunikationsmatrix — FHRP-Modell: fasst HSRP/VRRP-Status aller Switches je VLAN zusammen,
 // damit die Netzwerk-Details-Ansicht (Feature 4) bei Mehrfach-SVI-Netzen (HSRP/VRRP) zusätzlich
 // zeigen kann, welcher Switch gerade aktiv ist.
 KLU.fhrpModel = {};

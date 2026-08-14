@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — Parser für "show etherchannel summary" (Catalyst) und
+// L2-L3 Kommunikationsmatrix — Parser für "show etherchannel summary" (Catalyst) und
 // "show port-channel summary" (Nexus). Beide Formate: Gruppe + Po-ID(Flags) + Protokoll/Typ
 // + Liste "Port(Flag)". Mitglieder können auf Folgezeilen umbrechen (ohne Gruppen-Präfix).
 KLU.parsers = KLU.parsers || {};

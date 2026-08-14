@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — MAC-Adressen-Ansicht für das ausgewählte VLAN (Feature 3):
+// L2-L3 Kommunikationsmatrix — MAC-Adressen-Ansicht für das ausgewählte VLAN (Feature 3):
 // Switch/Port je MAC-Adresse, ohne Uplinks zwischen Switches und ohne SVI-eigene MACs.
 KLU.views = KLU.views || {};
 

@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — Trunk-Panel (Feature 6 der Erweiterung): Native-VLAN-Mismatch-Warnungen
+// L2-L3 Kommunikationsmatrix — Trunk-Panel (Feature 6 der Erweiterung): Native-VLAN-Mismatch-Warnungen
 // zwischen bekannten Trunk-Links, Erweiterung der VLAN-Tabellen-Ansicht.
 KLU.views = KLU.views || {};
 

@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — generischer Split-Pane-Resizer (Feature 7 der Erweiterung): verstellt
+// L2-L3 Kommunikationsmatrix — generischer Split-Pane-Resizer (Feature 7 der Erweiterung): verstellt
 // die Breite zwischen dem Element links vom Resizer und dem Rest der Flex-Zeile per Drag.
 KLU.views = KLU.views || {};
 

@@ -1,10 +1,10 @@
-# Architektur — Kunden LAN Überblick
+# Architektur — L2-L3 Kommunikationsmatrix
 
 ## 1. Technische Entscheidungen
 
 | Entscheidung | Begründung |
 |---|---|
-| **Kein Framework, kein Build-System** | Ordner öffnen (`Kunden LAN Überblick.html` via `file://`) → läuft. Kein npm, kein Bundler. |
+| **Kein Framework, kein Build-System** | Ordner öffnen (`L2-L3 Kommunikationsmatrix.html` via `file://`) → läuft. Kein npm, kein Bundler. |
 | **Namespace-Pattern statt ES-Module** | ES-Module brauchen einen HTTP-Server (CORS-Restriktionen bei `file://`), klassische `<script>`-Tags nicht. |
 | **Ein globales Objekt `KLU`, alle `<script>`-Tags teilen einen Scope** | Jede Datei erweitert `KLU.*`. Das bedeutet: `const`/`let`-Namen auf Modul-Ebene müssen projektweit eindeutig sein (siehe Abschnitt 4) — es gibt keine echte Modul-Isolation. |
 | **Event-Bus (`KLU.on`/`KLU.emit`) statt direkter Kopplung** | Views reagieren auf Zustandsänderungen (`switches:changed`, `vlan:selected`, …), ohne sich gegenseitig zu kennen. Neue Views lassen sich anhängen, ohne bestehende zu ändern. |
@@ -14,7 +14,7 @@
 ## 2. Dateistruktur
 
 ```
-├── Kunden LAN Überblick.html   Einstiegspunkt, Script-Tags in Ladereihenfolge, HTML-Grundgerüst
+├── L2-L3 Kommunikationsmatrix.html   Einstiegspunkt, Script-Tags in Ladereihenfolge, HTML-Grundgerüst
 ├── js/
 │   ├── core/                   Datenmodelle + App-weite Infrastruktur (state, theme, topology-graph, ...)
 │   ├── parsers/                Ein Parser pro show-Kommando (+ Splitter, Spalten-/Port-Helfer)

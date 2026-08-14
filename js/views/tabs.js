@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — Umschalter zwischen den Hauptansichten (Topologie / VLAN-Tabelle)
+// L2-L3 Kommunikationsmatrix — Umschalter zwischen den Hauptansichten (Topologie / VLAN-Tabelle)
 KLU.views = KLU.views || {};
 
 KLU.views.tabs = {

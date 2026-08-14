@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — Parser für "show cdp neighbor" (Catalyst + Nexus)
+// L2-L3 Kommunikationsmatrix — Parser für "show cdp neighbor" (Catalyst + Nexus)
 // Fixed-width Spaltenparser, da Device-ID bei Überlänge auf eigene Zeile umbricht
 // (identisches Verhalten auf IOS und NX-OS).
 KLU.parsers = KLU.parsers || {};

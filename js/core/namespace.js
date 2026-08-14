@@ -1,6 +1,6 @@
-// Kunden LAN Überblick — Global Namespace + Event Bus
+// L2-L3 Kommunikationsmatrix — Global Namespace + Event Bus
 const KLU = {
-  version: '0.3.0',
+  version: '0.4.0',
   _events: {},
 
   on(event, fn) {

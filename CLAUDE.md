@@ -1,4 +1,4 @@
-# Kunden LAN Überblick — Projektkontext
+# L2-L3 Kommunikationsmatrix — Projektkontext
 
 ## Überblick
 
@@ -6,8 +6,11 @@ Browser-basiertes Analyse-Tool für Kunden-LANs (Catalyst/Nexus) aus `show`-Komm
 
 ## Repo-Hosting
 
-**Nur Bechtle Gitea**, kein GitHub-Remote (bewusste Entscheidung, abweichend von den übrigen Cisco-Projekten):
+Seit 2026-08-14 dual-remote (Kurskorrektur — vorher bewusst Gitea-only, abweichend von den übrigen Cisco-Projekten):
 
 | Remote | URL |
 |---|---|
-| `bechtle-gitea` | `https://shdefbgsweb01.bechtle.net/git/denis.michel/Kunden-LAN--berblick.git` |
+| `origin` (GitHub) | `git@github.com:dmichel999/L2-L3-Kommunikationsmatrix.git` |
+| `bechtle-gitea` | `https://shdefbgsweb01.bechtle.net/git/denis.michel/Kunden-LAN--berblick.git` (Umbenennung auf Gitea-Seite ausstehend) |
+
+Ehemaliger Projektname: "Kunden LAN Überblick" (bis 2026-08-14).

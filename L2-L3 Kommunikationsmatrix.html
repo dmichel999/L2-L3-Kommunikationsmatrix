@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'self';">
-<title>Kunden LAN Überblick</title>
+<title>L2-L3 Kommunikationsmatrix</title>
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/layout.css">
 <link rel="stylesheet" href="css/components.css">
@@ -14,7 +14,7 @@
 
 <div class="app">
   <header class="app-header">
-    <h1>Kunden LAN Überblick</h1>
+    <h1>L2-L3 Kommunikationsmatrix</h1>
     <div id="dashboard-stats" class="dashboard-stats"></div>
     <div class="global-search">
       <input type="text" id="global-search-input" placeholder="MAC, IP oder Hostname suchen …">
@@ -135,6 +135,15 @@
           <div class="panel">
             <div class="panel-header">
               <button class="panel-collapse-btn" aria-expanded="true">▾</button>
+              <h3>Duplicate-Erkennung</h3>
+            </div>
+            <div class="panel-body panel-body-resizable" id="duplicate-panel"></div>
+            <div class="panel-resize-handle"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <button class="panel-collapse-btn" aria-expanded="true">▾</button>
               <h3>Netzwerk-Details</h3>
             </div>
             <div class="panel-body panel-body-resizable" id="network-detail-panel"></div>
@@ -192,6 +201,7 @@
 <script src="js/core/reachability-model.js"></script>
 <script src="js/core/stp-model.js"></script>
 <script src="js/core/fhrp-model.js"></script>
+<script src="js/core/duplicate-model.js"></script>
 <script src="js/views/import.js"></script>
 <script src="js/views/topology.js"></script>
 <script src="js/views/vlan-table.js"></script>
@@ -199,6 +209,7 @@
 <script src="js/views/network-detail.js"></script>
 <script src="js/views/trunk-panel.js"></script>
 <script src="js/views/stp-panel.js"></script>
+<script src="js/views/duplicate-panel.js"></script>
 <script src="js/views/reachability-matrix.js"></script>
 <script src="js/views/version-overview.js"></script>
 <script src="js/views/dashboard-stats.js"></script>

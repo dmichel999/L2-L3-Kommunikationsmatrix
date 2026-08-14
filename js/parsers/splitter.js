@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — Splitter: rohe Terminal-Session-Textdatei -> benannte Kommando-Blöcke
+// L2-L3 Kommunikationsmatrix — Splitter: rohe Terminal-Session-Textdatei -> benannte Kommando-Blöcke
 KLU.parsers = KLU.parsers || {};
 
 // Reihenfolge egal, mehrere Patterns pro Key falls Catalyst/Nexus-Syntax abweicht.

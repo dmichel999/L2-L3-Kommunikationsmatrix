@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — Parser für "show ip interface brief". Catalyst und Nexus haben
+// L2-L3 Kommunikationsmatrix — Parser für "show ip interface brief". Catalyst und Nexus haben
 // unterschiedliche Spaltenlayouts, aber in beiden stehen Interface und IP-Adresse als die
 // ersten beiden whitespace-getrennten Felder — das reicht uns, den Rest (Status) ignorieren wir.
 KLU.parsers = KLU.parsers || {};

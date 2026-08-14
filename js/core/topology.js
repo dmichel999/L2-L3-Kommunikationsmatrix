@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — Topologie-Graph aus CDP-Nachbarschaften + Port-Channel-Zuordnung
+// L2-L3 Kommunikationsmatrix — Topologie-Graph aus CDP-Nachbarschaften + Port-Channel-Zuordnung
 // aller importierten Switches. Liefert Knoten + Kanten in aggregierter und einzelner Form.
 KLU.topology = {};
 

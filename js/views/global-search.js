@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — Globale Suche (Feature 5 der Erweiterung): MAC/IP/Hostname eingeben ->
+// L2-L3 Kommunikationsmatrix — Globale Suche (Feature 5 der Erweiterung): MAC/IP/Hostname eingeben ->
 // direkt zeigen, auf welchem Switch/Port/VLAN das auftaucht. IP-Suche prüft zuerst die
 // VLAN-Interface-IPs (SVIs), danach ARP-Einträge (Endgeräte) und löst deren MAC zusätzlich über
 // die MAC-Tabelle zu Switch/Port/VLAN auf.

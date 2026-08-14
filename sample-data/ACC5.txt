@@ -82,6 +82,7 @@ Vlan99                 10.10.99.15     YES manual up                    up
 ACC5#show arp
 Protocol  Address          Age (min)  Hardware Addr   Type   Interface
 Internet  10.10.99.15              8   0011.2233.4400  ARPA   Vlan99
+Internet  10.10.50.50              3   0011.2233.9902  ARPA   Vlan10
 
 ACC5#show ip route
 Codes: L - local, C - connected, S - static

@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — VLAN-Tabelle: VLAN-ID/Name, IP-Netz(e) je SVI-Switch. "Switches mit
+// L2-L3 Kommunikationsmatrix — VLAN-Tabelle: VLAN-ID/Name, IP-Netz(e) je SVI-Switch. "Switches mit
 // VLAN" ist nicht als eigene Spalte sichtbar (bewusst entfernt, Platzgrund) — bleibt aber im
 // CSV-Export enthalten und ist über Klick auf ein IP-Netz weiterhin abrufbar (Feature 4).
 KLU.views = KLU.views || {};

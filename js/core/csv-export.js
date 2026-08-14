@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — CSV-Export-Helfer, von VLAN-Tabelle und MAC-Ansicht aus aufrufbar.
+// L2-L3 Kommunikationsmatrix — CSV-Export-Helfer, von VLAN-Tabelle und MAC-Ansicht aus aufrufbar.
 // Semikolon als Trennzeichen (Excel-DE-Konvention), UTF-8 BOM, damit Excel Umlaute korrekt zeigt.
 KLU.csvExport = {};
 

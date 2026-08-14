@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — Parser für "show ip interface" (voll, nicht "brief"). Liefert pro
+// L2-L3 Kommunikationsmatrix — Parser für "show ip interface" (voll, nicht "brief"). Liefert pro
 // VLAN-Interface NUR ein Flag, ob überhaupt eine Access-List (eingehend oder ausgehend)
 // konfiguriert ist — bewusst keine Auswertung der ACL-Regeln selbst (Scope-Entscheidung für die
 // L3-Kommunikationsmatrix, siehe features.md). Catalyst- und Nexus-Ausgabe unterscheiden sich im

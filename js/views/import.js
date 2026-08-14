@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — Import-View: Mehrfach-Datei-Upload, Parsing, Switch-Liste
+// L2-L3 Kommunikationsmatrix — Import-View: Mehrfach-Datei-Upload, Parsing, Switch-Liste
 KLU.views = KLU.views || {};
 
 const EXPECTED_COMMANDS = ['version', 'cdpNeighbor', 'portChannel', 'vlan', 'macAddressTable', 'ipInterfaceBrief', 'arp', 'ipRoute', 'interfacesTrunk', 'ipInterfaceFull', 'spanningTree', 'fhrpStatus'];

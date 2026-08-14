@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — L3-Kommunikationsmatrix: rein Routing-Reachability (kein ACL-Regel-
+// L2-L3 Kommunikationsmatrix — L3-Kommunikationsmatrix: rein Routing-Reachability (kein ACL-Regel-
 // Auswertung, bewusste Vereinfachung siehe features.md). Zwei VLAN-Netze gelten als zueinander
 // routbar, wenn mindestens ein Switch beide VLAN-Interfaces (SVIs) trägt — dieser Switch kann
 // dann direkt zwischen seinen eigenen connected Routes routen. Ohne einen solchen gemeinsamen

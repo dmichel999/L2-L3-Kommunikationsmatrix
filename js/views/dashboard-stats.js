@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — Dashboard-Kennzahlen (Feature 4 der Erweiterung): kompakte Übersicht,
+// L2-L3 Kommunikationsmatrix — Dashboard-Kennzahlen (Feature 4 der Erweiterung): kompakte Übersicht,
 // aggregiert ausschließlich bereits vorhandene Modelle, kein neuer Parser.
 KLU.views = KLU.views || {};
 

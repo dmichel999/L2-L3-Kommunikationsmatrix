@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — App-State
+// L2-L3 Kommunikationsmatrix — App-State
 KLU.state = {
   // switches: Map<switchId, { id, hostname, platform, raw: {commandKey: text}, parsed: {...} }>
   switches: new Map(),

@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — UI für die Theme-Auswahl (Hell/Dunkel/System) im Header.
+// L2-L3 Kommunikationsmatrix — UI für die Theme-Auswahl (Hell/Dunkel/System) im Header.
 KLU.views = KLU.views || {};
 
 KLU.views.themeToggle = {

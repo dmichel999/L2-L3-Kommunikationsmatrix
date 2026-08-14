@@ -59,6 +59,14 @@ virtuelle IP 10.10.10.254. CORE1 meldet sich als Active (Priorität 110), CORE2 
 (Priorität 100). Klick auf das IP-Netz 10.10.10.0/24 in der VLAN-Tabelle muss in den
 Netzwerk-Details "CORE1 (Active), CORE2 (Standby)" zeigen statt nur die reine Switch-Liste.
 
+## Erweiterung (Duplicate-Testdaten)
+
+- **Doppelte MAC:** `aaaa.bbbb.9999` steht sowohl auf ACC1 (Gi1/0/20, VLAN 30) als auch auf
+  ACC2 (Gi1/0/21, VLAN 30) — muss im Duplicate-Panel als doppelte MAC-Adresse auftauchen.
+- **IP-Konflikt:** `10.10.50.50` erscheint per ARP auf CORE1 mit MAC `0011.2233.9901` und auf
+  ACC5 mit MAC `0011.2233.9902` — muss als IP-Konflikt mit zwei unterschiedlichen MACs
+  auftauchen.
+
 ## Import
 
 App öffnen → alle 10 `.txt`-Dateien aus diesem Ordner per Drag & Drop oder Datei-Auswahl importieren.

@@ -4,6 +4,15 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/), Versionierun
 
 > Versionshistorie beginnt bei `0.1.0`, passend zum bereits im Code vorhandenen `KLU.version` (`js/core/namespace.js`) — dieses Dokument wurde nachträglich für ein bereits laufendes Projekt angelegt.
 
+## [0.4.0] - 2026-08-14
+
+### Added
+- Duplicate-IP/MAC-Erkennung (neues Panel, nutzt bereits vorhandene MAC-Tabellen/ARP-Daten, kein neuer Parser)
+
+### Changed
+- Projekt umbenannt von "Kunden LAN Überblick" zu "L2-L3 Kommunikationsmatrix" (Ordner, Haupt-HTML-Datei, alle Code-/Doku-Referenzen)
+- Repo-Hosting auf Dual-Remote umgestellt: GitHub (`dmichel999/L2-L3-Kommunikationsmatrix`, neu) zusätzlich zu Bechtle Gitea (bisher Gitea-only)
+
 ## [0.3.0] - 2026-08-14
 
 ### Added

@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — Theme-Verwaltung: Hell/Dunkel/System, in localStorage gemerkt (reine
+// L2-L3 Kommunikationsmatrix — Theme-Verwaltung: Hell/Dunkel/System, in localStorage gemerkt (reine
 // UI-Präferenz, keine Kundendaten — anders als der Analyse-Stand bewusst NICHT flüchtig).
 KLU.theme = {};
 

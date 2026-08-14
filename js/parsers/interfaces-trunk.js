@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — Parser für "show interfaces trunk" (Catalyst) / "show interface trunk"
+// L2-L3 Kommunikationsmatrix — Parser für "show interfaces trunk" (Catalyst) / "show interface trunk"
 // (Nexus). Beide haben mehrere Tabellen-Abschnitte hintereinander, je mit eigener "Port ..."-
 // Kopfzeile. Uns interessieren nur zwei: die Status/Native-VLAN-Tabelle und die "Vlans allowed
 // on trunk"-Tabelle — andere Abschnitte (aktiv im Management-Domain, STP-Forwarding) ignorieren

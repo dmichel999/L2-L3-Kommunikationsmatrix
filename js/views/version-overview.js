@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — Versionsübersicht (Feature 2 der Erweiterung): Hostname/Plattform/
+// L2-L3 Kommunikationsmatrix — Versionsübersicht (Feature 2 der Erweiterung): Hostname/Plattform/
 // Modell/Version je Switch, nutzt ausschließlich bereits vorhandene show-version-Parserdaten.
 KLU.views = KLU.views || {};
 

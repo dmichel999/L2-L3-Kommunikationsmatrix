@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — Parser für "show mac address-table". Catalyst und Nexus haben
+// L2-L3 Kommunikationsmatrix — Parser für "show mac address-table". Catalyst und Nexus haben
 // unterschiedlich viele Spalten (Nexus: zusätzlich age/Secure/NTFY, führendes "*" für
 // primary entry) — ein fixer Spaltenparser wäre pro Plattform anders. Stattdessen nutzen wir
 // zwei feste Invarianten: VLAN ist immer das erste Feld, Ports immer das letzte.

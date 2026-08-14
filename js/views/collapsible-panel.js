@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — generische Panel-Komponente: einklappbar per Klick auf den Header,
+// L2-L3 Kommunikationsmatrix — generische Panel-Komponente: einklappbar per Klick auf den Header,
 // optional per Ziehgriff unabhängig in der Höhe verstellbar. Wird auf die drei rechten
 // Detail-Panels (Netzwerk-Details/Trunk-Warnungen/MAC-Adressen) und die Sidebar-Bereiche
 // angewandt — jedes Panel behält seinen Auf/Zu-Zustand unabhängig von den anderen.

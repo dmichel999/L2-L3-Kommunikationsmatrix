@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — IP-Netz-Ansicht für das ausgewählte Netz (Feature 4):
+// L2-L3 Kommunikationsmatrix — IP-Netz-Ansicht für das ausgewählte Netz (Feature 4):
 // zeigt, auf welchem/welchen Switch(es) das VLAN-Interface für dieses Netz konfiguriert ist.
 // Bei mehreren SVIs (HSRP/VRRP) wird zusätzlich die Active/Standby-Rolle je Switch angezeigt,
 // sofern show standby/show hsrp/show vrrp importiert wurde (Backlog-Feature "FHRP-Rolle je SVI").

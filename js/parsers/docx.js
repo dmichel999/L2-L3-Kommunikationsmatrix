@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — Text-Extraktion aus .docx (Word-Dokument = ZIP-Archiv mit XML).
+// L2-L3 Kommunikationsmatrix — Text-Extraktion aus .docx (Word-Dokument = ZIP-Archiv mit XML).
 // Erlaubt Import, wenn Kunden ihre show-Kommando-Mitschriften in Word statt reinem Text
 // abgelegt haben. Nutzt lib/jszip.min.js zum Entpacken, kein Server/CDN nötig.
 KLU.parsers = KLU.parsers || {};

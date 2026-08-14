@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — Parser für "show version": Plattform + Hostname + Modell
+// L2-L3 Kommunikationsmatrix — Parser für "show version": Plattform + Hostname + Modell
 KLU.parsers = KLU.parsers || {};
 
 function detectPlatform(text) {

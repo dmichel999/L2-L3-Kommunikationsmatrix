@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — STP-Modell: Root-Bridge je VLAN + blockierte Ports (Loop-Präventions-
+// L2-L3 Kommunikationsmatrix — STP-Modell: Root-Bridge je VLAN + blockierte Ports (Loop-Präventions-
 // punkte). Root-Bridge wird über den Adress-Abgleich bestimmt: der Switch, dessen eigene
 // Bridge-Adresse mit der gemeldeten Root-Adresse übereinstimmt, IST die Root-Bridge. Meldet kein
 // importierter Switch eine passende Bridge-Adresse, ist die Root-Bridge nicht importiert (wird

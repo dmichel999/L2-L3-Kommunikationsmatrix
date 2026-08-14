@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — MAC-Modell: MAC-Adressen je VLAN, ohne Uplinks zwischen Switches
+// L2-L3 Kommunikationsmatrix — MAC-Modell: MAC-Adressen je VLAN, ohne Uplinks zwischen Switches
 // und ohne die MAC-Adresse der VLAN-Interfaces (SVI) selbst.
 KLU.macModel = {};
 
@@ -29,6 +29,11 @@ function computeUplinkPortsBySwitch(switches, graph) {
 
   return uplinks;
 }
+
+// Auch für duplicate-model.js zugänglich (Duplicate-MAC-Erkennung braucht dieselbe
+// Uplink-Ausschlussliste, um transitiv über mehrere Hops gelernte MACs nicht fälschlich als
+// Duplikat zu werten).
+KLU.macModel.computeUplinkPortsBySwitch = computeUplinkPortsBySwitch;
 
 /**
  * @param {Array} switches KLU.state.getSwitches()-Format, erwartet sw.parsed.macTable

@@ -1,4 +1,4 @@
-# Kunden LAN Überblick — Feature-Spezifikation
+# L2-L3 Kommunikationsmatrix — Feature-Spezifikation
 
 ## Zweck
 
@@ -141,6 +141,14 @@ Neuer Parser `fhrp.js` für `show standby` (Catalyst HSRP), `show hsrp` (Nexus H
 
 Button "📄 Report exportieren" im Header. Erzeugt eine eigenständige HTML-Datei (`js/views/report-export.js`) durch Snapshotten der bereits gerenderten DOM-Abschnitte (Versionsübersicht, Topologie-SVG, VLAN-Tabelle, L3-Kommunikationsmatrix, Trunk-Warnungen, STP) mit vollständig inline eingebettetem, statischem Light-Theme-CSS — kein Server, keine externe Nachladung, keine PDF-Generator-Bibliothek nötig. Für ein PDF nutzt der User die Browser-Druckfunktion (Cmd/Strg+P → Als PDF sichern) auf der exportierten Datei — deckt den Kundenlieferungs-Anwendungsfall ab, ohne eine schwere zusätzliche Abhängigkeit zu vendorn. Reiner Snapshot des aktuellen Zustands (inkl. z.B. gerade aktivem VLAN-Highlight/Geräte-Typ-Filter in der Topologie); Netzwerk-Details/MAC-Adressen (Drill-down-Panels, nicht Übersichts-Ebene) sind bewusst nicht Teil des Reports.
 
+## Feature 21: Duplicate-IP/MAC-Erkennung
+
+Neues Panel "Duplicate-Erkennung" (rechte Seite, unterhalb STP): nutzt ausschließlich bereits vorhandene `macTable`/`arpEntries`-Daten, kein neuer Parser. Zwei Diagnose-Checks:
+- **Doppelte MAC-Adressen:** dieselbe MAC im selben VLAN gleichzeitig auf mehr als einem Nicht-Uplink-Port gelernt (Hinweis auf Loop, MAC-Cloning oder ein Gerät mit zwei aktiven Anschlüssen) — nutzt dieselbe Uplink-Ausschlussliste wie Feature 3 (`KLU.macModel.computeUplinkPortsBySwitch`, dafür exportiert).
+- **Doppelte IPs:** dieselbe IP laut ARP-Tabelle mit unterschiedlichen MAC-Adressen (klassisches IP-Konflikt-Symptom).
+
+Reine Diagnose-Anzeige, keine automatische Bewertung, welcher der beiden Einträge "der richtige" ist.
+
 ## Entschieden
 
 - **Mehrere SVIs pro Netz (HSRP/VRRP):** Alle beteiligten Switches anzeigen, seit Feature 19 zusätzlich mit Active/Standby-Rolle sofern `show standby`/`show hsrp`/`show vrrp` importiert wurde.
@@ -155,7 +163,6 @@ Bewusst zurückgestellt (nicht umgesetzt), für einen späteren Auftrag:
 - **Freie/ungenutzte Ports** — Kapazitätsplanung ist ein anderer Anwendungsfall als "Kommunikationsmatrix".
 - **Interface-Fehler/Duplex-Mismatch** (`show interfaces`) — deckt sich mit dem vorhandenen Skill `network-interface-health`, eher dort lösen statt im Tool nachbauen.
 - **LLDP zusätzlich zu CDP** (`show lldp neighbor`) — nur relevant bei Fremdherstellern im Netz oder wenn CDP deaktiviert ist; Mehraufwand erst investieren, wenn ein konkreter Kundenfall das braucht.
-- **Duplicate-IP/MAC-Erkennung** über mehrere ARP-Tabellen/Switches hinweg — Diagnose-Zusatz, nicht Kernfunktion der Matrix.
 - **Redundanz-/Ausfall-Simulation** ("was passiert bei Ausfall von Switch/Link X") — hoher Aufwand (Graphalgorithmus auf Topologie+Port-Channel-Daten), klar eine spätere Ausbaustufe.
 - **Security-Hygiene-Checks** (ungenutzte Ports ohne Port-Security, VLAN 1 als Default in Nutzung, unautorisierte Trunks) — Scope-Überschneidung mit Skill `network-config-validation`, eher dort lösen statt im Tool nachbauen.
 - **Multi-Standort-Gruppierung** (Topologie nach Gebäude/Etage clustern) — fragile Heuristik, da Hostnamen-/CDP-Location-Konventionen je Kunde unterschiedlich sind.

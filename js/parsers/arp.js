@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — Parser für "show arp" (Catalyst) / "show ip arp" (Nexus). Statt fester
+// L2-L3 Kommunikationsmatrix — Parser für "show arp" (Catalyst) / "show ip arp" (Nexus). Statt fester
 // Spalten (Layout unterscheidet sich deutlich zwischen den Plattformen) wird jede Zeile
 // tokenweise nach einer IPv4-Adresse und einer MAC-Adresse durchsucht — funktioniert für beide
 // Formate gleich. Wird für die globale Suche (Feature 5 der Erweiterung) gebraucht: IP eines

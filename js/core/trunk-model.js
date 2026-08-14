@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — Trunk-Modell: erlaubte VLANs je Trunk-Port + Native-VLAN-Mismatch
+// L2-L3 Kommunikationsmatrix — Trunk-Modell: erlaubte VLANs je Trunk-Port + Native-VLAN-Mismatch
 // zwischen zwei Switches über denselben physischen Link (Link-Zuordnung wie beim bestehenden
 // Uplink-Ausschluss im MAC-Modell: über den CDP-Topologie-Graph, nur Switch-zu-Switch-Kanten).
 KLU.trunkModel = {};

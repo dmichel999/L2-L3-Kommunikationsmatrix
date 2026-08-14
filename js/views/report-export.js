@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — Report-Export (Backlog-Feature "PDF/HTML-Report-Export"): erzeugt einen
+// L2-L3 Kommunikationsmatrix — Report-Export (Backlog-Feature "PDF/HTML-Report-Export"): erzeugt einen
 // eigenständigen, versandfähigen HTML-Report (keine Abhängigkeit von den App-Dateien, kein
 // externes Nachladen) durch Snapshotten der bereits gerenderten DOM-Abschnitte (Versionsübersicht,
 // Topologie-SVG, VLAN-Tabelle, Kommunikationsmatrix, Trunk-Warnungen, STP). Bewusst kein
@@ -66,7 +66,7 @@ function buildReportHtml() {
 </head>
 <body>
   <h1>Kunden-LAN-Analyse-Report</h1>
-  <p class="hint">Erstellt am ${KLU.dom.escapeHtml(dateStr)} — ${switches.length} Switches importiert (Kunden LAN Überblick v${KLU.dom.escapeHtml(KLU.version)})</p>
+  <p class="hint">Erstellt am ${KLU.dom.escapeHtml(dateStr)} — ${switches.length} Switches importiert (L2-L3 Kommunikationsmatrix v${KLU.dom.escapeHtml(KLU.version)})</p>
 
   <h2>Switches</h2>
   ${domHtml('version-table-wrapper', 'Keine Switches importiert.')}

@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — STP-Panel: Root-Bridge je VLAN + blockierte Ports.
+// L2-L3 Kommunikationsmatrix — STP-Panel: Root-Bridge je VLAN + blockierte Ports.
 KLU.views = KLU.views || {};
 
 function hostnameOfSwitchForStp(id) {

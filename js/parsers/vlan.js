@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — Parser für "show vlan" (erste Tabelle: VLAN/Name/Status/Ports).
+// L2-L3 Kommunikationsmatrix — Parser für "show vlan" (erste Tabelle: VLAN/Name/Status/Ports).
 // Format ist auf Catalyst und Nexus identisch. Port-Listen können auf Folgezeilen umbrechen.
 // Manche Exporte (z.B. Copy/Paste aus bestimmten Terminal-Tools) fügen nach JEDER Zeile eine
 // Leerzeile ein — Leerzeilen dürfen daher NICHT als Tabellenende gewertet werden. Das echte

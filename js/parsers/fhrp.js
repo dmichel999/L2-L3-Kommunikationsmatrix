@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — Parser für FHRP-Status: "show standby" (Catalyst HSRP), "show hsrp"
+// L2-L3 Kommunikationsmatrix — Parser für FHRP-Status: "show standby" (Catalyst HSRP), "show hsrp"
 // (Nexus HSRP) und "show vrrp" (beide Plattformen). Alle drei teilen dasselbe Grundmuster
 // ("VlanNN - Group G" gefolgt von einer Zeile mit "state is <Wort>" irgendwo im Block), daher
 // genügt ein gemeinsamer Parser statt einer Variante pro Kommando/Protokoll.

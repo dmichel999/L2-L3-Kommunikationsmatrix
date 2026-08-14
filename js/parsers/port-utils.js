@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — Interface-Namen normalisieren für Vergleiche über verschiedene
+// L2-L3 Kommunikationsmatrix — Interface-Namen normalisieren für Vergleiche über verschiedene
 // show-Kommandos hinweg. Cisco verwendet je Kommando unterschiedliche Abkürzungsstile für
 // dieselbe Schnittstelle, z.B. "show cdp neighbor" -> "Gig 1/0/1" (mit Leerzeichen),
 // "show etherchannel summary" -> "Gi1/0/1" (ohne Leerzeichen) — ein reiner String-Vergleich

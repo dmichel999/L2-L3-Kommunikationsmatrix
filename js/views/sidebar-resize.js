@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — Breiten-Resizer zwischen Sidebar (Import) und Hauptbereich.
+// L2-L3 Kommunikationsmatrix — Breiten-Resizer zwischen Sidebar (Import) und Hauptbereich.
 KLU.views = KLU.views || {};
 
 KLU.views.sidebarResize = {

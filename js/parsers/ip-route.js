@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — Parser für "show ip route": nur directly-connected Routen
+// L2-L3 Kommunikationsmatrix — Parser für "show ip route": nur directly-connected Routen
 // (liefern Netz inkl. Maske je VLAN-Interface). Catalyst und Nexus haben komplett
 // unterschiedliche Ausgabeformate.
 KLU.parsers = KLU.parsers || {};

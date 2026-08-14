@@ -1,23 +1,25 @@
-# Kunden LAN Überblick
+# L2-L3 Kommunikationsmatrix
 
 Browser-basiertes Tool zur Analyse eines Kunden-LANs (Catalyst/Nexus-Switche) anhand von `show`-Kommando-Textmitschriften: physische Topologie, VLAN-Verteilung, IP-Netze, MAC-Adressen, L3-Erreichbarkeit.
 
-**Keine Installation, kein Server, keine Cloud** — Ordner öffnen, `Kunden LAN Überblick.html` im Browser öffnen, fertig. Alle Daten bleiben lokal im Browser, es findet kein Versand an Dritte (auch keine KI) statt.
+**Keine Installation, kein Server, keine Cloud** — Ordner öffnen, `L2-L3 Kommunikationsmatrix.html` im Browser öffnen, fertig. Alle Daten bleiben lokal im Browser, es findet kein Versand an Dritte (auch keine KI) statt.
 
 ---
 
 ## Schnellstart
 
 1. Repository klonen oder als ZIP herunterladen
-2. `Kunden LAN Überblick.html` im Browser öffnen (Chrome, Safari, Firefox, Edge)
+2. `L2-L3 Kommunikationsmatrix.html` im Browser öffnen (Chrome, Safari, Firefox, Edge)
 3. Pro Switch eine Textdatei (oder `.docx`) mit allen `show`-Kommando-Outputs hintereinander importieren (Drag & Drop oder Datei-Auswahl)
 4. Topologie/VLAN-Tabelle/Kommunikationsmatrix/Versionsübersicht durchklicken
 
 ```bash
-git clone https://shdefbgsweb01.bechtle.net/git/denis.michel/Kunden-LAN--berblick.git
-cd "Kunden-LAN--berblick"
-open "Kunden LAN Überblick.html"
+git clone git@github.com:dmichel999/L2-L3-Kommunikationsmatrix.git
+cd "L2-L3-Kommunikationsmatrix"
+open "L2-L3 Kommunikationsmatrix.html"
 ```
+
+Bechtle-intern gibt es zusätzlich ein Gitea-Mirror-Repo (siehe `CLAUDE.md`).
 
 Zum Ausprobieren ohne eigene Daten: alle `.txt`-Dateien aus `sample-data/` importieren (Details siehe `sample-data/README.md`).
 

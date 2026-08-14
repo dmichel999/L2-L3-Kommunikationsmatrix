@@ -73,6 +73,7 @@ Vlan    Mac Address       Type        Ports
   30    aaaa.bbbb.06d8    DYNAMIC     Gi1/0/15
   40    aaaa.bbbb.0700    DYNAMIC     Gi1/0/16
   10    aaaa.bbbb.06c3    DYNAMIC     Gi1/0/1
+  30    aaaa.bbbb.9999    DYNAMIC     Gi1/0/21
    1    aaaa.bbbb.0000    STATIC      CPU
 
 ACC2#show ip interface brief

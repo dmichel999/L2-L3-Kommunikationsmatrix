@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — Initialisierung
+// L2-L3 Kommunikationsmatrix — Initialisierung
 // thought up by human, coded by ai
 document.addEventListener('DOMContentLoaded', () => {
   KLU.views.import.init();
@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   KLU.views.networkDetail.init();
   KLU.views.trunkPanel.init();
   KLU.views.stpPanel.init();
+  KLU.views.duplicatePanel.init();
   KLU.views.reachabilityMatrix.init();
   KLU.views.versionOverview.init();
   KLU.views.dashboardStats.init();

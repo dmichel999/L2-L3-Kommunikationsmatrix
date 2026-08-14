@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — Parser für "show spanning-tree" (Catalyst + Nexus, identisches Format
+// L2-L3 Kommunikationsmatrix — Parser für "show spanning-tree" (Catalyst + Nexus, identisches Format
 // für die klassische PVST+/Rapid-PVST-Ausgabe). Liefert pro VLAN-Block: Root-Bridge-Adresse,
 // eigene Bridge-Adresse (zum späteren Abgleich, welcher importierte Switch die Root-Bridge IST)
 // und die Rolle/Status jedes Ports (für blockierte Ports = Loop-Präventionspunkte).

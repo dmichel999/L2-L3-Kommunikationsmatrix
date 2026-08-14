@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — Topologie-View: Kraft-basiertes Layout + SVG-Rendering,
+// L2-L3 Kommunikationsmatrix — Topologie-View: Kraft-basiertes Layout + SVG-Rendering,
 // Geräte-Icons je Typ (Switch/Firewall/WLC/Access Point/unbekannt), Knoten per Drag verschiebbar.
 KLU.views = KLU.views || {};
 

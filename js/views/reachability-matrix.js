@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — L3-Kommunikationsmatrix (Feature 1 der Erweiterung): VLAN×VLAN-Tabelle,
+// L2-L3 Kommunikationsmatrix — L3-Kommunikationsmatrix (Feature 1 der Erweiterung): VLAN×VLAN-Tabelle,
 // ✓ = gemeinsamer Switch mit beiden SVIs bekannt (routbar), ? = nicht ermittelbar (kein Beweis
 // für "blockiert", siehe reachability-model.js). ACL-Warnung ist nur ein Hinweis-Flag, keine
 // Regelauswertung.

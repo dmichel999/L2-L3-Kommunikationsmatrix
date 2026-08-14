@@ -106,9 +106,10 @@ Vlan99               10.10.99.1      protocol-up/link-up/admin-up
 
 CORE1# show ip arp
 IP ARP Table
-Total number of entries: 1
+Total number of entries: 2
 Address         Age       MAC Address     Interface
 10.10.99.1       00:05:23  0011.2233.4400  vlan99
+10.10.50.50      00:02:11  0011.2233.9901  vlan10
 
 CORE1# show ip route
 IP Route Table for VRF "default"

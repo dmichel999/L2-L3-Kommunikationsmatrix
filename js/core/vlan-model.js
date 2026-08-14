@@ -1,4 +1,4 @@
-// Kunden LAN Überblick — VLAN-Modell: fasst show-vlan/-ip-route/-ip-interface-brief aller
+// L2-L3 Kommunikationsmatrix — VLAN-Modell: fasst show-vlan/-ip-route/-ip-interface-brief aller
 // Switches zu einer globalen VLAN-Tabelle zusammen (VLAN-ID/Name, Switches mit dem VLAN,
 // IP-Netz(e) je VLAN-Interface + welche Switches dieses Interface haben).
 KLU.vlanModel = {};
