@@ -4,6 +4,11 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/), Versionierun
 
 > Versionshistorie beginnt bei `0.1.0`, passend zum bereits im Code vorhandenen `KLU.version` (`js/core/namespace.js`) — dieses Dokument wurde nachträglich für ein bereits laufendes Projekt angelegt.
 
+## [0.7.0] - 2026-08-14
+
+### Added
+- Redundanz-/Ausfall-Simulation: Klick auf Switch/Link bei aktivem "🔌 Ausfall-Simulation"-Toggle zeigt, welche Geräte dadurch isoliert würden (reine Graph-Erreichbarkeitsanalyse)
+
 ## [0.6.0] - 2026-08-14
 
 ### Added

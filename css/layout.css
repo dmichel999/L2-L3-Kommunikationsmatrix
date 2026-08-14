@@ -87,12 +87,30 @@
 }
 
 .topology-wrapper {
+  position: relative;
   flex: 1;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--surface);
   overflow: hidden;
 }
+
+.failure-sim-result {
+  display: none;
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  z-index: 20;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  padding: 8px 12px;
+  font-size: 13px;
+}
+.failure-sim-result.open { display: block; }
+.failure-sim-result p { margin: 0; }
 
 #topology-canvas { width: 100%; height: 100%; display: block; }
 

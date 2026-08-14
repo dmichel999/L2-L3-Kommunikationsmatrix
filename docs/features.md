@@ -161,6 +161,14 @@ Neuer Parser `lldp.js` für `show lldp neighbor` (Catalyst + Nexus, identisches 
 
 Ziehgriff unterhalb der VLAN-Tabelle (analog zu den rechten Detail-Panels) — Startgröße 280px, per Drag verstellbar. Nutzt denselben Ziehgriff-Mechanismus wie `collapsible-panel.js` (dafür als `KLU.views.collapsiblePanels.initHeightResizeHandle()` verallgemeinert), aber eigenständig ohne die volle `.panel`-Struktur, da die VLAN-Tabelle keinen einklappbaren Header hat.
 
+## Feature 25: Redundanz-/Ausfall-Simulation
+
+Toggle "🔌 Ausfall-Simulation" in den Topologie-Ansichtsoptionen. Solange aktiv, simuliert ein Klick auf einen Switch-Knoten oder eine Verbindung deren Ausfall: `js/core/failure-sim-model.js` entfernt den geklickten Knoten (inkl. aller seiner Kanten) bzw. die geklickte Kante aus dem Graphen und berechnet die Zusammenhangskomponenten (Connected Components) des Rests. Alle Geräte außerhalb der größten verbleibenden Komponente gelten als isoliert und werden rot hervorgehoben; ein Overlay über der Topologie nennt sie namentlich.
+
+Nutzt bewusst dieselbe Kantenliste, die gerade angezeigt wird (`KLU.state.linkMode`): im Einzeln-Modus simuliert ein Klick nur das eine angeklickte physische Kabel (bei einem redundanten Bündel bleibt das Netz dann korrekt zusammenhängend), im Aggregiert-Modus den selteneren Fall "das ganze Bündel fällt gleichzeitig aus".
+
+**Bewusste Vereinfachung:** reine Graph-Erreichbarkeit, keine Kenntnis von dynamischem Routing, STP-Konvergenzzeit oder tatsächlicher Bandbreite/Performance — die Frage ist ausschließlich "wer wäre danach noch über den bekannten Layer-2/Port-Channel-Pfad erreichbar", nicht "wie lange dauert der Failover" oder "welche Performance-Einbußen gäbe es".
+
 ## Entschieden
 
 - **Mehrere SVIs pro Netz (HSRP/VRRP):** Alle beteiligten Switches anzeigen, seit Feature 19 zusätzlich mit Active/Standby-Rolle sofern `show standby`/`show hsrp`/`show vrrp` importiert wurde.
@@ -174,7 +182,6 @@ Bewusst zurückgestellt (nicht umgesetzt), für einen späteren Auftrag:
 
 - **Freie/ungenutzte Ports** — Kapazitätsplanung ist ein anderer Anwendungsfall als "Kommunikationsmatrix".
 - **Interface-Fehler/Duplex-Mismatch** (`show interfaces`) — deckt sich mit dem vorhandenen Skill `network-interface-health`, eher dort lösen statt im Tool nachbauen.
-- **Redundanz-/Ausfall-Simulation** ("was passiert bei Ausfall von Switch/Link X") — hoher Aufwand (Graphalgorithmus auf Topologie+Port-Channel-Daten), klar eine spätere Ausbaustufe.
 - **Security-Hygiene-Checks** (ungenutzte Ports ohne Port-Security, VLAN 1 als Default in Nutzung, unautorisierte Trunks) — Scope-Überschneidung mit Skill `network-config-validation`, eher dort lösen statt im Tool nachbauen.
 - **Multi-Standort-Gruppierung** (Topologie nach Gebäude/Etage clustern) — fragile Heuristik, da Hostnamen-/CDP-Location-Konventionen je Kunde unterschiedlich sind.
 - **Anonymisierungs-Option** (analog Config Anonymizer) — nur nötig, falls eine Analyse mit Dritten geteilt wird; noch kein konkreter Bedarf.

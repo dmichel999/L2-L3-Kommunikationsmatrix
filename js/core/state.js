@@ -7,7 +7,9 @@ KLU.state = {
   selectedNetwork: null,
   showPortLabels: false,
   selectedSwitchFocus: null,
-  hiddenDeviceTypes: new Set()
+  hiddenDeviceTypes: new Set(),
+  failureSimActive: false,
+  failureSimTarget: null // { type: 'node'|'edge', id: string } | null
 };
 
 KLU.state.addSwitch = function (sw) {
@@ -50,6 +52,20 @@ KLU.state.toggleDeviceTypeVisibility = function (deviceType) {
   if (KLU.state.hiddenDeviceTypes.has(deviceType)) KLU.state.hiddenDeviceTypes.delete(deviceType);
   else KLU.state.hiddenDeviceTypes.add(deviceType);
   KLU.emit('deviceTypeVisibility:changed', deviceType);
+};
+
+KLU.state.setFailureSimActive = function (value) {
+  KLU.state.failureSimActive = value;
+  KLU.state.failureSimTarget = null; // Moduswechsel hebt eine laufende Simulation auf
+  KLU.emit('failureSim:changed', null);
+};
+
+// target = { type: 'node'|'edge', id } | null. Erneutes Klicken desselben Ziels hebt es auf.
+KLU.state.setFailureSimTarget = function (target) {
+  const current = KLU.state.failureSimTarget;
+  const same = current && target && current.type === target.type && current.id === target.id;
+  KLU.state.failureSimTarget = same ? null : target;
+  KLU.emit('failureSim:changed', KLU.state.failureSimTarget);
 };
 
 // Verschiebt draggedId an die Position von targetId in der Import-Liste (Drag & Drop-Sortierung).

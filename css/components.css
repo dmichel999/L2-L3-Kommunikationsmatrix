@@ -144,6 +144,17 @@
 .topology-node.highlighted rect { stroke-width: 4; }
 
 .topology-link.dimmed { opacity: 0.15; }
+.failure-sim-active .topology-link { cursor: pointer; }
+
+/* Redundanz-/Ausfall-Simulation: das simulierte Ziel (rot, gestrichelt bei Kanten) und die
+   dadurch isolierten Geräte (rot gefüllt/umrandet) klar von der normalen Darstellung abheben. */
+.topology-node.failed circle,
+.topology-node.failed polygon,
+.topology-node.failed rect { stroke: var(--error); stroke-width: 4; stroke-dasharray: 4 3; }
+.topology-link.failed { stroke: var(--error); stroke-dasharray: 6 4; }
+.topology-node.isolated circle,
+.topology-node.isolated polygon,
+.topology-node.isolated rect { fill: var(--error-bg); stroke: var(--error); }
 
 .edge-port-label {
   fill: var(--text-muted);

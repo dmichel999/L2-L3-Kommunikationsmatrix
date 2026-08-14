@@ -175,6 +175,7 @@ function renderTopology() {
   const width = svg.clientWidth || 800;
   const height = svg.clientHeight || 500;
   svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  svg.classList.toggle('failure-sim-active', KLU.state.failureSimActive);
 
   if (graph.nodes.length === 0) {
     const text = svgEl('text', { x: width / 2, y: height / 2, 'text-anchor': 'middle', class: 'topology-empty-hint' });
@@ -193,6 +194,12 @@ function renderTopology() {
   // Über die Legende ausgeblendete Gerätetypen: Knoten UND ihre Kanten verstecken.
   const visibleIds = new Set(graph.nodes.filter(n => !KLU.state.hiddenDeviceTypes.has(n.deviceType)).map(n => n.id));
 
+  const failureTarget = KLU.state.failureSimTarget;
+  let failureResult = null;
+  if (failureTarget?.type === 'node') failureResult = KLU.failureSimModel.simulateNodeFailure(graph.nodes, activeEdges, failureTarget.id);
+  else if (failureTarget?.type === 'edge') failureResult = KLU.failureSimModel.simulateEdgeFailure(graph.nodes, activeEdges, failureTarget.id);
+  renderFailureSimResult(failureResult, failureTarget, graph.nodes);
+
   const zoomLayer = svgEl('g', { class: 'zoom-layer', transform: `translate(${zoomState.tx},${zoomState.ty}) scale(${zoomState.scale})` });
   const edgeLayer = svgEl('g', { class: 'edge-layer' });
   const nodeLayer = svgEl('g', { class: 'node-layer' });
@@ -209,9 +216,11 @@ function renderTopology() {
       const x1 = a.x + perpX, y1 = a.y + perpY, x2 = b.x + perpX, y2 = b.y + perpY;
 
       const edgeDimmed = focusNeighbors && !(focusNeighbors.has(e.a) && focusNeighbors.has(e.b));
+      const edgeFailed = failureTarget?.type === 'edge' && failureTarget.id === e.id;
       const line = svgEl('line', {
         x1, y1, x2, y2,
-        class: `topology-link${edgeDimmed ? ' dimmed' : ''}`
+        class: `topology-link${edgeDimmed ? ' dimmed' : ''}${edgeFailed ? ' failed' : ''}`,
+        'data-edge-id': e.id
       });
       // Aggregierte Kanten (e.members) haben KEIN eigenes aPort/bPort — nur bei einem echten
       // Port-Channel-Bündel ist poLabelA/poLabelB gesetzt; eine aggregierte Einzelverbindung
@@ -241,7 +250,10 @@ function renderTopology() {
     const nodeDimmed = (highlightSet && !highlightSet.has(node.id)) || (focusNeighbors && !focusNeighbors.has(node.id));
     const dimSet = nodeDimmed ? new Set([node.id]) : null;
     const hlSet = highlightSet?.has(node.id) ? new Set([node.id]) : null;
-    const g = svgEl('g', { class: nodeClasses(node, dimSet, hlSet), transform: `translate(${pos.x},${pos.y})`, 'data-node-id': node.id });
+    let classes = nodeClasses(node, dimSet, hlSet);
+    if (failureTarget?.type === 'node' && failureTarget.id === node.id) classes += ' failed';
+    if (failureResult?.isolatedNodeIds.has(node.id)) classes += ' isolated';
+    const g = svgEl('g', { class: classes, transform: `translate(${pos.x},${pos.y})`, 'data-node-id': node.id });
     g.appendChild(nodeShapeElement(node.deviceType));
     const label = svgEl('text', { y: 36, 'text-anchor': 'middle', class: 'topology-node-label' });
     label.textContent = node.hostname || node.id;
@@ -255,6 +267,34 @@ function renderTopology() {
   zoomLayer.appendChild(edgeLayer);
   zoomLayer.appendChild(nodeLayer);
   svg.appendChild(zoomLayer);
+}
+
+function hostnameOfNode(nodeId, nodes) {
+  return nodes.find(n => n.id === nodeId)?.hostname || nodeId;
+}
+
+// Ergebnis-Overlay der Ausfall-Simulation (Feature "Redundanz-/Ausfall-Simulation") — reine
+// Erreichbarkeits-Analyse auf dem Graphen, keine Aussage über Konvergenzzeit/Performance.
+function renderFailureSimResult(result, target, nodes) {
+  const box = document.getElementById('failure-sim-result');
+  if (!box) return;
+  if (!KLU.state.failureSimActive) {
+    box.classList.remove('open');
+    box.innerHTML = '';
+    return;
+  }
+  box.classList.add('open');
+  if (!target) {
+    box.innerHTML = '<p class="hint">Klicke auf einen Switch-Knoten oder eine Verbindung, um deren Ausfall zu simulieren.</p>';
+    return;
+  }
+  const targetLabel = target.type === 'node' ? hostnameOfNode(target.id, nodes) : 'dieser Verbindung';
+  if (!result || result.isolatedNodeIds.size === 0) {
+    box.innerHTML = `<p><strong>Ausfall von ${KLU.dom.escapeHtml(targetLabel)}:</strong> Netz bleibt zusammenhängend, keine Geräte isoliert.</p>`;
+    return;
+  }
+  const names = Array.from(result.isolatedNodeIds).map(id => hostnameOfNode(id, nodes)).map(KLU.dom.escapeHtml).join(', ');
+  box.innerHTML = `<p><strong>Ausfall von ${KLU.dom.escapeHtml(targetLabel)}:</strong> ${result.isolatedNodeIds.size} Gerät(e) wären isoliert: ${names}</p>`;
 }
 
 // Legende ist zugleich Geräte-Typ-Filter: Checkbox pro Typ blendet dessen Knoten/Kanten aus.
@@ -303,9 +343,21 @@ function initDrag(svg) {
   svg.addEventListener('pointerup', e => {
     const drag = activeDrags.get(e.pointerId);
     activeDrags.delete(e.pointerId);
-    if (drag && !drag.moved) KLU.state.selectSwitchFocus(drag.nodeId); // Klick ohne nennenswerte Bewegung -> Fokus-Filter (Feature 10)
+    if (!drag || drag.moved) return; // war ein Drag, kein Klick
+    if (KLU.state.failureSimActive) KLU.state.setFailureSimTarget({ type: 'node', id: drag.nodeId });
+    else KLU.state.selectSwitchFocus(drag.nodeId); // Fokus-Filter (Feature 10)
   });
   svg.addEventListener('pointercancel', e => activeDrags.delete(e.pointerId));
+
+  // Klick auf eine Kante wählt sie nur während aktiver Ausfall-Simulation als Ziel aus (sonst
+  // keine Wirkung) — Kanten sind nicht draggable, daher reicht ein einfacher Klick-Listener.
+  svg.addEventListener('click', e => {
+    if (!KLU.state.failureSimActive) return;
+    const line = e.target.closest('.topology-link');
+    if (!line) return;
+    const edgeId = line.dataset.edgeId;
+    if (edgeId) KLU.state.setFailureSimTarget({ type: 'edge', id: edgeId });
+  });
 }
 
 function initZoom(svg) {
@@ -328,6 +380,9 @@ KLU.views.topology = {
 
     const portLabelToggle = document.getElementById('port-label-toggle');
     portLabelToggle?.addEventListener('change', () => KLU.state.setShowPortLabels(portLabelToggle.checked));
+
+    const failureSimToggle = document.getElementById('failure-sim-toggle');
+    failureSimToggle?.addEventListener('change', () => KLU.state.setFailureSimActive(failureSimToggle.checked));
 
     // Ansichtsoptionen (Aggregiert/Einzeln, Portbezeichnungen, Geräte-Typ-Legende/-Filter) in ein
     // Popover ausgelagert, statt permanent 2-3 Zeilen Toolbar-Höhe zu belegen (Nutzer-Feedback).
@@ -376,6 +431,7 @@ KLU.views.topology = {
     KLU.on('switchFocus:selected', renderTopology); // Feature 10: Fokus-Filter auf einen Switch
     KLU.on('portLabels:changed', renderTopology); // Feature 9: Portbezeichnungen an Kanten
     KLU.on('deviceTypeVisibility:changed', renderTopology); // Geräte-Typ-Filter in der Legende
+    KLU.on('failureSim:changed', renderTopology); // Redundanz-/Ausfall-Simulation
 
     window.addEventListener('resize', renderTopology);
     if (svg) { initDrag(svg); initZoom(svg); }

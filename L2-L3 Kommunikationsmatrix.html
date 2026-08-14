@@ -88,12 +88,18 @@
                   Portbezeichnungen anzeigen (ab Zoom &gt;150%)
                 </label>
                 <hr>
+                <label class="toggle-switch" title="Klick auf einen Switch-Knoten oder eine Verbindung zeigt, welche Geräte bei dessen Ausfall isoliert wären">
+                  <input type="checkbox" id="failure-sim-toggle">
+                  🔌 Ausfall-Simulation
+                </label>
+                <hr>
                 <span id="topology-legend" class="topology-legend"></span>
               </div>
             </div>
           </div>
           <div class="topology-wrapper">
             <svg id="topology-canvas"></svg>
+            <div class="failure-sim-result" id="failure-sim-result"></div>
           </div>
           <p class="hint">Knoten verschiebbar (Drag), Mausrad zum Zoomen. Klick auf einen Switch-Knoten filtert auf dessen Verbindungen, Klick auf eine VLAN-Zeile hebt die zugehörigen Switches hervor.</p>
         </div>
@@ -212,6 +218,7 @@
 <script src="js/core/stp-model.js"></script>
 <script src="js/core/fhrp-model.js"></script>
 <script src="js/core/duplicate-model.js"></script>
+<script src="js/core/failure-sim-model.js"></script>
 <script src="js/views/import.js"></script>
 <script src="js/views/topology.js"></script>
 <script src="js/views/vlan-table.js"></script>
