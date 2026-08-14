@@ -26,6 +26,17 @@ CORE2.customer.local
 
 Total cdp entries displayed : 1
 
+ACC7#show lldp neighbor
+Capability codes:
+    (R) Router, (B) Bridge, (T) Telephone, (C) DOCSIS Cable Device
+    (W) WLAN Access Point, (P) Repeater, (S) Station, (O) Other
+
+Device ID           Local Intf     Hold-time  Capability      Port ID
+CORE2.customer.local Gig 1/0/1      120        B,R             Eth1/5
+ArubaAP-215          Gig 1/0/24     120        W               1
+
+Total entries displayed: 2
+
 ACC7#show etherchannel summary
 Flags:  D - down        P - bundled in port-channel
         I - stand-alone s - suspended

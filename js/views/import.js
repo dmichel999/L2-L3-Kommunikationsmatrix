@@ -99,6 +99,10 @@ async function processFile(file) {
   const arpEntries = commands.arp ? KLU.parsers.parseArp(commands.arp) : [];
   const spanningTree = commands.spanningTree ? KLU.parsers.parseSpanningTree(commands.spanningTree) : [];
   const fhrpStatus = commands.fhrpStatus ? KLU.parsers.parseFhrpStatus(commands.fhrpStatus) : [];
+  // lldpNeighbor bewusst NICHT in EXPECTED_COMMANDS: reiner CDP-Fallback (Fremdhersteller/CDP
+  // deaktiviert), auf einem normalen All-Cisco-Netz mit aktivem CDP fehlt es praktisch immer und
+  // wäre dort nur irreführendes Rauschen im Import-Feedback-Panel.
+  const lldpNeighbors = commands.lldpNeighbor ? KLU.parsers.parseLldpNeighbor(commands.lldpNeighbor) : [];
   const missingCommands = EXPECTED_COMMANDS.filter(k => !(k in commands));
 
   const sw = {
@@ -110,7 +114,7 @@ async function processFile(file) {
     osVersion: version.osVersion,
     fileName: file.name,
     raw: commands,
-    parsed: { cdpNeighbors, portChannels, vlans, ipRouteConnected, ipInterfaceBrief, macTable, trunks, ipInterfaceFull, arpEntries, spanningTree, fhrpStatus },
+    parsed: { cdpNeighbors, portChannels, vlans, ipRouteConnected, ipInterfaceBrief, macTable, trunks, ipInterfaceFull, arpEntries, spanningTree, fhrpStatus, lldpNeighbors },
     missingCommands,
     unrecognized
   };

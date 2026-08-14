@@ -16,6 +16,10 @@ document.addEventListener('DOMContentLoaded', () => {
   KLU.views.splitPane.init('.split-pane', '#network-split-resizer');
   KLU.views.sidebarResize.init();
   KLU.views.collapsiblePanels.init('.panel');
+  KLU.views.collapsiblePanels.initHeightResizeHandle(
+    document.getElementById('vlan-table-resize-handle'),
+    document.getElementById('vlan-table-wrapper')
+  );
   KLU.views.themeToggle.init();
   KLU.views.reportExport.init();
   KLU.views.panelVisibility.init();

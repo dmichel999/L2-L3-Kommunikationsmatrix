@@ -4,6 +4,12 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/), Versionierun
 
 > Versionshistorie beginnt bei `0.1.0`, passend zum bereits im Code vorhandenen `KLU.version` (`js/core/namespace.js`) — dieses Dokument wurde nachträglich für ein bereits laufendes Projekt angelegt.
 
+## [0.6.0] - 2026-08-14
+
+### Added
+- LLDP-Nachbarn zusätzlich zu CDP (`show lldp neighbor`), ergänzt Topologie-Erkennung bei deaktiviertem CDP oder Fremdherstellern; CDP hat je Port Vorrang
+- VLAN-Tabelle höhenverstellbar (Ziehgriff, analog zu den rechten Detail-Panels)
+
 ## [0.5.0] - 2026-08-14
 
 ### Added

@@ -67,6 +67,14 @@ Netzwerk-Details "CORE1 (Active), CORE2 (Standby)" zeigen statt nur die reine Sw
   ACC5 mit MAC `0011.2233.9902` — muss als IP-Konflikt mit zwei unterschiedlichen MACs
   auftauchen.
 
+## Erweiterung (LLDP-Testdaten)
+
+Nur **ACC7** enthält `show lldp neighbor`. Der bereits per CDP bekannte Uplink zu CORE2
+(Gig 1/0/1) taucht dort redundant auf — darf **keine** zweite Kante erzeugen (CDP hat Vorrang je
+Port). Zusätzlich meldet LLDP einen neuen Nachbarn "ArubaAP-215" auf Gig 1/0/24 (Capability `W`
+= WLAN Access Point), der **nicht** per CDP sichtbar ist (Fremdhersteller, kein CDP-Support) —
+muss als eigener externer Topologie-Knoten mit Dreieck-Symbol (Access Point) auftauchen.
+
 ## Import
 
 App öffnen → alle 10 `.txt`-Dateien aus diesem Ordner per Drag & Drop oder Datei-Auswahl importieren.

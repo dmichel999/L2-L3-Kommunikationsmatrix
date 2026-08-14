@@ -6,17 +6,9 @@ KLU.views = KLU.views || {};
 
 const PANEL_MIN_HEIGHT = 80; // px
 
-function initPanel(panelEl) {
-  const header = panelEl.querySelector('.panel-header');
-  const toggleIcon = panelEl.querySelector('.panel-collapse-btn');
-  const body = panelEl.querySelector('.panel-body');
-  const handle = panelEl.querySelector('.panel-resize-handle');
-
-  header?.addEventListener('click', () => {
-    panelEl.classList.toggle('collapsed');
-    toggleIcon?.setAttribute('aria-expanded', String(!panelEl.classList.contains('collapsed')));
-  });
-
+// Eigenständig nutzbar (nicht nur innerhalb einer .panel-Struktur) — z.B. für die VLAN-Tabelle,
+// die einen eigenen Ziehgriff hat, aber keinen einklappbaren .panel-header besitzt.
+function initHeightResizeHandle(handle, body) {
   if (!handle || !body) return;
   let dragging = false;
   let startY = 0;
@@ -38,8 +30,23 @@ function initPanel(panelEl) {
   handle.addEventListener('pointercancel', stopDrag);
 }
 
+function initPanel(panelEl) {
+  const header = panelEl.querySelector('.panel-header');
+  const toggleIcon = panelEl.querySelector('.panel-collapse-btn');
+  const body = panelEl.querySelector('.panel-body');
+  const handle = panelEl.querySelector('.panel-resize-handle');
+
+  header?.addEventListener('click', () => {
+    panelEl.classList.toggle('collapsed');
+    toggleIcon?.setAttribute('aria-expanded', String(!panelEl.classList.contains('collapsed')));
+  });
+
+  initHeightResizeHandle(handle, body);
+}
+
 KLU.views.collapsiblePanels = {
   init(selector) {
     document.querySelectorAll(selector).forEach(initPanel);
-  }
+  },
+  initHeightResizeHandle
 };

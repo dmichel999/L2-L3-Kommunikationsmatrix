@@ -1,5 +1,8 @@
-// L2-L3 Kommunikationsmatrix — Topologie-Graph aus CDP-Nachbarschaften + Port-Channel-Zuordnung
-// aller importierten Switches. Liefert Knoten + Kanten in aggregierter und einzelner Form.
+// L2-L3 Kommunikationsmatrix — Topologie-Graph aus CDP-/LLDP-Nachbarschaften + Port-Channel-
+// Zuordnung aller importierten Switches. Liefert Knoten + Kanten in aggregierter und einzelner
+// Form. LLDP ergänzt CDP nur für lokale Ports, die CDP nicht abdeckt (CDP deaktiviert oder
+// Fremdhersteller-Nachbar ohne CDP-Support) — CDP hat je Port Vorrang, damit derselbe physische
+// Link nicht doppelt als zwei Kanten gezeichnet wird.
 KLU.topology = {};
 
 function stripDeviceIdSuffix(deviceId) {
@@ -52,6 +55,16 @@ KLU.topology.inferDeviceType = function (platformStr) {
   return 'unknown';
 };
 
+// LLDP-Kurztabelle hat keine Platform-Spalte, dafür IEEE-802.1AB-Capability-Codes (R=Router,
+// B=Bridge, T=Telephone, C=DOCSIS, W=WLAN-AP, P=Repeater, S=Station, O=Other) — grobe
+// Geräte-Typ-Erkennung für Nachbarn, die nur per LLDP sichtbar sind (kein CDP-Support).
+KLU.topology.inferDeviceTypeFromLldpCapability = function (capability) {
+  const c = (capability || '').toUpperCase();
+  if (c.includes('W')) return 'ap';
+  if (c.includes('B')) return 'switch';
+  return 'unknown';
+};
+
 /**
  * @param {Array} switches KLU.state.getSwitches()-Format, benötigt sw.parsed.cdpNeighbors + sw.parsed.portChannels
  * @returns {{ nodes: Array, edgesIndividual: Array, edgesAggregated: Array }}
@@ -64,22 +77,35 @@ KLU.topology.buildGraph = function (switches) {
   const seenEdges = new Map(); // edgeKey -> { a, aPort, b, bPort }
 
   for (const sw of switches) {
-    for (const nb of sw.parsed?.cdpNeighbors || []) {
+    const cdpNeighbors = sw.parsed?.cdpNeighbors || [];
+    const cdpLocalPorts = new Set(cdpNeighbors.map(nb => KLU.parsers.normalizePort(nb.localPort)));
+    // LLDP nur für Ports heranziehen, die CDP nicht bereits gemeldet hat (s.o.).
+    const lldpNeighbors = (sw.parsed?.lldpNeighbors || []).filter(nb => !cdpLocalPorts.has(KLU.parsers.normalizePort(nb.localPort)));
+
+    const taggedNeighbors = [
+      ...cdpNeighbors.map(nb => ({ ...nb, source: 'cdp' })),
+      ...lldpNeighbors.map(nb => ({ ...nb, source: 'lldp' }))
+    ];
+
+    for (const nb of taggedNeighbors) {
       const normalizedKey = normalizeDeviceKey(nb.neighborDeviceId);
       let neighborId = normalizedKey ? hostnameIndex.get(normalizedKey) : undefined;
 
       if (!neighborId) {
         // Nicht importierter Nachbar (Firewall/WLC/AP/...) -> als externen Knoten aufnehmen
         // statt ihn zu verwerfen, damit die Topologie ihn sichtbar macht. Ein leerer
-        // Device-ID-Key (CDP-Zeile ohne erkannten Namen) darf NICHT über mehrere Switches
+        // Device-ID-Key (CDP-/LLDP-Zeile ohne erkannten Namen) darf NICHT über mehrere Switches
         // hinweg zusammengefasst werden, sonst verschmelzen unterschiedliche unbekannte
         // Nachbarn zu einem einzigen Knoten -> Key wird dann pro Switch+Port eindeutig gemacht.
         const dedupeKey = normalizedKey || `blank:${sw.id}:${nb.localPort}`;
         if (!externalNodes.has(dedupeKey)) {
+          const deviceType = nb.source === 'cdp'
+            ? KLU.topology.inferDeviceType(nb.neighborPlatform)
+            : KLU.topology.inferDeviceTypeFromLldpCapability(nb.neighborCapability);
           externalNodes.set(dedupeKey, {
             id: `ext:${dedupeKey}`,
             hostname: stripDeviceIdSuffix(nb.neighborDeviceId) || '(unbekannt)',
-            deviceType: KLU.topology.inferDeviceType(nb.neighborPlatform),
+            deviceType,
             external: true
           });
         }

@@ -133,9 +133,8 @@
 }
 
 #vlan-table-wrapper {
-  max-height: 280px;
+  height: 280px;
   overflow-y: auto;
-  margin-bottom: 8px;
 }
 
 /* Standardhöhe der drei rechten Detail-Panels (Netzwerk-Details/Trunk-Warnungen/

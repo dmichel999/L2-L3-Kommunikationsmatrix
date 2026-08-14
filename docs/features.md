@@ -153,6 +153,14 @@ Reine Diagnose-Anzeige, keine automatische Bewertung, welcher der beiden Einträ
 
 Button "☰ Panels" in der VLAN-Tabellen-Toolbar öffnet ein Popover mit einer Checkbox je rechtem Detail-Panel (MAC-Adressen/Trunk-Warnungen/STP/Duplicate-Erkennung/Netzwerk-Details) — bei wachsender Panel-Zahl sonst zu viel permanenter Platzverbrauch. Deaktivierte Panels werden komplett ausgeblendet (nicht nur eingeklappt wie beim bestehenden Collapse-Button). Reine UI-Präferenz ohne Kundendatenbezug → wie die Theme-Auswahl bewusst NICHT flüchtig, in `localStorage` gemerkt.
 
+## Feature 23: LLDP zusätzlich zu CDP
+
+Neuer Parser `lldp.js` für `show lldp neighbor` (Catalyst + Nexus, identisches Format). Ergänzt CDP für Fälle, in denen CDP deaktiviert ist oder Fremdhersteller-Geräte (kein CDP-Support) im Netz hängen — CDP hat je lokalem Port Vorrang, LLDP füllt nur Lücken, damit derselbe physische Link nicht doppelt als zwei Kanten gezeichnet wird (`KLU.topology.buildGraph`). Da die LLDP-Kurztabelle keine Platform-Spalte hat, wird der Gerätetyp nicht importierter Nachbarn stattdessen aus den IEEE-802.1AB-Capability-Codes abgeleitet (`KLU.topology.inferDeviceTypeFromLldpCapability`: `W` → Access Point, `B` → Switch, sonst unbekannt). `lldpNeighbor` ist bewusst NICHT in den erwarteten Kommandos gelistet — auf einem normalen All-Cisco-Netz mit aktivem CDP fehlt es praktisch immer und wäre dort nur irreführendes Rauschen im Import-Feedback-Panel.
+
+## Feature 24: VLAN-Tabelle höhenverstellbar
+
+Ziehgriff unterhalb der VLAN-Tabelle (analog zu den rechten Detail-Panels) — Startgröße 280px, per Drag verstellbar. Nutzt denselben Ziehgriff-Mechanismus wie `collapsible-panel.js` (dafür als `KLU.views.collapsiblePanels.initHeightResizeHandle()` verallgemeinert), aber eigenständig ohne die volle `.panel`-Struktur, da die VLAN-Tabelle keinen einklappbaren Header hat.
+
 ## Entschieden
 
 - **Mehrere SVIs pro Netz (HSRP/VRRP):** Alle beteiligten Switches anzeigen, seit Feature 19 zusätzlich mit Active/Standby-Rolle sofern `show standby`/`show hsrp`/`show vrrp` importiert wurde.
@@ -166,7 +174,6 @@ Bewusst zurückgestellt (nicht umgesetzt), für einen späteren Auftrag:
 
 - **Freie/ungenutzte Ports** — Kapazitätsplanung ist ein anderer Anwendungsfall als "Kommunikationsmatrix".
 - **Interface-Fehler/Duplex-Mismatch** (`show interfaces`) — deckt sich mit dem vorhandenen Skill `network-interface-health`, eher dort lösen statt im Tool nachbauen.
-- **LLDP zusätzlich zu CDP** (`show lldp neighbor`) — nur relevant bei Fremdherstellern im Netz oder wenn CDP deaktiviert ist; Mehraufwand erst investieren, wenn ein konkreter Kundenfall das braucht.
 - **Redundanz-/Ausfall-Simulation** ("was passiert bei Ausfall von Switch/Link X") — hoher Aufwand (Graphalgorithmus auf Topologie+Port-Channel-Daten), klar eine spätere Ausbaustufe.
 - **Security-Hygiene-Checks** (ungenutzte Ports ohne Port-Security, VLAN 1 als Default in Nutzung, unautorisierte Trunks) — Scope-Überschneidung mit Skill `network-config-validation`, eher dort lösen statt im Tool nachbauen.
 - **Multi-Standort-Gruppierung** (Topologie nach Gebäude/Etage clustern) — fragile Heuristik, da Hostnamen-/CDP-Location-Konventionen je Kunde unterschiedlich sind.
