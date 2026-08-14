@@ -4,16 +4,19 @@
 KLU.views = KLU.views || {};
 
 function hostnameOf(switchId) {
-  return KLU.state.switches.get(switchId)?.hostname || switchId;
+  const hostname = KLU.state.switches.get(switchId)?.hostname || switchId;
+  return KLU.anonymize.hostname(hostname);
 }
 
 function renderNetworkCell(vlanId, networks) {
   if (!networks.length) return '<span class="hint">–</span>';
   return networks.map(n => {
+    // Klick-Key bleibt der ECHTE CIDR-Wert (State-Lookup/network-detail.js parst ihn zurück),
+    // nur die sichtbare Textdarstellung wird anonymisiert.
     const key = `${vlanId}|${n.cidr}`;
     const selected = KLU.state.selectedNetwork === key;
     const maskHint = n.maskKnown ? '' : ' <span class="hint" title="Keine connected Route gefunden, Maske unbekannt">(Maske?)</span>';
-    return `<div class="vlan-network${selected ? ' selected' : ''}" data-network-key="${KLU.dom.escapeHtml(key)}"><code>${KLU.dom.escapeHtml(n.cidr)}</code>${maskHint}</div>`;
+    return `<div class="vlan-network${selected ? ' selected' : ''}" data-network-key="${KLU.dom.escapeHtml(key)}"><code>${KLU.dom.escapeHtml(KLU.anonymize.ip(n.cidr))}</code>${maskHint}</div>`;
   }).join('');
 }
 
@@ -25,7 +28,7 @@ function buildVlanCsvRows(vlans) {
       rows.push([v.vlanId, v.name || '', '', '', switchNames]);
       continue;
     }
-    for (const n of v.networks) rows.push([v.vlanId, v.name || '', n.cidr, n.maskKnown ? 'ja' : 'nein', switchNames]);
+    for (const n of v.networks) rows.push([v.vlanId, v.name || '', KLU.anonymize.ip(n.cidr), n.maskKnown ? 'ja' : 'nein', switchNames]);
   }
   return rows;
 }

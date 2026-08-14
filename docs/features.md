@@ -175,6 +175,14 @@ Toggle "🏢 Standort-Gruppierung" in den Topologie-Ansichtsoptionen. `js/core/s
 
 **Bewusst fragile Heuristik (wie im Backlog vermerkt):** funktioniert nur, wenn die tatsächliche Kunden-Namenskonvention einen Standort-/Gebäude-Präfix vor einem Trenner enthält — bei Hostnamen ohne dieses Muster (wie im mitgelieferten `sample-data/`-Testdatensatz, der bewusst keine Standort-Präfixe nutzt) zeigt das Feature korrekterweise keine sichtbare Clusterung, das ist kein Bug. Keine Auswertung von CDP-Location-Daten (dafür wäre `show cdp neighbor detail`/`show cdp entry` nötig, ein anderes, aktuell nicht geparstes Kommando).
 
+## Feature 27: Anonymisierungs-Option
+
+Toggle "🕶 Anonymisieren" im Header (analog Config Anonymizer). `js/core/anonymize.js` ersetzt Hostnamen/IPs/MAC-Adressen ab dem ersten Auftreten durch fortlaufende Platzhalter (`*HOSTNAME_001*`, `*IP_001*`, `*MAC_001*`) — derselbe Wert bekommt sitzungsweit immer denselben Platzhalter, konsistent über alle Ansichten hinweg (Topologie-Labels, VLAN-Tabelle, MAC-/Trunk-/STP-/Duplicate-Panel, Versionsübersicht, Import-Liste, globale Suche). Beim Deaktivieren erscheinen sofort wieder die Klartext-Werte.
+
+**Bewusst reine Anzeige-Transformation, keine Datenschicht-Änderung:** `KLU.anonymize.*` wird ausschließlich an der Stelle aufgerufen, wo ein Wert als Text ins DOM geschrieben wird — interne Lookup-Keys wie `data-network-key` oder `data-id` (Switch-Auswahl, Drag&Drop, VLAN-Filter) bleiben immer im Klartext, sonst würden Klicks/Filter nach dem Umschalten fehlschlagen. Der Analyse-Stand selbst (importierte Rohdaten, `KLU.state`) bleibt unverändert.
+
+Die CSV-Exports der VLAN-Tabelle und der MAC-Detail-Ansicht respektieren den Anonymisieren-Status ebenfalls. **Nicht abgedeckt:** der PDF/HTML-Report-Export (Feature 20) — der exportiert weiterhin die Klartext-Werte, unabhängig vom Toggle-Status. Wer eine Analyse anonymisiert mit Dritten teilen will, muss aktuell die CSV-Exporte nutzen, nicht den Report-Export.
+
 ## Entschieden
 
 - **Mehrere SVIs pro Netz (HSRP/VRRP):** Alle beteiligten Switches anzeigen, seit Feature 19 zusätzlich mit Active/Standby-Rolle sofern `show standby`/`show hsrp`/`show vrrp` importiert wurde.
@@ -189,4 +197,3 @@ Bewusst zurückgestellt (nicht umgesetzt), für einen späteren Auftrag:
 - **Freie/ungenutzte Ports** — Kapazitätsplanung ist ein anderer Anwendungsfall als "Kommunikationsmatrix".
 - **Interface-Fehler/Duplex-Mismatch** (`show interfaces`) — deckt sich mit dem vorhandenen Skill `network-interface-health`, eher dort lösen statt im Tool nachbauen.
 - **Security-Hygiene-Checks** (ungenutzte Ports ohne Port-Security, VLAN 1 als Default in Nutzung, unautorisierte Trunks) — Scope-Überschneidung mit Skill `network-config-validation`, eher dort lösen statt im Tool nachbauen.
-- **Anonymisierungs-Option** (analog Config Anonymizer) — nur nötig, falls eine Analyse mit Dritten geteilt wird; noch kein konkreter Bedarf.

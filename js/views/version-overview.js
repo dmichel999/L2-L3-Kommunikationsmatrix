@@ -14,7 +14,7 @@ function renderVersionTable() {
 
   const rows = switches.map(sw => `
     <tr>
-      <td>${KLU.dom.escapeHtml(sw.hostname)}</td>
+      <td>${KLU.dom.escapeHtml(KLU.anonymize.hostname(sw.hostname))}</td>
       <td><span class="badge badge-${sw.platform === 'nexus' ? 'nexus' : 'catalyst'}">${KLU.dom.escapeHtml(sw.platform)}</span></td>
       <td>${KLU.dom.escapeHtml(sw.model) || '<span class="hint">–</span>'}</td>
       <td>${KLU.dom.escapeHtml(sw.osVersion) || '<span class="hint">–</span>'}</td>

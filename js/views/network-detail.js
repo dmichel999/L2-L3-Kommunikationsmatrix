@@ -28,7 +28,7 @@ function renderNetworkDetail() {
   const fhrpForVlan = KLU.fhrpModel.build(KLU.state.getSwitches()).find(r => r.vlanId === vlanId);
   const switchNames = network.switches
     .map(id => {
-      const hostname = KLU.state.switches.get(id)?.hostname || id;
+      const hostname = KLU.anonymize.hostname(KLU.state.switches.get(id)?.hostname || id);
       const fhrpState = fhrpForVlan?.entries.find(e => e.switchId === id)?.state;
       return fhrpState ? `${hostname} (${fhrpState})` : hostname;
     })
@@ -39,7 +39,7 @@ function renderNetworkDetail() {
     : ' <span class="hint">(Maske nicht gesichert — keine passende connected Route gefunden, nur aus "show ip interface brief")</span>';
 
   panel.innerHTML = `
-    <p><strong>VLAN-Interface für ${KLU.dom.escapeHtml(cidr)}</strong></p>
+    <p><strong>VLAN-Interface für ${KLU.dom.escapeHtml(KLU.anonymize.ip(cidr))}</strong></p>
     <p class="hint">VLAN ${vlan.vlanId} (${KLU.dom.escapeHtml(vlan.name) || '–'})</p>
     <p>SVI auf: <strong>${switchNames}</strong>${maskHint}</p>
   `;

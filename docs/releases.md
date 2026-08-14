@@ -4,6 +4,11 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/), Versionierun
 
 > Versionshistorie beginnt bei `0.1.0`, passend zum bereits im Code vorhandenen `KLU.version` (`js/core/namespace.js`) — dieses Dokument wurde nachträglich für ein bereits laufendes Projekt angelegt.
 
+## [0.9.0] - 2026-08-14
+
+### Added
+- Anonymisierungs-Option: Toggle "🕶 Anonymisieren" im Header ersetzt Hostnamen/IPs/MAC-Adressen sitzungsweit konsistent durch Platzhalter (`*HOSTNAME_001*` etc.) in allen Ansichten (Topologie, VLAN-Tabelle, MAC-/Trunk-/STP-/Duplicate-Panel, Versionsübersicht, Import-Liste, globale Suche) sowie in den CSV-Exports von VLAN-Tabelle und MAC-Detail-Ansicht; reine Anzeige-Transformation, Analyse-Stand und interne Lookup-Keys bleiben unverändert. Der PDF/HTML-Report-Export ist bewusst nicht abgedeckt (dokumentierte Einschränkung).
+
 ## [0.8.0] - 2026-08-14
 
 ### Added

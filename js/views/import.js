@@ -141,7 +141,7 @@ function renderMissingCommandsPopup(sw) {
   return `
     <span class="switch-warning switch-warning-hover">⚠ ${sw.missingCommands.length} fehlend
       <div class="feature-impact-popup">
-        <strong>Fehlende Kommandos für ${KLU.dom.escapeHtml(sw.hostname)}:</strong>
+        <strong>Fehlende Kommandos für ${KLU.dom.escapeHtml(KLU.anonymize.hostname(sw.hostname))}:</strong>
         ${rows}
       </div>
     </span>
@@ -165,7 +165,7 @@ function renderSwitchList() {
         <option value="catalyst"${sw.platform === 'catalyst' ? ' selected' : ''}>Catalyst</option>
         <option value="nexus"${sw.platform === 'nexus' ? ' selected' : ''}>Nexus</option>
       </select>
-      <span class="switch-hostname">${KLU.dom.escapeHtml(sw.hostname)}</span>
+      <span class="switch-hostname">${KLU.dom.escapeHtml(KLU.anonymize.hostname(sw.hostname))}</span>
       <span class="switch-model">${KLU.dom.escapeHtml(sw.model) || '–'}</span>
       ${sw.platformGuessed ? '<span class="switch-warning" title="Kein \'show version\' in der Datei — Plattform anhand der verwendeten Kommandonamen vermutet, bitte prüfen">⚠ Plattform vermutet</span>' : ''}
       ${renderMissingCommandsPopup(sw)}

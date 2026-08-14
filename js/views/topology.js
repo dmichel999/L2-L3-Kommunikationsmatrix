@@ -265,10 +265,11 @@ function renderTopology() {
     g.appendChild(nodeShapeElement(node.deviceType));
     const label = svgEl('text', { y: 36, 'text-anchor': 'middle', class: 'topology-node-label' });
     const groupSuffix = groupMap ? ` · ${groupMap.get(node.id)}` : '';
-    label.textContent = (node.hostname || node.id) + groupSuffix;
+    const displayName = KLU.anonymize.hostname(node.hostname || node.id);
+    label.textContent = displayName + groupSuffix;
     g.appendChild(label);
     const title = svgEl('title', {});
-    title.textContent = `${node.hostname || node.id} (${DEVICE_TYPE_LABELS[node.deviceType] || node.deviceType})`;
+    title.textContent = `${displayName} (${DEVICE_TYPE_LABELS[node.deviceType] || node.deviceType})`;
     g.appendChild(title);
     nodeLayer.appendChild(g);
   }
@@ -279,7 +280,7 @@ function renderTopology() {
 }
 
 function hostnameOfNode(nodeId, nodes) {
-  return nodes.find(n => n.id === nodeId)?.hostname || nodeId;
+  return KLU.anonymize.hostname(nodes.find(n => n.id === nodeId)?.hostname || nodeId);
 }
 
 // Ergebnis-Overlay der Ausfall-Simulation (Feature "Redundanz-/Ausfall-Simulation") — reine

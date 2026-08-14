@@ -21,6 +21,10 @@
       <div id="global-search-results" class="global-search-results"></div>
     </div>
     <button id="report-export-btn" title="Vollständigen Analyse-Report als eigenständige HTML-Datei exportieren (im Browser druckbar/als PDF speicherbar)">📄 Report exportieren</button>
+    <label class="theme-select-label" title="Ersetzt Hostnamen/IPs/MAC-Adressen in der Anzeige durch Platzhalter (z.B. *HOSTNAME_001*) — für Screenshots/Freigaben mit Dritten. Der Analyse-Stand selbst bleibt unverändert.">
+      <input type="checkbox" id="anonymize-toggle">
+      🕶 Anonymisieren
+    </label>
     <label class="theme-select-label">
       Darstellung
       <select id="theme-select">
@@ -194,6 +198,7 @@
 <script src="lib/jszip.min.js"></script>
 <script src="js/core/namespace.js"></script>
 <script src="js/core/theme.js"></script>
+<script src="js/core/anonymize.js"></script>
 <script src="js/core/state.js"></script>
 <script src="js/core/dom-utils.js"></script>
 <script src="js/core/csv-export.js"></script>
@@ -240,6 +245,7 @@
 <script src="js/views/sidebar-resize.js"></script>
 <script src="js/views/collapsible-panel.js"></script>
 <script src="js/views/theme-toggle.js"></script>
+<script src="js/views/anonymize-toggle.js"></script>
 <script src="js/views/report-export.js"></script>
 <script src="js/views/panel-visibility.js"></script>
 <script src="js/views/tabs.js"></script>

@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('vlan-table-wrapper')
   );
   KLU.views.themeToggle.init();
+  KLU.views.anonymizeToggle.init();
   KLU.views.reportExport.init();
   KLU.views.panelVisibility.init();
   KLU.views.tabs.init();

@@ -2,7 +2,7 @@
 KLU.views = KLU.views || {};
 
 function hostnameOfSwitchForDup(id) {
-  return KLU.state.switches.get(id)?.hostname || id;
+  return KLU.anonymize.hostname(KLU.state.switches.get(id)?.hostname || id);
 }
 
 function renderDuplicatePanel() {
@@ -25,15 +25,15 @@ function renderDuplicatePanel() {
 
   const macRows = duplicateMacs.map(d => `
     <div class="error-line">
-      VLAN ${d.vlanId}, <code>${KLU.dom.escapeHtml(d.macAddress)}</code> gleichzeitig auf:
+      VLAN ${d.vlanId}, <code>${KLU.dom.escapeHtml(KLU.anonymize.mac(d.macAddress))}</code> gleichzeitig auf:
       ${d.occurrences.map(o => `${KLU.dom.escapeHtml(hostnameOfSwitchForDup(o.switchId))}/${KLU.dom.escapeHtml(o.port)}`).join(', ')}
     </div>
   `).join('');
 
   const ipRows = duplicateIps.map(d => `
     <div class="error-line">
-      IP <code>${KLU.dom.escapeHtml(d.ipAddress)}</code> mit unterschiedlichen MAC-Adressen:
-      ${d.macAddresses.map(m => `${KLU.dom.escapeHtml(m.mac)} (${m.switchIds.map(hostnameOfSwitchForDup).map(KLU.dom.escapeHtml).join(', ')})`).join(' | ')}
+      IP <code>${KLU.dom.escapeHtml(KLU.anonymize.ip(d.ipAddress))}</code> mit unterschiedlichen MAC-Adressen:
+      ${d.macAddresses.map(m => `${KLU.dom.escapeHtml(KLU.anonymize.mac(m.mac))} (${m.switchIds.map(hostnameOfSwitchForDup).map(KLU.dom.escapeHtml).join(', ')})`).join(' | ')}
     </div>
   `).join('');
 

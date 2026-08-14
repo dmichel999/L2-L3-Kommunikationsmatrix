@@ -2,7 +2,7 @@
 KLU.views = KLU.views || {};
 
 function hostnameOfSwitchForStp(id) {
-  return KLU.state.switches.get(id)?.hostname || id;
+  return KLU.anonymize.hostname(KLU.state.switches.get(id)?.hostname || id);
 }
 
 function renderStpPanel() {
@@ -25,7 +25,7 @@ function renderStpPanel() {
     const rootLabel = r.rootSwitchId
       ? KLU.dom.escapeHtml(hostnameOfSwitchForStp(r.rootSwitchId))
       : r.rootAddress
-        ? `unbekannt (${KLU.dom.escapeHtml(r.rootAddress)})`
+        ? `unbekannt (${KLU.dom.escapeHtml(KLU.anonymize.mac(r.rootAddress))})`
         : '<span class="hint">–</span>';
     const blockedLabel = r.blockedPorts.length
       ? r.blockedPorts.map(b => `${KLU.dom.escapeHtml(hostnameOfSwitchForStp(b.switchId))}: ${KLU.dom.escapeHtml(b.port)}`).join(', ')

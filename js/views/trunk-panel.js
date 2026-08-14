@@ -3,7 +3,7 @@
 KLU.views = KLU.views || {};
 
 function hostnameOfSwitch(id) {
-  return KLU.state.switches.get(id)?.hostname || id;
+  return KLU.anonymize.hostname(KLU.state.switches.get(id)?.hostname || id);
 }
 
 function renderTrunkPanel() {

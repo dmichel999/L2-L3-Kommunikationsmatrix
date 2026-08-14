@@ -18,9 +18,9 @@ function renderMacDetail() {
 
   const rows = entries.map(e => `
     <tr>
-      <td>${KLU.dom.escapeHtml(e.hostname)}</td>
+      <td>${KLU.dom.escapeHtml(KLU.anonymize.hostname(e.hostname))}</td>
       <td>${KLU.dom.escapeHtml(e.port)}</td>
-      <td><code>${KLU.dom.escapeHtml(e.macAddress)}</code></td>
+      <td><code>${KLU.dom.escapeHtml(KLU.anonymize.mac(e.macAddress))}</code></td>
     </tr>
   `).join('');
 
@@ -45,7 +45,7 @@ KLU.views.macDetail = {
       const switches = KLU.state.getSwitches();
       const graph = KLU.topology.buildGraph(switches);
       const entries = KLU.macModel.getEntriesForVlan(switches, vlanId, graph);
-      const csv = KLU.csvExport.toCsv(['Switch', 'Port', 'MAC-Adresse'], entries.map(en => [en.hostname, en.port, en.macAddress]));
+      const csv = KLU.csvExport.toCsv(['Switch', 'Port', 'MAC-Adresse'], entries.map(en => [KLU.anonymize.hostname(en.hostname), en.port, KLU.anonymize.mac(en.macAddress)]));
       KLU.csvExport.download(`mac-vlan-${vlanId}.csv`, csv);
     });
 
