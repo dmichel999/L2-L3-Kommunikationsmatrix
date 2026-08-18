@@ -4,6 +4,59 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/), Versionierun
 
 > Versionshistorie beginnt bei `0.1.0`, passend zum bereits im Code vorhandenen `KLU.version` (`js/core/namespace.js`) — dieses Dokument wurde nachträglich für ein bereits laufendes Projekt angelegt.
 
+## [0.12.0] - 2026-08-18
+
+### Fixed
+- Topologie-Beschriftung war fett und schlecht lesbar: die Icon-Umstellung (0.11.0) hatte fill/stroke
+  auf die Knoten-Gruppe verschoben, wodurch der Text die 2px-Icon-Kontur erbte. Text bekommt jetzt
+  explizit `stroke: none`.
+- Ausfall-Simulation aktivieren hebt jetzt eine noch laufende Fokus-Auswahl auf (verhinderte bisher,
+  dass isolierte/ausgefallene Geräte klar erkennbar waren, weil beide Hervorhebungen gleichzeitig
+  griffen).
+- Topologie-Layout: reine Anziehung/Abstoßung drängte bei vielen schwach verbundenen Randgeräten
+  (Access Points, unbekannte Geräte) trotz Zentrierung zu einem hohlen Ring statt einer gefüllten
+  Fläche. Umgestellt auf ein geschichtetes Layout (Tiefe per BFS ab dem bestvernetzten Knoten),
+  Kern oben, Endgeräte unten, jede Ebene nutzt die volle Breite.
+
+### Changed
+- Geräte-Farbe im Topologie-Graph ist jetzt einheitlich (neutrales Grau) — der Typ wird bereits über
+  die Icon-Form unterschieden, Farbe ist damit ausschließlich Zuständen (fokussiert/ausgefallen/
+  isoliert) vorbehalten.
+- L3-Kommunikationsmatrix: Klick auf eine VLAN-Zeile mit ACL zeigt jetzt die tatsächlichen ACL-Regeln
+  an (neuer Parser für "show ip access-lists", `js/parsers/access-lists.js`), nicht mehr nur ein
+  Warn-Icon. `show ip interface`-Parser erfasst jetzt auch den ACL-Namen statt nur eines Flags.
+- Beispieldatensatz TechChamps: neues VLAN 50 (Guest, nur SVI auf MUC-CORE2) für echte "nicht
+  ermittelbar"-Zellen in der Matrix statt durchgehend "erreichbar", plus Regelinhalt für beide
+  ACL-Beispiele (ACL_WIFI_GUEST, ACL_GUEST_ISOLATION).
+
+## [0.11.0] - 2026-08-18
+
+### Changed
+- Topologie-Icons: Switch/Firewall/WLC/Access Point bekommen einfache, sofort lesbare
+  Systemsymbole (Gehaeuse mit Ports, Backstein-Mauer, Gehaeuse mit Antenne, Funksymbol) statt
+  generischer Formen (Kreis/Polygon) — angelehnt an uebliche draw.io/Visio-Netzwerksymbolik.
+  "Unbekannte Geraete" bleiben bewusst das schlichte Rechteck.
+- Kraft-basiertes Topologie-Layout: ideale Kantenlaenge skaliert jetzt mit Knotenzahl und
+  Canvas-Flaeche statt eines festen Werts, zusaetzliche Zentrierung verhindert, dass bei vielen
+  Knoten (grosse Kundennetze) fast alles an den Rand gedrueckt wird.
+- Fenster-/Panel-Grössenänderungen berechnen die Positionen jetzt proportional neu (bisher
+  blieben Knoten auf die zuletzt berechnete, ggf. deutlich kleinere Flaeche begrenzt).
+- Der per Klick fokussierte Switch bekommt eine eigene, deutlich sichtbare Markierung
+  (Akzentfarbe + Schatten) statt nur "nicht abgedunkelt wie der Rest" zu sein.
+
+## [0.10.1] - 2026-08-18
+
+### Fixed
+- Topologie-Geräteerkennung (`KLU.topology.inferDeviceType`): aktuelle Catalyst-Access-Points
+  (Wi-Fi 6/6E/7, Modellnamen `C91xx`/`CW9xxx`, z. B. `C9130AXI`) wurden fälschlich als Switch statt
+  als Access Point erkannt, da sie ins generische `c\d{3,4}`-Switch-Muster fielen. Neues Muster
+  greift vor dem Switch-Fallback.
+
+## [0.10.0] - 2026-08-18
+
+### Changed
+- Bechtle Design System Retrofit: Farb-Tokens (`css/design-tokens.css`) und die geteilte Button-/Tab-/Icon-Komponente (`css/design-components.css`) übernommen, Bechtle-Logo im Header, Theme-Toggle (Hell/Automatisch/Dunkel) ersetzt das bisherige Dropdown, KI-Label folgt jetzt korrekt dem Theme (Datei-Umbenennung `ai-label-{light,dark}.svg`). Details/Begründung siehe `docs/architecture.md` Abschnitt 9.
+
 ## [0.9.0] - 2026-08-14
 
 ### Added

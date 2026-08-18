@@ -20,15 +20,73 @@ const DEVICE_TYPE_LABELS = {
   unknown: 'Unbekanntes Gerät'
 };
 
+// BFS-Tiefe je Knoten ab dem bestvernetzten Knoten (meist ein Kern-Switch) - liefert fuer JEDE
+// Topologie eine sinnvolle "von oben nach unten"-Schichtung (Kern -> Distribution -> Access ->
+// Endgeraete), statt sie einem rein physikalischen Kraft-Gleichgewicht zu ueberlassen. Reine
+// Abstossung+Anziehung neigt bei vielen schwach verbundenen Randknoten (die meisten Access
+// Points/unbekannten Geraete haben nur eine einzige Kante) zu einem hohlen Ring statt einer
+// gefuellten Flaeche, weil der Rand fuer jeden einzelnen Knoten den groessten Abstand zu allen
+// anderen bietet.
+function computeLevels(nodes, edges) {
+  const adjacency = new Map(nodes.map(n => [n.id, []]));
+  for (const e of edges) {
+    adjacency.get(e.a)?.push(e.b);
+    adjacency.get(e.b)?.push(e.a);
+  }
+  let root = nodes[0]?.id;
+  let maxDeg = -1;
+  for (const n of nodes) {
+    const deg = (adjacency.get(n.id) || []).length;
+    if (deg > maxDeg) { maxDeg = deg; root = n.id; }
+  }
+  const levels = new Map();
+  if (root != null) {
+    levels.set(root, 0);
+    const queue = [root];
+    while (queue.length) {
+      const cur = queue.shift();
+      const curLevel = levels.get(cur);
+      for (const nb of adjacency.get(cur) || []) {
+        if (!levels.has(nb)) { levels.set(nb, curLevel + 1); queue.push(nb); }
+      }
+    }
+  }
+  let maxLevel = 0;
+  for (const l of levels.values()) maxLevel = Math.max(maxLevel, l);
+  for (const n of nodes) if (!levels.has(n.id)) levels.set(n.id, maxLevel + 1); // getrennte Komponente
+  return levels;
+}
+
 // groupMap (nodeId -> Gruppen-Label) ist optional: wenn gesetzt, werden Knoten derselben Gruppe
 // leicht zueinander gezogen und Knoten unterschiedlicher Gruppen leicht auseinandergedrückt, statt
 // eines komplett eigenen Cluster-Layout-Algorithmus (Multi-Standort-Gruppierung, siehe features.md).
 function computeLayout(nodes, edges, width, height, groupMap) {
-  const positions = new Map(nodes.map(n => [n.id, { x: width / 2 + (Math.random() - 0.5) * 200, y: height / 2 + (Math.random() - 0.5) * 200 }]));
-  const k = 110;
+  const levels = computeLevels(nodes, edges);
+  let maxLevel = 0;
+  for (const l of levels.values()) maxLevel = Math.max(maxLevel, l);
+  const topMargin = 50, bottomMargin = 50;
+  const levelHeight = maxLevel > 0 ? (height - topMargin - bottomMargin) / maxLevel : 0;
+  const targetY = id => topMargin + levels.get(id) * levelHeight;
+
+  const positions = new Map(nodes.map(n => [n.id, {
+    x: width / 2 + (Math.random() - 0.5) * 200,
+    y: targetY(n.id) + (Math.random() - 0.5) * 40
+  }]));
+  // Ideale Kantenlaenge an Knotenzahl UND Canvas-Flaeche anpassen (Fruchterman-Reingold-
+  // Faustformel k = sqrt(Flaeche/Knotenzahl)) statt eines festen Werts - bei groesseren
+  // Kundennetzen (viele Knoten) liess ein fester Wert fast alles gegen den Rand laufen, weil die
+  // Abstossung nicht zur verfuegbaren Flaeche passte.
+  const k = Math.max(50, Math.sqrt((width * height) / nodes.length) * 0.9);
+  const centerX = width / 2;
 
   for (let iter = 0; iter < 300; iter++) {
-    const forces = new Map(nodes.map(n => [n.id, { x: 0, y: 0 }]));
+    // Nur die X-Komponente wird als Kraft akkumuliert (Abstossung/Anziehung bestimmen die
+    // Verteilung NEBENEINANDER innerhalb einer Ebene). Die Y-Komponente wird bewusst NICHT Teil
+    // dieser Kraft-Summe: eine mittlere Ebene wird von potenziell Dutzenden Knoten in
+    // Nachbar-Ebenen gleichzeitig abgestossen, wodurch eine Y-Kraft regelmaessig von der
+    // kumulierten Abstossung ueberstimmt wurde und Knoten trotzdem an den Rand drueckte (siehe
+    // Bugfix-Notiz weiter unten bei der Y-Aktualisierung).
+    const forcesX = new Map(nodes.map(n => [n.id, 0]));
 
     for (let i = 0; i < nodes.length; i++) {
       for (let j = i + 1; j < nodes.length; j++) {
@@ -40,9 +98,9 @@ function computeLayout(nodes, edges, width, height, groupMap) {
           const sameGroup = groupMap.get(nodes[i].id) === groupMap.get(nodes[j].id);
           force *= sameGroup ? 0.3 : 1.6; // gleiche Gruppe näher zusammen, andere weiter auseinander
         }
-        const fx = (dx / dist) * force, fy = (dy / dist) * force;
-        forces.get(nodes[i].id).x += fx; forces.get(nodes[i].id).y += fy;
-        forces.get(nodes[j].id).x -= fx; forces.get(nodes[j].id).y -= fy;
+        const fx = (dx / dist) * force;
+        forcesX.set(nodes[i].id, forcesX.get(nodes[i].id) + fx);
+        forcesX.set(nodes[j].id, forcesX.get(nodes[j].id) - fx);
       }
     }
 
@@ -52,28 +110,63 @@ function computeLayout(nodes, edges, width, height, groupMap) {
       const dx = b.x - a.x, dy = b.y - a.y;
       const dist = Math.sqrt(dx * dx + dy * dy) || 0.01;
       const force = ((dist * dist) / k) * 0.05;
-      const fx = (dx / dist) * force, fy = (dy / dist) * force;
-      forces.get(e.a).x += fx; forces.get(e.a).y += fy;
-      forces.get(e.b).x -= fx; forces.get(e.b).y -= fy;
+      const fx = (dx / dist) * force;
+      forcesX.set(e.a, forcesX.get(e.a) + fx);
+      forcesX.set(e.b, forcesX.get(e.b) - fx);
     }
 
     for (const n of nodes) {
-      const f = forces.get(n.id), p = positions.get(n.id);
-      p.x += Math.max(-10, Math.min(10, f.x * 0.01));
-      p.y += Math.max(-10, Math.min(10, f.y * 0.01));
+      const p = positions.get(n.id);
+      // X: Kraft-Summe (Abstossung/Anziehung/Gruppierung) plus milde Zentrierung.
+      let fx = forcesX.get(n.id) + (centerX - p.x) * 0.01;
+      p.x += Math.max(-10, Math.min(10, fx * 0.01));
       p.x = Math.max(40, Math.min(width - 40, p.x));
+      // Y: direkte Annaeherung an die per BFS-Tiefe vorgegebene Ebene statt einer Kraft, die
+      // gegen die X-Abstossung haette konkurrieren muessen (siehe Kommentar oben) - garantiert
+      // Konvergenz zur richtigen Ebene unabhaengig von Knotenzahl/Abstossungsstaerke.
+      p.y += (targetY(n.id) - p.y) * 0.08;
       p.y = Math.max(40, Math.min(height - 40, p.y));
     }
+  }
+
+  // Nur den X-Schwerpunkt nachtraeglich zentrieren - Y ist bereits durch die Ebenen-Ankerkraft
+  // kontrolliert; ein zusaetzlicher Y-Shift wuerde einzelne Ebenen ggf. aus dem sichtbaren
+  // Bereich schieben.
+  let meanX = 0;
+  for (const p of positions.values()) meanX += p.x;
+  meanX /= nodes.length;
+  const shiftX = centerX - meanX;
+  for (const p of positions.values()) {
+    p.x = Math.max(40, Math.min(width - 40, p.x + shiftX));
   }
 
   return positions;
 }
 
+let cachedWidth = null;
+let cachedHeight = null;
+
 function getPositions(nodes, edgesForLayout, width, height, groupMap) {
   const nodeIdsKey = nodes.map(n => n.id).sort().join(',') + (groupMap ? '|grouped' : '');
-  if (cachedPositions && cachedNodeIds === nodeIdsKey) return cachedPositions;
+  if (cachedPositions && cachedNodeIds === nodeIdsKey) {
+    // Canvas-Groesse hat sich geaendert (z.B. Fenster vergroessert/Vollbild): bestehende,
+    // eventuell manuell per Drag verschobene Positionen proportional auf die neue Flaeche
+    // umrechnen, statt das teure Layout komplett neu zu simulieren und Drags zu verwerfen.
+    if (cachedWidth && cachedHeight && (cachedWidth !== width || cachedHeight !== height)) {
+      const scaleX = width / cachedWidth, scaleY = height / cachedHeight;
+      for (const p of cachedPositions.values()) {
+        p.x = Math.max(40, Math.min(width - 40, p.x * scaleX));
+        p.y = Math.max(40, Math.min(height - 40, p.y * scaleY));
+      }
+      cachedWidth = width;
+      cachedHeight = height;
+    }
+    return cachedPositions;
+  }
   cachedPositions = computeLayout(nodes, edgesForLayout, width, height, groupMap);
   cachedNodeIds = nodeIdsKey;
+  cachedWidth = width;
+  cachedHeight = height;
   return cachedPositions;
 }
 
@@ -93,20 +186,54 @@ function groupEdgesByPair(edges) {
   return byPair;
 }
 
-// Geometrie je Gerätetyp — eigene Form statt nur Farbe, damit der Typ auch ohne Farbsehen
-// erkennbar ist. Alle Formen sind um den Ursprung zentriert (Elternknoten übernimmt translate).
+// Geometrie je Gerätetyp — einfache, auf den ersten Blick lesbare Systemsymbole (angelehnt an
+// die uebliche draw.io/Visio-Netzwerk-Symbolik: Switch = Gehaeuse mit Ports, Firewall =
+// Backstein-Mauer, WLC = Gehaeuse mit Antenne, Access Point = Funksymbol), statt generischer
+// Formen ohne Wiedererkennungswert. Nur "unbekannt" bleibt bewusst das schlichte Rechteck.
+// Alle Icons sind um den Ursprung zentriert (Elternknoten uebernimmt translate) und bestehen aus
+// mehreren Grundformen in einer Gruppe - fill/stroke kommen dabei von der .topology-node-Gruppe
+// (siehe css/components.css), rein dekorative Linien/Pfade setzen bewusst fill="none", damit
+// aus offenen Pfaden (Ports, Signalboegen, Fugen) keine gefuellten Flaechen werden.
 function nodeShapeElement(deviceType) {
+  const g = svgEl('g', {});
+  const deco = (tag, attrs) => g.appendChild(svgEl(tag, { fill: 'none', ...attrs }));
+
   switch (deviceType) {
-    case 'firewall':
-      return svgEl('polygon', { points: '0,-24 24,0 0,24 -24,0' });
-    case 'wlc':
-      return svgEl('polygon', { points: '22,0 11,19 -11,19 -22,0 -11,-19 11,-19' });
-    case 'ap':
-      return svgEl('polygon', { points: '0,-24 21,13 -21,13' });
+    case 'firewall': {
+      // Backstein-Mauer in einem Rahmen (3 versetzte Reihen), wie das klassische draw.io-Symbol.
+      g.appendChild(svgEl('rect', { x: -20, y: -20, width: 40, height: 40, rx: 2 }));
+      deco('line', { x1: -20, y1: -7, x2: 20, y2: -7 });
+      deco('line', { x1: -20, y1: 6, x2: 20, y2: 6 });
+      deco('line', { x1: 0, y1: -20, x2: 0, y2: -7 });
+      deco('line', { x1: -10, y1: -7, x2: -10, y2: 6 });
+      deco('line', { x1: 10, y1: -7, x2: 10, y2: 6 });
+      deco('line', { x1: 0, y1: 6, x2: 0, y2: 20 });
+      return g;
+    }
+    case 'wlc': {
+      // Controller-Gehaeuse mit Antenne + zwei Signalboegen darueber ("Box, die Funk steuert").
+      g.appendChild(svgEl('rect', { x: -14, y: 4, width: 28, height: 14, rx: 2 }));
+      deco('line', { x1: 0, y1: 4, x2: 0, y2: -2 });
+      deco('path', { d: 'M -6,-2 Q 0,-10 6,-2' });
+      deco('path', { d: 'M -12,-2 Q 0,-18 12,-2' });
+      return g;
+    }
+    case 'ap': {
+      // Klassisches Funk-/WLAN-Symbol: Geraet (Punkt) + konzentrische Signalboegen darueber.
+      g.appendChild(svgEl('circle', { cx: 0, cy: 10, r: 4 }));
+      deco('path', { d: 'M -5,6 Q 0,-2 5,6' });
+      deco('path', { d: 'M -10,6 Q 0,-8 10,6' });
+      deco('path', { d: 'M -15,6 Q 0,-14 15,6' });
+      return g;
+    }
     case 'unknown':
       return svgEl('rect', { x: -19, y: -19, width: 38, height: 38, rx: 4 });
-    default: // switch
-      return svgEl('circle', { r: 22 });
+    default: {
+      // Switch: Gehaeuse mit einer Reihe Port-Markierungen.
+      g.appendChild(svgEl('rect', { x: -22, y: -12, width: 44, height: 24, rx: 3 }));
+      for (const x of [-16, -8, 0, 8, 16]) deco('line', { x1: x, y1: 2, x2: x, y2: 8 });
+      return g;
+    }
   }
 }
 
@@ -259,6 +386,7 @@ function renderTopology() {
     const dimSet = nodeDimmed ? new Set([node.id]) : null;
     const hlSet = highlightSet?.has(node.id) ? new Set([node.id]) : null;
     let classes = nodeClasses(node, dimSet, hlSet);
+    if (focusId && node.id === focusId) classes += ' focused'; // Feature 10: welches Geraet ist fokussiert
     if (failureTarget?.type === 'node' && failureTarget.id === node.id) classes += ' failed';
     if (failureResult?.isolatedNodeIds.has(node.id)) classes += ' isolated';
     const g = svgEl('g', { class: classes, transform: `translate(${pos.x},${pos.y})`, 'data-node-id': node.id });

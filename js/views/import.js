@@ -1,7 +1,7 @@
 // L2-L3 Kommunikationsmatrix — Import-View: Mehrfach-Datei-Upload, Parsing, Switch-Liste
 KLU.views = KLU.views || {};
 
-const EXPECTED_COMMANDS = ['version', 'cdpNeighbor', 'portChannel', 'vlan', 'macAddressTable', 'ipInterfaceBrief', 'arp', 'ipRoute', 'interfacesTrunk', 'ipInterfaceFull', 'spanningTree', 'fhrpStatus'];
+const EXPECTED_COMMANDS = ['version', 'cdpNeighbor', 'portChannel', 'vlan', 'macAddressTable', 'ipInterfaceBrief', 'arp', 'ipRoute', 'interfacesTrunk', 'ipInterfaceFull', 'spanningTree', 'fhrpStatus', 'accessLists'];
 
 // Für den Hover-Popup bei fehlenden Kommandos (Feature 11 der Erweiterung, siehe features.md):
 // welches Feature/welche Ansicht ist ohne dieses Kommando für diesen Switch eingeschränkt.
@@ -17,7 +17,8 @@ const COMMAND_FEATURE_IMPACT = {
   interfacesTrunk: 'Trunk-Ansicht: Native-VLAN-Mismatch-Prüfung für Links dieses Switches nicht möglich',
   ipInterfaceFull: 'Kommunikationsmatrix: ACL-Hinweis-Flag für SVIs dieses Switches nicht verfügbar',
   spanningTree: 'STP-Ansicht: Root-Bridge-Erkennung und blockierte Ports für diesen Switch nicht verfügbar',
-  fhrpStatus: 'Netzwerk-Details: Active/Standby-Rolle dieses Switches bei mehreren SVIs (HSRP/VRRP) nicht verfügbar'
+  fhrpStatus: 'Netzwerk-Details: Active/Standby-Rolle dieses Switches bei mehreren SVIs (HSRP/VRRP) nicht verfügbar',
+  accessLists: 'Kommunikationsmatrix: ACL-Regeltext für SVIs dieses Switches nicht verfügbar (nur der Name, falls über "show ip interface" bekannt)'
 };
 
 function readFileAsText(file) {
@@ -103,6 +104,7 @@ async function processFile(file) {
   // deaktiviert), auf einem normalen All-Cisco-Netz mit aktivem CDP fehlt es praktisch immer und
   // wäre dort nur irreführendes Rauschen im Import-Feedback-Panel.
   const lldpNeighbors = commands.lldpNeighbor ? KLU.parsers.parseLldpNeighbor(commands.lldpNeighbor) : [];
+  const accessLists = commands.accessLists ? KLU.parsers.parseAccessLists(commands.accessLists) : [];
   const missingCommands = EXPECTED_COMMANDS.filter(k => !(k in commands));
 
   const sw = {
@@ -114,7 +116,7 @@ async function processFile(file) {
     osVersion: version.osVersion,
     fileName: file.name,
     raw: commands,
-    parsed: { cdpNeighbors, portChannels, vlans, ipRouteConnected, ipInterfaceBrief, macTable, trunks, ipInterfaceFull, arpEntries, spanningTree, fhrpStatus, lldpNeighbors },
+    parsed: { cdpNeighbors, portChannels, vlans, ipRouteConnected, ipInterfaceBrief, macTable, trunks, ipInterfaceFull, arpEntries, spanningTree, fhrpStatus, lldpNeighbors, accessLists },
     missingCommands,
     unrecognized
   };
@@ -169,7 +171,7 @@ function renderSwitchList() {
       <span class="switch-model">${KLU.dom.escapeHtml(sw.model) || '–'}</span>
       ${sw.platformGuessed ? '<span class="switch-warning" title="Kein \'show version\' in der Datei — Plattform anhand der verwendeten Kommandonamen vermutet, bitte prüfen">⚠ Plattform vermutet</span>' : ''}
       ${renderMissingCommandsPopup(sw)}
-      <button class="btn-remove" data-id="${KLU.dom.escapeHtml(sw.id)}">Entfernen</button>
+      <button class="btn-remove danger outlined" data-id="${KLU.dom.escapeHtml(sw.id)}">Entfernen</button>
     </div>
   `).join('');
 }

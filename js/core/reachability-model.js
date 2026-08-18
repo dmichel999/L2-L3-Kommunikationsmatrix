@@ -9,7 +9,8 @@ KLU.reachabilityModel = {};
 
 /**
  * @param {Array} switches KLU.state.getSwitches()-Format, erwartet sw.parsed.ipInterfaceFull
- * @returns {Array<{ vlanId: number, name: string|null, cidr: string, hostSwitches: Set<string>, aclFlag: boolean }>}
+ * @returns {Array<{ vlanId: number, name: string|null, cidr: string, hostSwitches: Set<string>,
+ *   aclFlag: boolean, acls: Array<{ switchId: string, name: string, rules: string[]|null }> }>}
  */
 KLU.reachabilityModel.build = function (switches) {
   const vlans = KLU.vlanModel.build(switches);
@@ -18,10 +19,20 @@ KLU.reachabilityModel.build = function (switches) {
     .filter(v => v.networks.length > 0) // nur VLANs mit bekanntem SVI sind Teil der Matrix
     .map(v => {
       const hostSwitches = new Set(v.networks.flatMap(n => n.switches));
-      const aclFlag = switches.some(sw =>
-        hostSwitches.has(sw.id) && (sw.parsed?.ipInterfaceFull || []).some(e => e.vlanId === v.vlanId && e.hasAcl)
-      );
-      return { vlanId: v.vlanId, name: v.name, cidr: v.networks[0].cidr, hostSwitches, aclFlag };
+      const acls = [];
+      for (const sw of switches) {
+        if (!hostSwitches.has(sw.id)) continue;
+        const entry = (sw.parsed?.ipInterfaceFull || []).find(e => e.vlanId === v.vlanId);
+        if (!entry?.hasAcl) continue;
+        for (const name of entry.acls) {
+          // Regelinhalt kommt aus "show ip access-lists" auf demselben Switch - fehlt dieses
+          // Kommando (siehe EXPECTED_COMMANDS in import.js), bleibt rules null statt eines
+          // Fehlers, die Ansicht zeigt dann nur den Namen.
+          const definition = (sw.parsed?.accessLists || []).find(a => a.name === name);
+          acls.push({ switchId: sw.id, name, rules: definition ? definition.rules : null });
+        }
+      }
+      return { vlanId: v.vlanId, name: v.name, cidr: v.networks[0].cidr, hostSwitches, aclFlag: acls.length > 0, acls };
     });
 };
 
