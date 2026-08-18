@@ -28,4 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const footerVersion = document.getElementById('app-footer-version');
   if (footerVersion) footerVersion.textContent = `v${KLU.version}`;
+  const headerBadge = document.getElementById('header-version-badge');
+  if (headerBadge) headerBadge.textContent = `v${KLU.version}`;
 });

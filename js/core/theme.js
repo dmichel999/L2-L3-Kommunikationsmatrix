@@ -21,7 +21,7 @@ function effectiveIsDark() {
 function updateAiLabelIcon() {
   const icon = document.getElementById('ai-label-icon');
   if (!icon) return;
-  icon.src = `assets/Bechtle_AI_Generated_Label_${effectiveIsDark() ? 'dark' : 'light'}_EN.svg`;
+  icon.src = `assets/ai-label-${effectiveIsDark() ? 'dark' : 'light'}.svg`;
 }
 
 // 'system' entfernt das Attribut wieder -> @media (prefers-color-scheme) in base.css greift.

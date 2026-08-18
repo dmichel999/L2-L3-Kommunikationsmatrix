@@ -58,6 +58,12 @@ KLU.state.toggleDeviceTypeVisibility = function (deviceType) {
 KLU.state.setFailureSimActive = function (value) {
   KLU.state.failureSimActive = value;
   KLU.state.failureSimTarget = null; // Moduswechsel hebt eine laufende Simulation auf
+  // Ein noch aktiver Fokus-Filter (Feature 10) wuerde parallel abgedunkelte Knoten zeigen und
+  // mit der Ausfall-Darstellung (isoliert/ausgefallen) kollidieren - beim Umschalten aufheben.
+  if (KLU.state.selectedSwitchFocus) {
+    KLU.state.selectedSwitchFocus = null;
+    KLU.emit('switchFocus:selected', null);
+  }
   KLU.emit('failureSim:changed', null);
 };
 

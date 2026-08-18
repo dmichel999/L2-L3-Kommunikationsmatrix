@@ -47,7 +47,10 @@ KLU.topology.inferDeviceType = function (platformStr) {
   // Reihenfolge wichtig: C9800 ist ein IOS-XE-WLC (kein AireOS "AIR-CT"), aber "c98" würde sonst
   // vom generischen Switch-Modell-Muster weiter unten fälschlich als Switch erkannt.
   if (/air-ct|c9800|wlc|wireless lan controller/.test(p)) return 'wlc';
-  if (/air-ap|meraki mr|access point|^ap\b/.test(p)) return 'ap';
+  // Aktuelle Catalyst-Access-Points (Wi-Fi 6/6E/7) heissen "C91xx"/"CW9xxx" (z.B. C9130AXI,
+  // CW9166I) - Reihenfolge wichtig: liegen im selben Nummernbereich wie ein generisches
+  // "c\d{3,4}"-Switch-Modell, muessen also VOR dem Switch-Fallback-Muster geprueft werden.
+  if (/air-ap|meraki mr|access point|^ap\b|^c91\d\d|^cw9/.test(p)) return 'ap';
   // Nicht importierter Nachbar, der selbst offensichtlich ein Switch ist (z.B. das
   // CDP-Gegenstück eines Nexus/Catalyst, der nur nicht mit-importiert wurde). Der WLC-Check
   // oben greift bereits vorher, "c9800" landet also nie hier.

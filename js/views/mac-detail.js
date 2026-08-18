@@ -25,7 +25,7 @@ function renderMacDetail() {
   `).join('');
 
   panel.innerHTML = `
-    <div class="panel-body-toolbar"><strong>VLAN ${vlanId}</strong><button class="mac-csv-export">CSV exportieren</button></div>
+    <div class="panel-body-toolbar"><strong>VLAN ${vlanId}</strong><button class="mac-csv-export outlined">CSV exportieren</button></div>
     <p class="hint">Uplinks zwischen Switches und VLAN-Interface-eigene MACs sind ausgeblendet.</p>
     ${entries.length
       ? `<table class="vlan-table"><thead><tr><th>Switch</th><th>Port</th><th>MAC-Adresse</th></tr></thead><tbody>${rows}</tbody></table>`

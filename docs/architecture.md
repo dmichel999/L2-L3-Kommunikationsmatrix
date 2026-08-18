@@ -60,7 +60,53 @@ Zoom/Pan ist ein reiner Transform auf einer `<g class="zoom-layer">`, die Knoten
 - **`js/views/collapsible-panel.js`**: generische einklappbare, optional höhenverstellbare Panel-Komponente (`.panel`/`.panel-header`/`.panel-body`/`.panel-resize-handle`), genutzt für die drei rechten Detail-Panels und die Sidebar-Bereiche.
 - **`js/core/theme.js`**: Hell/Dunkel/System per `data-theme`-Attribut auf `<html>` + `localStorage`. CSS-Variablen in `css/base.css` sind dreifach definiert (Basis auf `:root`, System-Override unter `@media (prefers-color-scheme: dark) :root:not([data-theme="light"])`, expliziter Override unter `:root[data-theme="dark"]`).
 
-## 8. Test-Strategie (kein Node.js auf der Entwicklungsmaschine)
+## 9. Bechtle Design System Retrofit (2026-08-18)
+
+Dieses Projekt hat eine sehr dichte Oberfläche mit ~30 kleinen, bewusst dezenten Buttons
+(Zoom-Steuerung, Panel-Einklappen, Einstellungs-Popover-Trigger, Entfernen-Button pro
+importierten Switch, …). Die geteilte `button, .btn {}`-Regel aus `css/design-components.css`
+setzt dafür standardmäßig einen 40px hohen, gefüllten Pill-Button — das hätte diese kleinen
+Bedienelemente ohne weiteres Zutun aufgebläht. Deshalb wurde jeder Button einzeln klassifiziert:
+
+| Kategorie | Klasse | Beispiele |
+|---|---|---|
+| Primäre Aktion | keine (Default) | `#report-export-btn` |
+| Icon-Only-Trigger | `.icon` | Zoom −/💯/+/⛶, `#topology-settings-toggle`, `#panel-visibility-toggle` |
+| Sekundäraktion mit Text | `.outlined` | `#vlan-csv-export`, `.mac-csv-export` |
+| Destruktive Aktion | `.danger.outlined` | `.btn-remove` (Switch aus der Import-Liste entfernen) |
+| Bereits vollständig eigenständig gestylt | keine Design-System-Klasse | `.panel-collapse-btn` (▾, setzt selbst Hintergrund/Farbe/Padding — braucht nur `min-height: auto`, da die geteilte Regel sonst trotzdem eine Mindesthöhe erzwingt) |
+
+**Wo Icon-Buttons zuvor Text+Symbol waren** (`⚙ Ansicht`, `☰ Panels`), wurde auf reines Icon
+(`.icon` + SVG aus dem Sprite) reduziert — beide öffnen ohnehin ein Popover mit den
+eigentlichen Optionen, ein beschrifteter 40px-Pill-Button hätte die ohnehin volle Toolbar-Zeile
+gesprengt. Tooltip (`title`) bleibt für Zugänglichkeit erhalten.
+
+**Icon-Sprite:** Nur die tatsächlich verwendeten 5 Symbole (`ic-settings`, `ic-menu`,
+`ic-light-mode`, `ic-dark-mode`, `ic-auto-mode`) sind inline im `<body>` eingebettet, nicht
+der komplette 24-Symbol-Sprite aus `icons/icon-sprite-inline.html` — bei Bedarf für neue
+Icons dort nachschauen und ergänzen (Referenzquelle bleibt `icons/icon-sprite.svg`).
+
+**Header bleibt neutral statt appbar-grün:** Die Design-System-Referenz-Appbar hat einen
+satten grünen Hintergrund (`--md-primary-strong`) mit weißen Kontrollen. Dieser Header
+beherbergt aber Suchfeld, Dashboard-Stats, Checkbox und Theme-Toggle nebeneinander in einer
+dichten Toolbar-Zeile — auf grünem Grund wären diese (für eine helle/neutrale Fläche
+ausgelegten) Elemente kaum lesbar gewesen. Der Header behält daher seinen bisherigen
+neutralen `var(--surface)`-Hintergrund; Logo, Theme-Toggle und Versions-Badge sind eigene,
+auf neutralen Hintergrund abgestimmte Regeln in `css/layout.css` (gleiche Klassennamen wie im
+Design System, aber lokal mit anderen Farben überschrieben — funktioniert, weil die
+Projekt-CSS-Dateien nach `css/design-components.css` geladen werden).
+
+**Farb-Variablen:** `css/base.css` definiert die bisherigen semantischen Variablen
+(`--bg`, `--surface`, `--border`, `--text`, `--text-muted`, `--accent`, `--warning`, `--error`,
+…) jetzt als Aliase auf die `--md-*`-Tokens aus `css/design-tokens.css`, statt eigener
+Hex-Werte — `css/layout.css`/`css/components.css` mussten dadurch **nicht** angefasst werden,
+Farben/Theming laufen jetzt zentral über das Design System. Die sechs Geräte-/Plattform-Farben
+(`--catalyst`, `--nexus`, `--firewall`, `--wlc`, `--ap`, `--unknown-device`) sind bewusst
+**keine** Aliase, da sie keine Markenfarben sind, sondern eine Kategorie-Palette für die
+Topologie-Darstellung (vergleichbar einer Chart-Farbskala) — sie behalten ihre eigenen,
+pro Theme angepassten Werte.
+
+## 10. Test-Strategie (kein Node.js auf der Entwicklungsmaschine)
 
 - **Parser-/Modell-Unit-Tests:** `osascript -l JavaScript` (JXA) als Ersatz-JS-Runtime. Projektdateien werden über `ObjC.import('Foundation')` + `NSString.stringWithContentsOfFileEncodingError` gelesen (zuverlässiger als der Standard-Additions-`read`-Befehl bei Pfaden mit Sonderzeichen wie "Überblick") und per `new Function(code + 'return KLU;')()` ausgeführt.
 - **End-to-End:** Safari + AppleScript `do JavaScript`/JXA `Application('Safari').doJavaScript()`, Test-Dateien werden als synthetische `File`-Objekte (`new File([text], name)` + `DataTransfer`) ins echte `<input type="file">` injiziert, um den echten Import-Pfad zu testen statt eine Test-only-Abkürzung zu bauen.

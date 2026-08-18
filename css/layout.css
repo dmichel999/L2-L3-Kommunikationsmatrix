@@ -9,10 +9,16 @@
   height: 100vh;
 }
 
+/* justify-content/text-align explizit gesetzt, weil das globale (zentrierte) footer{}
+   aus css/design-components.css sonst durchschlaegt, sobald .app-footer selbst diese
+   beiden Eigenschaften nicht definiert (Spezifitaet gewinnt nur bei ueberschneidenden
+   Properties, nicht bei fehlenden). */
 .app-footer {
   grid-area: footer;
   display: flex;
   align-items: center;
+  justify-content: flex-start;
+  text-align: left;
   gap: 8px;
   padding: 3px 16px;
   border-top: 1px solid var(--border);
@@ -43,8 +49,70 @@
   flex-wrap: wrap;
 }
 
-.app-header h1 { flex-shrink: 0; }
+.app-header h1 { flex-shrink: 0; font-size: 1.1rem; }
 #report-export-btn { flex-shrink: 0; }
+
+/* Bechtle-Logo im Header — Signet auf schmalen Fenstern, Landscape-Logo ab 1024px
+   (gleiches Verhalten wie die Appbar-Komponente des Design Systems, nur kompakter
+   dimensioniert, da dieser Header ein dichtes Toolbar-Layout mit vielen Bedienelementen
+   ist statt einer schlichten Titelleiste). */
+.app-header .logo-signet,
+.app-header .logo-landscape { display: none; flex: none; }
+.app-header .logo-signet { display: block; height: 26px; width: auto; }
+@media (min-width: 1024px) {
+  .app-header .logo-signet { display: none; }
+  .app-header .logo-landscape { display: block; height: 20px; width: auto; }
+}
+
+.header-toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.header-version-badge {
+  font: 500 0.7rem/1 var(--mono);
+  padding: 5px 10px;
+  border-radius: var(--radius-full);
+  background: var(--md-surface-2);
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Theme-Toggle: gleiche Komponente/Klassen wie in den anderen Cisco-Tools, aber mit
+   neutralen statt appbar-gruenen Farben — dieser Header hat bewusst keinen farbigen
+   Hintergrund (siehe docs/architecture.md), die Original-Appbar-Farben waeren hier
+   unlesbar. */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--md-surface-2);
+  border-radius: var(--radius-full);
+  padding: 2px;
+  flex-shrink: 0;
+}
+.theme-toggle button {
+  all: unset;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: background 0.15s, color 0.15s;
+}
+.theme-toggle button:hover { color: var(--text); }
+.theme-toggle button[aria-pressed="true"] {
+  background: var(--md-surface-3);
+  color: var(--accent);
+}
+.theme-toggle svg.i { width: 16px; height: 16px; }
 
 .app-sidebar {
   grid-area: sidebar;
@@ -54,19 +122,25 @@
   min-width: 0;
 }
 
+/* max-width/margin explizit zurueckgesetzt, weil das globale main{} aus
+   css/design-components.css sonst den Hauptbereich auf --content-max-width (1100px)
+   begrenzt und zentriert — dieses Tool ist ein Vollbild-Grid-Layout, kein zentrierter
+   Dokument-Textbereich, der Hauptbereich muss die komplette Grid-Zelle ausfuellen. */
 .app-main {
   grid-area: main;
+  max-width: none;
+  margin: 0;
   padding: 16px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 
+/* .view-tabs traegt zusaetzlich die Design-System-Klasse .tab-bar (Border/Farben/aktiver
+   Zustand kommen von dort, siehe css/design-components.css) — .view-tabs selbst liefert
+   nur noch den Abstand nach unten. */
 .view-tabs {
-  display: flex;
-  gap: 4px;
   margin-bottom: 12px;
-  border-bottom: 1px solid var(--border);
 }
 
 .view-panel { display: none; flex: 1; min-height: 0; flex-direction: column; }
@@ -216,22 +290,5 @@
   padding: 6px;
 }
 .global-search-results.open { display: block; }
-
-.theme-select-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--text-muted);
-  flex-shrink: 0;
-}
-.theme-select-label select {
-  padding: 4px 6px;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--bg);
-  color: var(--text);
-  font: inherit;
-}
 
 #view-matrix, #view-versions { overflow-y: auto; }
