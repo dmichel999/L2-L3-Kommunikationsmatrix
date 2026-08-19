@@ -41,7 +41,7 @@ Rein client-seitig (HTML/JS, kein Build-System, kein npm), analog `Config Anonym
 - Zuordnung Port → Port-Channel kommt aus `show etherchannel summary` (Catalyst) bzw. `show port-channel summary` (Nexus).
 - **Nicht importierte CDP-Nachbarn** (Firewall, WLC, Access Point, sonstige Geräte) werden ebenfalls als Knoten angezeigt, sobald ein importierter Switch sie als CDP-Nachbar meldet — auch wenn für sie keine eigene Datei importiert wurde (kein VLAN/MAC/IP-Wissen über sie, nur Verbindungspunkt). Typ wird aus dem (ggf. abgeschnittenen) CDP-Platform-String erkannt: `KLU.topology.inferDeviceType()`.
 - **Handgezeichnete Icons je Gerätetyp:** Gehäuse mit Ports = Switch, Backstein-Mauer = Firewall, Gehäuse mit Antenne = WLC, Funksymbol = Access Point, Quadrat = unbekanntes Gerät. Farbe ist bewusst einheitlich (neutraler Grauton) — Typ wird über die Icon-Form unterschieden, Farbe bleibt ausschließlich Zuständen (Fokus/VLAN-Hervorhebung/Ausfall-Simulation) vorbehalten. Legende in der Toolbar (zugleich Geräte-Typ-Filter, siehe Feature 13).
-- **Zwei Layouts umschaltbar:** "Baum" (Standard, hierarchisch top-down) und "Kräfte" (organisch) — Rendering seit 0.13.0 über Cytoscape.js + cytoscape-fcose statt einer selbstgebauten SVG-Kraft-Simulation (siehe `docs/architecture.md` §6).
+- **Zwei Layouts umschaltbar:** "Baum" (Standard, hierarchisch top-down) und "Kräfte" (organisch) — Rendering seit 0.13.0 über Cytoscape.js + cytoscape-fcose statt einer selbstgebauten SVG-Kraft-Simulation (siehe `docs/architecture.md` §6). Im Baum-Layout ist die Firewall (bei einem Redundanzpaar beide gleichberechtigt) immer die Wurzel ganz oben — fachlich der Netzübergang, unabhängig vom reinen Verbindungsgrad im Graphen. Ohne (sichtbare) Firewall wählt das Layout automatisch geeignete Wurzeln.
 - **Knoten sind per Drag & Drop verschiebbar** (Layout wird pro Session gemerkt, nicht persistiert).
 - **Klick auf einen Knoten** öffnet ein Detail-Panel (Icon/Typ/Hostname, bei importierten Switches Plattform/Modell/OS-Version, vollständige Nachbarliste mit Portbezeichnungen — Klick auf einen Nachbarn springt direkt dorthin) und filtert gleichzeitig auf dessen Verbindungen wie bisher (siehe Feature 12).
 - **Export-Menü** in der Toolbar: PNG-Bild, CSV (Geräteliste) oder JSON (Graph) der aktuell sichtbaren Topologie.
@@ -61,7 +61,7 @@ Spalten: VLAN-ID, VLAN-Name, zugeordnetes IP-Netz (falls vorhanden), Liste der S
 Zeigt: Switch + Switchport für jede gelernte MAC-Adresse in diesem VLAN (aus `show mac address-table`, gefiltert auf die VLAN-ID).
 
 **Ausschlüsse:**
-- **Uplinks zwischen Switches:** Ports, die laut `show cdp neighbor` oder Port-Channel-Membership (`show etherchannel/port-channel summary`) zu einem anderen bekannten Switch führen.
+- **Uplinks zwischen Switches:** Ports, die laut `show cdp neighbor` zu einem anderen bekannten Switch führen. Ist ein solcher Port Mitglied eines Port-Channels (`show etherchannel/port-channel summary`), zählen auch alle anderen Member-Ports **und die Port-Channel-Schnittstelle selbst** (z.B. `Po1`) als Uplink — `show mac address-table` weist eine über ein Bündel gelernte MAC-Adresse nämlich der Port-Channel-Schnittstelle zu, nicht dem einzelnen physischen Member-Port. **Voraussetzung:** `show etherchannel summary`/`show port-channel summary` muss für den betreffenden Switch importiert sein — fehlt dieses Kommando (siehe Feature 15, Warn-Hover), kennt die App die Zuordnung Port-Channel-ID → Mitglieds-Port nicht und über den Bündel-Uplink gelernte MAC-Adressen erscheinen fälschlich als lokale Endgeräte.
 - **MAC-Adressen der VLAN-Interfaces (SVI) selbst:** Einträge mit Type `static`/`self` bzw. Port-Bezeichnung `CPU`/`Router`/`Vlan*` statt eines physischen Interfaces.
 
 ## Feature 4: Klick auf IP-Netz → SVI-Switch-Ansicht
@@ -187,6 +187,12 @@ Toggle "🕶 Anonymisieren" im Header (analog Config Anonymizer). `js/core/anony
 **Bewusst reine Anzeige-Transformation, keine Datenschicht-Änderung:** `KLU.anonymize.*` wird ausschließlich an der Stelle aufgerufen, wo ein Wert als Text ins DOM geschrieben wird — interne Lookup-Keys wie `data-network-key` oder `data-id` (Switch-Auswahl, Drag&Drop, VLAN-Filter) bleiben immer im Klartext, sonst würden Klicks/Filter nach dem Umschalten fehlschlagen. Der Analyse-Stand selbst (importierte Rohdaten, `KLU.state`) bleibt unverändert.
 
 Die CSV-Exports der VLAN-Tabelle und der MAC-Detail-Ansicht respektieren den Anonymisieren-Status ebenfalls. **Nicht abgedeckt:** der PDF/HTML-Report-Export (Feature 20) — der exportiert weiterhin die Klartext-Werte, unabhängig vom Toggle-Status. Wer eine Analyse anonymisiert mit Dritten teilen will, muss aktuell die CSV-Exporte nutzen, nicht den Report-Export.
+
+## Feature 28: Port-Channel-Übersicht
+
+Neues Panel "Port-Channels" (rechte Spalte, Netzwerk-Ansicht, `js/core/portchannel-model.js` + `js/views/portchannel-panel.js`): eine Zeile je Port-Channel eines importierten Switches — Switch, Port-Channel-ID, Mitglieds-Ports (aus `show etherchannel summary`/`show port-channel summary`) und ob laut `show cdp neighbor`/LLDP mindestens ein Mitglieds-Port zu einem anderen importierten Switch führt ("Uplink zu …"). Nutzt dieselbe Uplink-Erkennung wie die MAC-Ansicht (Feature 3) — hilft direkt nachzuvollziehen, warum eine MAC-Adresse dort (nicht) ausgeschlossen wird, insbesondere wenn für einen Switch das Port-Channel-Kommando fehlt (siehe Feature 15, Warn-Hover).
+
+**vPC/MC-LAG-Redundanzpaare:** Zeigen die Mitglieds-Ports EINES Bündels laut CDP auf zwei unterschiedliche Nachbar-Switches (z.B. ein Access-Switch mit je einem Mitglieds-Port zu zwei redundanten Core-Switches), ist das kein Datenfehler, sondern ein verbreitetes Redundanz-Design — beide Nachbarn werden gleichwertig unter "Uplink zu" aufgeführt, statt den Fall als uneindeutig zu verwerfen.
 
 ## Entschieden
 

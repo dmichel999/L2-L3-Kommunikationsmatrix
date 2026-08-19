@@ -10,6 +10,7 @@ const PANEL_VISIBILITY_STORAGE_KEY = 'klu-hidden-panels';
 const TOGGLABLE_PANELS = [
   { key: 'mac', label: 'MAC-Adressen' },
   { key: 'trunk', label: 'Trunk-Warnungen' },
+  { key: 'portchannel', label: 'Port-Channels' },
   { key: 'stp', label: 'STP: Root-Bridge & blockierte Ports' },
   { key: 'duplicate', label: 'Duplicate-Erkennung' },
   { key: 'network', label: 'Netzwerk-Details' }

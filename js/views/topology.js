@@ -501,6 +501,17 @@ function computeElementsKey(graph, activeEdges, groupMap) {
   return `${n}|${e}|${g}`;
 }
 
+// Baum-Layout soll immer bei der Firewall starten (Wurzel = Ebene 0, ganz oben) statt beim
+// Knoten mit dem höchsten Verbindungsgrad — im Kundennetz ist die Firewall der eigentliche
+// Netzübergang und steht fachlich "über" den Core-Switches, auch wenn ein Core-Switch rein nach
+// Kantenzahl höher vernetzt sein kann. Mehrere Firewalls (Redundanz-Paar) werden gleichberechtigt
+// beide als Wurzel übergeben und landen dadurch nebeneinander auf Ebene 0. Ohne (sichtbare)
+// Firewall im Graphen wählt breadthfirst automatisch geeignete Wurzeln (bisheriges Verhalten).
+function pickTreeRoots(eles) {
+  const firewalls = eles.nodes('[type="firewall"]');
+  return firewalls.length ? firewalls : null;
+}
+
 function runLayout(name, animate) {
   if (!cy) return;
   if (!LAYOUTS[name]) name = 'tree';
@@ -510,7 +521,12 @@ function runLayout(name, animate) {
   // breadthfirst haengt vom aktuellen Ausgangspositionen ab — nach einer Legendenfilter-Aenderung
   // waere die Anordnung sonst verzerrt (siehe dora-the-explorer). Grid-Vorlauf normalisiert.
   if (name === 'tree') eles.layout({ name: 'grid', animate: false }).run();
-  cy.layout(Object.assign({}, LAYOUTS[name], { eles, animate: animate !== false })).run();
+  const opts = Object.assign({}, LAYOUTS[name], { eles, animate: animate !== false });
+  if (name === 'tree') {
+    const roots = pickTreeRoots(eles);
+    if (roots) opts.roots = roots;
+  }
+  cy.layout(opts).run();
 }
 
 function renderTopology() {

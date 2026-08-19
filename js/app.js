@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   KLU.views.macDetail.init();
   KLU.views.networkDetail.init();
   KLU.views.trunkPanel.init();
+  KLU.views.portChannelPanel.init();
   KLU.views.stpPanel.init();
   KLU.views.duplicatePanel.init();
   KLU.views.reachabilityMatrix.init();

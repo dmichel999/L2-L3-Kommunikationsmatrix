@@ -23,7 +23,14 @@ function computeUplinkPortsBySwitch(switches, graph) {
     const set = uplinks.get(sw.id);
     for (const pc of sw.parsed?.portChannels || []) {
       const normalized = pc.members.map(KLU.parsers.normalizePort);
-      if (normalized.some(p => set.has(p))) normalized.forEach(p => set.add(p));
+      if (normalized.some(p => set.has(p))) {
+        normalized.forEach(p => set.add(p));
+        // "show mac address-table" listet den Port bei einem Bündel-Uplink i.d.R. als die
+        // Port-Channel-Schnittstelle selbst (z.B. "Po1"), nicht als einzelnes Member-Interface
+        // (Gi1/0/1) — ohne diesen Eintrag würde der Abgleich unten NIE greifen und über einen
+        // Port-Channel gelernte MAC-Adressen fälschlich als lokale Endgeräte durchrutschen.
+        set.add(KLU.parsers.normalizePort(pc.portChannelId));
+      }
     }
   }
 

@@ -4,6 +4,29 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/), Versionierun
 
 > Versionshistorie beginnt bei `0.1.0`, passend zum bereits im Code vorhandenen `KLU.version` (`js/core/namespace.js`) — dieses Dokument wurde nachträglich für ein bereits laufendes Projekt angelegt.
 
+## [0.14.0] - 2026-08-19
+
+### Fixed
+- MAC-Adressen-Ansicht (Feature 3) und Duplicate-Erkennung (Feature 21) zeigten über einen
+  Port-Channel-Uplink gelernte MAC-Adressen fälschlich als lokal an — `show mac address-table`
+  weist eine solche Adresse der Port-Channel-Schnittstelle selbst zu (z.B. `Po1`), nicht einem
+  einzelnen physischen Member-Port, wodurch der bisherige Uplink-Abgleich sie nie erfasste.
+  `computeUplinkPortsBySwitch()` nimmt jetzt zusätzlich die Port-Channel-ID selbst in die
+  Uplink-Menge auf. Voraussetzung bleibt, dass `show etherchannel summary`/`show port-channel
+  summary` für den betroffenen Switch importiert ist — der Warn-Hover bei fehlenden Kommandos
+  (Feature 15) weist jetzt zusätzlich auf diese Auswirkung hin.
+
+### Added
+- Neues Panel "Port-Channels" (rechte Spalte, Netzwerk-Ansicht): Übersicht je Switch, welche
+  Port-Channels konfiguriert sind, aus welchen Member-Ports sie bestehen und ob sie laut CDP/LLDP
+  als Uplink zu einem anderen Switch erkannt werden (inkl. Mehrfach-Nachbarn bei vPC/MC-LAG-
+  Redundanzpaaren) — hilft nachzuvollziehen, warum eine MAC-Adresse in der MAC-Ansicht (nicht)
+  ausgeschlossen wird.
+- Topologie-Baum-Layout startet jetzt immer bei der Firewall (Redundanzpaar landet gleichberechtigt
+  auf Ebene 0), statt beim Knoten mit dem höchsten Verbindungsgrad — die Firewall steht im
+  Kundennetz fachlich über den Core-Switches. Ohne (sichtbare) Firewall wählt das Layout wie
+  bisher automatisch geeignete Wurzeln.
+
 ## [0.13.0] - 2026-08-19
 
 ### Changed

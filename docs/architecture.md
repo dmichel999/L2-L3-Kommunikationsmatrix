@@ -67,7 +67,10 @@ bestehenden Elementen), damit Zoom/Pan/manuell verschobene Positionen dabei nich
 **Layouts:** zwei benannte Layouts, umschaltbar über die Ansichtsoptionen — `tree` (`breadthfirst`,
 Standard, deterministisch dank Grid-Vorlauf vor jedem Lauf) und `force` (`fcose`, organische
 Alternative mit großzügigem `nodeSeparation`/`nodeRepulsion` gegen Zusammenklumpen bei Hub-and-
-Spoke-Topologien). Standort-Gruppierung nutzt echte Cytoscape-Compound-Knoten (`data.parent`)
+Spoke-Topologien). `pickTreeRoots()` übergibt `breadthfirst` explizit alle sichtbaren
+Firewall-Knoten als `roots` (fachlich der Netzübergang, "über" den Core-Switches) statt sie per
+Verbindungsgrad automatisch ermitteln zu lassen — ohne sichtbare Firewall entfällt die Option und
+`breadthfirst` wählt wie gewohnt selbst geeignete Wurzeln. Standort-Gruppierung nutzt echte Cytoscape-Compound-Knoten (`data.parent`)
 statt der früheren weichen Anziehungskraft.
 
 **Icons:** Die handgezeichneten Geräte-Symbole (Switch/Firewall/WLC/Access Point) sind SVG-Markup-

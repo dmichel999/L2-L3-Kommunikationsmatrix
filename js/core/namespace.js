@@ -1,6 +1,6 @@
 // L2-L3 Kommunikationsmatrix — Global Namespace + Event Bus
 const KLU = {
-  version: '0.13.0',
+  version: '0.14.0',
   _events: {},
 
   on(event, fn) {

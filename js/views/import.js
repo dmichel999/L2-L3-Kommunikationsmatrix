@@ -8,7 +8,7 @@ const EXPECTED_COMMANDS = ['version', 'cdpNeighbor', 'portChannel', 'vlan', 'mac
 const COMMAND_FEATURE_IMPACT = {
   version: 'Plattform-/Hostname-Erkennung unsicher (Fallback über Prompt-Zeile + Kommandonamen aktiv)',
   cdpNeighbor: 'Topologie: Verbindungen dieses Switches fehlen komplett',
-  portChannel: 'Topologie: Port-Channel-Bündelung für diesen Switch nicht erkennbar, Links erscheinen einzeln',
+  portChannel: 'Topologie: Port-Channel-Bündelung für diesen Switch nicht erkennbar, Links erscheinen einzeln. MAC-Ansicht/Duplicate-Erkennung: über einen Port-Channel-Uplink gelernte MAC-Adressen dieses Switches können nicht als Uplink erkannt werden und erscheinen fälschlich als lokale Endgeräte (die App kennt ohne dieses Kommando keine Zuordnung "Port-Channel-ID -> Mitglieds-Port -> CDP-Nachbar").',
   vlan: 'VLAN-Tabelle: VLANs dieses Switches fehlen komplett',
   macAddressTable: 'MAC-Ansicht: gelernte MAC-Adressen dieses Switches fehlen',
   ipInterfaceBrief: 'VLAN-Tabelle: SVI-Fallback-Zuordnung ohne Maske für diesen Switch nicht möglich',
