@@ -29,6 +29,10 @@ KLU.theme.apply = function (value) {
   if (value === 'dark' || value === 'light') document.documentElement.setAttribute('data-theme', value);
   else document.documentElement.removeAttribute('data-theme');
   updateAiLabelIcon();
+  // Cytoscape kennt keine CSS-Variablen - die Topologie-Ansicht loest Token-Farben einmalig in
+  // echte Farbwerte auf und muss bei jedem Theme-Wechsel neu aufgeloest werden (siehe
+  // js/views/topology.js, resolveToken()).
+  KLU.emit('theme:changed', null);
 };
 
 KLU.theme.set = function (value) {
@@ -36,7 +40,10 @@ KLU.theme.set = function (value) {
   KLU.theme.apply(value);
 };
 
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateAiLabelIcon);
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+  updateAiLabelIcon();
+  KLU.emit('theme:changed', null);
+});
 
 // Sofort beim Laden anwenden (nicht erst bei DOMContentLoaded), damit kein helles Aufblitzen
 // entsteht, bevor das gespeicherte Dunkel-Theme greift.

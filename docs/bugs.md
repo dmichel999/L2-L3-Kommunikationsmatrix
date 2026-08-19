@@ -41,3 +41,9 @@
 - CDP: Die "Platform"-Spalte steht in echten Exporten nicht immer exakt an der Zeichenposition, die die Kopfzeile vermuten lässt (Capability-Codes sind variabel breit) — reine Spaltenschnitt-Logik lieferte falsche Platform/Port-ID-Werte, insbesondere bei umbrechenden Port-IDs (z. B. "TwentyFiveGigE1/0/9").
 **Fix:** `show version` optional (Fallback über Prompt-Zeile + Kommandonamen-Heuristik), Leerzeilen-Toleranz in VLAN-/Route-Parsern, generalisierte Marker-Erkennung in der MAC-Tabelle, `direct`-Filter für Routen, CDP-Parser von reiner Spaltenposition auf hybrides Spalten+Token-Verfahren umgestellt.
 **Hinweis:** Die Kundendatei selbst wurde nie ins Repo, in Sample-Daten oder in Notizen kopiert — nur lokal zum Debuggen gelesen.
+
+### Report-Export hätte nach der Cytoscape-Portierung eine leere Topologie geliefert (gefunden + behoben 2026-08-19, vor dem Release)
+**Symptom:** Wäre beim ersten Report-Export nach 0.13.0 aufgefallen — der Topologie-Abschnitt im HTML-Report wäre leer gewesen.
+**Ursache:** `js/views/report-export.js` snapshotete bisher `document.getElementById('topology-canvas').outerHTML` — das funktionierte beim alten SVG-Rendering, weil das SVG ein echter DOM-Baum war. Cytoscape rendert stattdessen in ein eigenes internes `<canvas>`; dessen Pixel sind nicht Teil der DOM-Serialisierung, ein `outerHTML`-Snapshot liefert dafür nur ein leeres Grundgerüst.
+**Fix:** Neue Funktion `KLU.views.topology.snapshotLightPng()` schaltet kurz auf feste Light-Theme-Werte um (der Report ist immer hell), rendert `cy.png({output:'base64uri', full:true})` und stellt sofort das Live-Theme wieder her (synchron, kein sichtbares Aufblitzen). Der Report bettet das Ergebnis als `<img>` ein.
+**Gefunden durch:** Gezielte Safari/JXA-End-to-End-Tests während der Cytoscape-Portierung, vor dem ersten Commit.

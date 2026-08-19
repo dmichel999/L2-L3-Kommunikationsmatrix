@@ -123,72 +123,142 @@
   color: var(--text-muted);
 }
 
-.topology-empty-hint { fill: var(--text-muted); font-size: 14px; }
+/* Topologie-Rendering läuft seit der dora-the-explorer-Portierung über Cytoscape.js (eigenes
+   <canvas>, siehe js/views/topology.js) statt über handgezeichnetes SVG — Knoten/Kanten-Optik
+   (Icons, Farben, Fokus-/Dimm-/Ausfall-Zustände) wird daher komplett über das Cytoscape-Stylesheet
+   in JS (resolveToken() + buildStylesheet()) gesetzt, nicht mehr über CSS-Klassen wie früher
+   .topology-node/.topology-link. Hier bleiben nur noch die HTML-Overlay-Elemente (Leerer-Zustand-
+   Hinweis, Detail-Panel, Export-Menü, Layout-Umschalter).*/
 
-.topology-link {
-  stroke: var(--border);
-  stroke-width: 2;
+.topology-empty-hint {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.topology-empty-hint.open { display: flex; }
+
+.topology-export {
+  position: relative;
 }
 
-/* Icons bestehen z.T. aus mehreren Grundformen (Rect+Linien/Pfade statt nur einer einzelnen
-   circle/polygon) — fill/stroke sitzen daher auf der Gruppe selbst und vererben sich an alle
-   Kind-Elemente; rein dekorative Linien/Pfade (Ports, Signalbögen, Backstein-Fugen) setzen
-   ihr eigenes fill="none" als Attribut, das die geerbte Füllung gezielt überschreibt. */
-.topology-node {
-  fill: var(--surface);
-  stroke-width: 2;
-  stroke: var(--unknown-device); /* Fallback für Switches ohne bekannte Plattform (nicht importierter CDP-Nachbar) */
-  cursor: grab;
-  touch-action: none;
+.topology-export-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 30;
+  margin-top: 4px;
+  width: max-content;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  padding: 4px;
+  gap: 2px;
 }
-.topology-node:active { cursor: grabbing; }
-
-.topology-node.dimmed { opacity: 0.25; }
-.topology-node.highlighted { stroke-width: 4; }
-
-/* Klar sichtbare Markierung des aktuell per Klick fokussierten Geräts (Feature 10) — eigene,
-   kräftigere Kennzeichnung statt nur "nicht abgedunkelt wie der Rest zu sein", damit erkennbar
-   ist, WELCHER Knoten ausgewählt ist, nicht nur dass irgendeine Nachbarschaft hervorgehoben ist. */
-.topology-node.focused {
-  stroke: var(--accent) !important;
-  stroke-width: 4;
-  filter: drop-shadow(0 0 3px var(--accent));
+.topology-export-menu.open { display: flex; }
+.topology-export-menu button {
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
 }
+.topology-export-menu button:hover { background: var(--bg); }
 
-.topology-link.dimmed { opacity: 0.15; }
-.failure-sim-active .topology-link { cursor: pointer; }
-
-/* Redundanz-/Ausfall-Simulation: das simulierte Ziel (rot, gestrichelt bei Kanten) und die
-   dadurch isolierten Geräte (rot gefüllt/umrandet) klar von der normalen Darstellung abheben. */
-.topology-node.failed { stroke: var(--error); stroke-width: 4; stroke-dasharray: 4 3; }
-.topology-link.failed { stroke: var(--error); stroke-dasharray: 6 4; }
-.topology-node.isolated { fill: var(--error-bg); stroke: var(--error); stroke-width: 4; }
-
-.edge-port-label {
-  fill: var(--text-muted);
-  font-size: 10px;
-  text-anchor: middle;
-  paint-order: stroke;
-  stroke: var(--surface);
-  stroke-width: 3px;
+.topology-layout-toggle {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  align-self: flex-start;
 }
-
-/* Geraetefarbe bewusst einheitlich (var(--unknown-device) als neutraler Grundton fuer alle
-   Typen, siehe .topology-node oben) - der Typ wird bereits ueber die Icon-Form unterschieden.
-   Farbe ist damit ausschliesslich Zustaenden vorbehalten (fokussiert/hervorgehoben/ausgefallen/
-   isoliert), keine gleichzeitige zweite Bedeutung mehr. */
-
-.topology-node-label {
-  fill: var(--text);
-  /* stroke/stroke-width explizit zurueckgesetzt: .topology-node setzt beides fuer die
-     Icon-Formen, ohne Reset wuerde die Beschriftung eine 2px farbige Kontur erben und dadurch
-     fett/unleserlich wirken. */
-  stroke: none;
-  stroke-width: 0;
+.topology-layout-toggle button {
+  background: none;
+  border: none;
+  padding: 5px 12px;
   font-size: 12px;
-  font-weight: 400;
-  text-anchor: middle;
+  color: var(--text-muted);
+  cursor: pointer;
 }
+.topology-layout-toggle button + button { border-left: 1px solid var(--border); }
+.topology-layout-toggle button.active { background: var(--accent); color: var(--accent-contrast); }
+
+/* Detail-Panel (Feature aus dora-the-explorer): schiebt sich rechts über die Topologie-Fläche
+   ein (position:absolute im bereits relative positionierten .topology-wrapper), statt permanent
+   Platz zu belegen — bei den oft schon knappen Split-Pane-Breiten (siehe split-pane-left) würde
+   ein dauerhaft sichtbares drittes Panel die Topologie-Fläche zu stark einschränken. */
+.topology-detail-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(300px, 92%);
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  box-shadow: -6px 0 16px rgba(0, 0, 0, 0.15);
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 160ms ease-out;
+  overflow-y: auto;
+}
+.topology-detail-panel.open { transform: translateX(0); }
+
+.topology-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.topology-detail-icon { width: 28px; height: 28px; flex-shrink: 0; }
+.topology-detail-heading {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+.topology-detail-type { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
+.topology-detail-heading strong { font-size: 14px; overflow-wrap: anywhere; }
+
+.topology-detail-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.topology-detail-cell { min-width: 0; }
+.topology-detail-cell.full { grid-column: 1 / -1; }
+.topology-detail-cell .k { font-size: 11px; color: var(--text-muted); }
+.topology-detail-cell .v { font-size: 13px; overflow-wrap: anywhere; }
+
+.topology-detail-neighbors { padding: 12px; }
+.topology-detail-neighbors h4 { margin: 0 0 8px; font-size: 12px; color: var(--text-muted); font-weight: 600; }
+.topology-detail-neighbor-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
+.topology-detail-neighbor-row:hover { background: var(--bg); }
+.topology-detail-neighbor-row img { width: 18px; height: 18px; flex-shrink: 0; }
+.topology-detail-neighbor-main { min-width: 0; flex: 1; }
+.topology-detail-neighbor-name { overflow-wrap: anywhere; }
+.topology-detail-neighbor-path { font-size: 11px; color: var(--text-muted); }
 
 .topology-settings {
   position: relative;
@@ -261,19 +331,15 @@
   gap: 2px;
 }
 /* Zoom-/Vollbild-Buttons tragen zusaetzlich die .icon-Klasse aus css/design-components.css
-   (kompakte 38px-Kreisflaeche) — hier nur die kleinere Schrift fuer "100%"/Symbole. */
-.topology-zoom-controls button { font-size: 12px; }
-#topology-zoom-reset { min-width: 52px; }
+   (kompakte 38px-Kreisflaeche) — hier nur die kleinere Schrift fuer die Symbole. */
+.topology-zoom-controls button { font-size: 14px; }
 
+/* Legenden-Icons sind dieselben <img>-Data-URIs wie die Topologie-Knoten selbst (siehe
+   ICONS in js/views/topology.js) statt eigener Inline-SVG-Formen — Farbe/Kontur kommen bereits
+   aufgelöst aus der Grafik, hier nur die Anzeigegröße. */
 .topology-legend-icon {
-  width: 16px;
-  height: 16px;
-  overflow: visible;
-}
-.topology-legend-icon {
-  fill: var(--surface);
-  stroke: var(--unknown-device);
-  stroke-width: 4;
+  width: 18px;
+  height: 18px;
 }
 
 /* .view-tab wird jetzt vollstaendig von der .tab-bar-Komponente aus
@@ -391,6 +457,7 @@
   padding: 6px 8px;
   font-size: 13px;
   border-radius: 6px;
+  cursor: pointer;
 }
 .global-search-result:hover { background: var(--bg); }
 

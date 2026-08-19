@@ -36,12 +36,15 @@ Rein client-seitig (HTML/JS, kein Build-System, kein npm), analog `Config Anonym
 
 - Knoten = Switches (Hostname aus `show version`), Kanten = physische Verbindungen aus `show cdp neighbor`.
 - **Umschaltbare Darstellung der Etherchannel/Port-Channel-Links** (Toggle in der UI):
-  - **Aggregiert:** Ein Port-Channel zwischen zwei Switches = eine Linie, Tooltip/Label zeigt Member-Ports (z.B. `Po1: Gi1/0/1, Gi1/0/2`).
+  - **Aggregiert:** Ein Port-Channel zwischen zwei Switches = eine Linie, Label zeigt Member-Ports (z.B. `Po1: Gi1/0/1, Gi1/0/2`).
   - **Einzeln:** Jedes physische Member-Interface als eigene Linie.
 - Zuordnung Port → Port-Channel kommt aus `show etherchannel summary` (Catalyst) bzw. `show port-channel summary` (Nexus).
 - **Nicht importierte CDP-Nachbarn** (Firewall, WLC, Access Point, sonstige Geräte) werden ebenfalls als Knoten angezeigt, sobald ein importierter Switch sie als CDP-Nachbar meldet — auch wenn für sie keine eigene Datei importiert wurde (kein VLAN/MAC/IP-Wissen über sie, nur Verbindungspunkt). Typ wird aus dem (ggf. abgeschnittenen) CDP-Platform-String erkannt: `KLU.topology.inferDeviceType()`.
-- **Icons je Gerätetyp:** Kreis = Switch, Raute = Firewall, Sechseck = WLC, Dreieck = Access Point, Quadrat = unbekanntes Gerät. Legende in der Toolbar.
+- **Handgezeichnete Icons je Gerätetyp:** Gehäuse mit Ports = Switch, Backstein-Mauer = Firewall, Gehäuse mit Antenne = WLC, Funksymbol = Access Point, Quadrat = unbekanntes Gerät. Farbe ist bewusst einheitlich (neutraler Grauton) — Typ wird über die Icon-Form unterschieden, Farbe bleibt ausschließlich Zuständen (Fokus/VLAN-Hervorhebung/Ausfall-Simulation) vorbehalten. Legende in der Toolbar (zugleich Geräte-Typ-Filter, siehe Feature 13).
+- **Zwei Layouts umschaltbar:** "Baum" (Standard, hierarchisch top-down) und "Kräfte" (organisch) — Rendering seit 0.13.0 über Cytoscape.js + cytoscape-fcose statt einer selbstgebauten SVG-Kraft-Simulation (siehe `docs/architecture.md` §6).
 - **Knoten sind per Drag & Drop verschiebbar** (Layout wird pro Session gemerkt, nicht persistiert).
+- **Klick auf einen Knoten** öffnet ein Detail-Panel (Icon/Typ/Hostname, bei importierten Switches Plattform/Modell/OS-Version, vollständige Nachbarliste mit Portbezeichnungen — Klick auf einen Nachbarn springt direkt dorthin) und filtert gleichzeitig auf dessen Verbindungen wie bisher (siehe Feature 12).
+- **Export-Menü** in der Toolbar: PNG-Bild, CSV (Geräteliste) oder JSON (Graph) der aktuell sichtbaren Topologie.
 
 ## Feature 2: VLAN-Tabelle
 
@@ -85,7 +88,7 @@ Kompakte Kennzahlen-Leiste im Header: Anzahl Switches, Anzahl VLANs, Anzahl VLAN
 
 ## Feature 9: Globale Suche
 
-Eingabefeld im Header: MAC-Adresse, IP-Adresse oder Hostname eingeben → direkte Treffer-Liste (Switch/Port/VLAN bzw. Switch/Modell). IP-Suche prüft zuerst SVI-IPs (`show ip interface brief`), danach ARP-Einträge (neuer Parser `arp.js`, deckt sowohl `show arp` als auch `show ip arp` ab) — ein Treffer über ARP wird zusätzlich mit der MAC-Tabelle verknüpft, um Switch/Port/VLAN des Endgeräts zu zeigen.
+Eingabefeld im Header: MAC-Adresse, IP-Adresse oder Hostname eingeben → direkte Treffer-Liste (Switch/Port/VLAN bzw. Switch/Modell). IP-Suche prüft zuerst SVI-IPs (`show ip interface brief`), danach ARP-Einträge (neuer Parser `arp.js`, deckt sowohl `show arp` als auch `show ip arp` ab) — ein Treffer über ARP wird zusätzlich mit der MAC-Tabelle verknüpft, um Switch/Port/VLAN des Endgeräts zu zeigen. Klick auf einen Treffer wechselt in die Netzwerk-Ansicht und fokussiert den betroffenen Switch in der Topologie (Detail-Panel + Nachbarschafts-Hervorhebung, siehe Feature 12) — bei einem MAC-/IP-/CDP-Nachbar-Treffer immer der Switch, auf dem der Eintrag gefunden wurde, nicht das ggf. gemeinte Endgerät selbst.
 
 ## Feature 10: Trunk-VLANs + Native-VLAN-Mismatch
 
@@ -99,12 +102,12 @@ Topologie und VLAN-Tabelle liegen im Tab "Netzwerk" nebeneinander (Split-Pane mi
 
 - **VLAN-Highlight:** Sobald eine VLAN-Zeile ausgewählt ist (Feature 3), werden die Switch-Knoten mit diesem VLAN im Graph hervorgehoben (dickerer Rahmen), alle anderen Knoten abgedunkelt (Opazität reduziert).
 - **Portbezeichnungen:** Toggle in der Toolbar (Default aus) zeigt die Interface-Bezeichnung an jeder Kante — erst ab Zoomstufe ≥150% (`PORT_LABEL_MIN_ZOOM`), da die Kanten-Mittelpunkte bei vielen kurzen Verbindungen zu einem Hub-Switch in Normalansicht zu dicht beieinander liegen und sich sonst unlesbar überlappen. Beim Hineinzoomen rücken sie räumlich auseinander.
-- **Switch-Fokus-Filter:** Klick auf einen Knoten (Bewegung < 5px, sonst gilt es als Drag) filtert auf dessen eigene Verbindungen — alle anderen Kanten/Knoten werden abgedunkelt. Erneuter Klick hebt den Fokus auf.
+- **Switch-Fokus-Filter + Detail-Panel:** Klick auf einen Knoten filtert auf dessen eigene Verbindungen (alle anderen Kanten/Knoten werden abgedunkelt) und öffnet gleichzeitig das Detail-Panel (siehe Feature 1). Klick auf die leere Fläche oder erneuter Klick auf denselben Knoten hebt Fokus + Panel wieder auf. Ein Treffer in der globalen Suche (Feature 9) springt ebenfalls hierher.
 
 ## Feature 13: Topologie — Zoom + Geräte-Typ-Filter
 
-- **Zoom:** Mausrad zoomt zentriert auf die Cursor-Position (Zoom-Layer-Transform um die Knoten-Layer, Knoten-Weltkoordinaten bleiben unverändert); zusätzlich +/−/100%-Buttons in der Toolbar für Nicht-Maus-Bedienung. Zoom-Stand ist pro Sitzung gemerkt, nicht persistiert.
-- **Geräte-Typ-Filter:** Die Legende ist zugleich Filter — jede Checkbox blendet Knoten (und deren Kanten) dieses Gerätetyps aus, ohne das Kraft-Layout neu zu berechnen (Positionen bleiben stabil, nur Sichtbarkeit ändert sich).
+- **Zoom:** Mausrad zoomt zentriert auf die Cursor-Position; zusätzlich +/−/Einpassen-Buttons in der Toolbar für Nicht-Maus-Bedienung. Zoom-Stand ist pro Sitzung gemerkt, nicht persistiert.
+- **Geräte-Typ-Filter:** Die Legende ist zugleich Filter — jede Checkbox blendet Knoten (und deren Kanten) dieses Gerätetyps aus, ohne das Layout neu zu berechnen (Positionen bleiben stabil, nur Sichtbarkeit ändert sich).
 
 ## Feature 14: Switch-Import-Liste sortierbar
 
@@ -119,7 +122,7 @@ Pro importiertem Switch in der Sidebar-Liste: Plattform-Badge ist jetzt ein Drop
 - **VLAN-Tabelle:** Spalte "Switches mit VLAN" entfernt (Platzgrund) — bleibt im CSV-Export enthalten, ist über Klick auf ein IP-Netz weiterhin abrufbar (Feature 4).
 - **Kollabierbare Panels:** Netzwerk-Details/Trunk-Warnungen/MAC-Adressen sind jetzt drei permanent gleichzeitig sichtbare, aber unabhängig einklappbare und in der Höhe verstellbare Panels (Ziehgriff unten) statt reiner Auf/Zu-Logik über den Auswahlzustand. Gleiche Panel-Komponente (`js/views/collapsible-panel.js`) auch für die zwei Sidebar-Bereiche (Import-Dropzone, Switch-Liste) — dort ohne Höhen-Resize, nur einklappbar.
 - **Sidebar breitenverstellbar:** Resizer zwischen Sidebar und Hauptbereich (analog zum bestehenden Split-Pane-Resizer der Netzwerk-Ansicht).
-- **Topologie-Vollbild:** Button in der Toolbar nutzt die native Fullscreen-API auf den gesamten Topologie-Bereich (inkl. Toolbar, nicht nur die SVG-Fläche).
+- **Topologie-Vollbild:** Button in der Toolbar nutzt die native Fullscreen-API auf den gesamten Topologie-Bereich (inkl. Toolbar, nicht nur die Canvas-Fläche).
 - **Dark Mode:** Auswahl Hell/Dunkel/System im Header (`localStorage`-gemerkt, bewusst NICHT flüchtig wie der Analyse-Stand, da reine UI-Präferenz ohne Kundendatenbezug). "System" nutzt weiterhin `prefers-color-scheme`.
 
 **Bugfix (im selben Zug behoben):** Portbezeichnungen an Kanten (Feature 13) zeigten im Standard-Modus "Aggregiert" für Verbindungen ohne Port-Channel-Bündelung "undefined ↔ undefined", da aggregierte Kanten kein eigenes `aPort`/`bPort` besitzen (nur `members[]`) — wirkte wie "Label nur im Modus 'Einzelne Verbindungen' sichtbar". Fällt jetzt korrekt auf den Member-Port zurück.
@@ -139,7 +142,9 @@ Neuer Parser `fhrp.js` für `show standby` (Catalyst HSRP), `show hsrp` (Nexus H
 
 ## Feature 20: PDF/HTML-Report-Export
 
-Button "📄 Report exportieren" im Header. Erzeugt eine eigenständige HTML-Datei (`js/views/report-export.js`) durch Snapshotten der bereits gerenderten DOM-Abschnitte (Versionsübersicht, Topologie-SVG, VLAN-Tabelle, L3-Kommunikationsmatrix, Trunk-Warnungen, STP) mit vollständig inline eingebettetem, statischem Light-Theme-CSS — kein Server, keine externe Nachladung, keine PDF-Generator-Bibliothek nötig. Für ein PDF nutzt der User die Browser-Druckfunktion (Cmd/Strg+P → Als PDF sichern) auf der exportierten Datei — deckt den Kundenlieferungs-Anwendungsfall ab, ohne eine schwere zusätzliche Abhängigkeit zu vendorn. Reiner Snapshot des aktuellen Zustands (inkl. z.B. gerade aktivem VLAN-Highlight/Geräte-Typ-Filter in der Topologie); Netzwerk-Details/MAC-Adressen (Drill-down-Panels, nicht Übersichts-Ebene) sind bewusst nicht Teil des Reports.
+Button "📄 Report exportieren" im Header. Erzeugt eine eigenständige HTML-Datei (`js/views/report-export.js`) durch Snapshotten der bereits gerenderten DOM-Abschnitte (Versionsübersicht, VLAN-Tabelle, L3-Kommunikationsmatrix, Trunk-Warnungen, STP) mit vollständig inline eingebettetem, statischem Light-Theme-CSS — kein Server, keine externe Nachladung, keine PDF-Generator-Bibliothek nötig. Für ein PDF nutzt der User die Browser-Druckfunktion (Cmd/Strg+P → Als PDF sichern) auf der exportierten Datei — deckt den Kundenlieferungs-Anwendungsfall ab, ohne eine schwere zusätzliche Abhängigkeit zu vendorn. Reiner Snapshot des aktuellen Zustands (inkl. z.B. gerade aktivem VLAN-Highlight/Geräte-Typ-Filter in der Topologie); Netzwerk-Details/MAC-Adressen (Drill-down-Panels, nicht Übersichts-Ebene) sind bewusst nicht Teil des Reports.
+
+Die Topologie selbst ist seit 0.13.0 ein PNG-Snapshot (`KLU.views.topology.snapshotLightPng()`, siehe `docs/architecture.md` §6) statt eines DOM-Abschnitts — Cytoscape rendert in ein `<canvas>`, dessen Pixel sich nicht per DOM-Snapshot einbetten lassen. Der Snapshot zeigt immer den gesamten Graphen (unabhängig vom gerade eingestellten Zoom/Pan-Ausschnitt), respektiert aber den aktiven Geräte-Typ-Filter sowie eine gerade aktive VLAN-Hervorhebung.
 
 ## Feature 21: Duplicate-IP/MAC-Erkennung
 
@@ -171,7 +176,7 @@ Nutzt bewusst dieselbe Kantenliste, die gerade angezeigt wird (`KLU.state.linkMo
 
 ## Feature 26: Multi-Standort-Gruppierung
 
-Toggle "🏢 Standort-Gruppierung" in den Topologie-Ansichtsoptionen. `js/core/site-group-model.js` leitet je Knoten ein Gruppen-Label rein aus dem Hostname ab (alles vor dem ersten `-`/`_`, z.B. "FRA1-CORE1" → Gruppe "FRA1"); ist im Hostname kein Trenner vorhanden, wird **keine** Gruppierung erfunden — der Knoten bildet eine Einzel-Gruppe mit sich selbst (sichtbar am Label-Suffix, das dann identisch zum Hostname ist). Aktiv verändert es zwei Dinge: das Kraft-Layout zieht Knoten derselben Gruppe leicht zueinander und drückt unterschiedliche Gruppen leicht auseinander (`computeLayout()`), und jedes Knoten-Label bekommt das Gruppen-Label als Suffix angehängt (" · GRUPPE").
+Toggle "🏢 Standort-Gruppierung" in den Topologie-Ansichtsoptionen. `js/core/site-group-model.js` leitet je Knoten ein Gruppen-Label rein aus dem Hostname ab (alles vor dem ersten `-`/`_`, z.B. "FRA1-CORE1" → Gruppe "FRA1"); ist im Hostname kein Trenner vorhanden, wird **keine** Gruppierung erfunden — der Knoten bildet eine Einzel-Gruppe mit sich selbst. Aktiv zeigt jede Gruppe eine eigene, sichtbar umrandete Box mit Gruppen-Label (Cytoscape-Compound-Knoten, siehe `docs/architecture.md` §6) statt der früheren weichen Anziehungskraft + Label-Suffix.
 
 **Bewusst fragile Heuristik (wie im Backlog vermerkt):** funktioniert nur, wenn die tatsächliche Kunden-Namenskonvention einen Standort-/Gebäude-Präfix vor einem Trenner enthält — bei Hostnamen ohne dieses Muster (wie im mitgelieferten `sample-data/`-Testdatensatz, der bewusst keine Standort-Präfixe nutzt) zeigt das Feature korrekterweise keine sichtbare Clusterung, das ist kein Bug. Keine Auswertung von CDP-Location-Daten (dafür wäre `show cdp neighbor detail`/`show cdp entry` nötig, ein anderes, aktuell nicht geparstes Kommando).
 

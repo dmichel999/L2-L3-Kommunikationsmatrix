@@ -50,9 +50,45 @@ Cisco-`show`-Kommandos sind grundsätzlich Fixed-Width-Tabellen, aber reale Expo
 
 ## 6. Topologie-Rendering
 
-Eigenes, einfaches Force-Directed-Layout (kein D3) in `js/views/topology.js`, Positionen werden pro Session gecacht (`cachedPositions`) und nur bei geänderter Switch-Menge neu berechnet. Rendering ist ein vollständiger SVG-Rebuild pro Frame (kein Diffing) — bei der Knotenanzahl, für die dieses Tool gedacht ist (Kunden-LAN, typischerweise < 100 Switches), ist das ausreichend performant; ein Rebuild bei jedem `pointermove` während Drag/Zoom/Resize wird über `requestAnimationFrame`-Drosselung (Split-Pane-Resizer) bzw. bewusst in Kauf genommen (Node-Drag/Zoom, siehe `docs/bugs.md`-Historie) gebremst.
+Seit 0.13.0 (2026-08-19) rendert `js/views/topology.js` über **Cytoscape.js + cytoscape-fcose**
+(vendort unter `lib/`, siehe `docs/THIRD_PARTY_LICENSES.md` für die Ladereihenfolge) statt der
+vorherigen handgebauten SVG-Kraft-Simulation — portiert aus dem Kollegen-Referenzprojekt
+"dora-the-explorer" (Layout-Technik, Detail-Panel, Suche-Integration, Export). `#topology-canvas`
+ist dafür ein leeres `<div>`, in das Cytoscape sein eigenes internes `<canvas>` rendert.
 
-Zoom/Pan ist ein reiner Transform auf einer `<g class="zoom-layer">`, die Knoten-"Weltkoordinaten" bleiben davon unberührt — Drag-Interaktionen rechnen Bildschirmkoordinaten über den aktuellen Zoom-Zustand in Weltkoordinaten zurück (`svgPointFromEvent`).
+**Elemente/Rebuild:** `renderTopology()` baut `graph = KLU.topology.buildGraph(...)` (unverändert)
+und vergleicht einen aus Knoten-/Kanten-/Gruppen-IDs abgeleiteten `computeElementsKey()` gegen den
+zuletzt gebauten Stand — nur bei tatsächlicher struktureller Änderung (Switches importiert/entfernt,
+Aggregiert/Einzeln-Modus, Standort-Gruppierung an/aus) werden Cytoscape-Elemente neu aufgebaut und
+neu layoutet; reine Zustandsänderungen (VLAN-Auswahl, Fokus, Ausfall-Simulation, Geräte-Typ-Filter)
+laufen ausschließlich über `applyStateClasses()`/`applyTypeVisibility()` (CSS-Klassen auf
+bestehenden Elementen), damit Zoom/Pan/manuell verschobene Positionen dabei nicht verworfen werden.
+
+**Layouts:** zwei benannte Layouts, umschaltbar über die Ansichtsoptionen — `tree` (`breadthfirst`,
+Standard, deterministisch dank Grid-Vorlauf vor jedem Lauf) und `force` (`fcose`, organische
+Alternative mit großzügigem `nodeSeparation`/`nodeRepulsion` gegen Zusammenklumpen bei Hub-and-
+Spoke-Topologien). Standort-Gruppierung nutzt echte Cytoscape-Compound-Knoten (`data.parent`)
+statt der früheren weichen Anziehungskraft.
+
+**Icons:** Die handgezeichneten Geräte-Symbole (Switch/Firewall/WLC/Access Point) sind SVG-Markup-
+Strings (`iconMarkup()`), zu Data-URIs aufgelöst (`ICONS`) und per `background-image: data(icon)`
+auf den (unsichtbaren, `background-opacity: 0`) Node-Shape gelegt — Cytoscape kann Icons nur so
+einbinden, nicht als DOM-`<g>`-Baum wie zuvor. Farbe bleibt bewusst einheitlich (Typ wird über die
+Icon-Form unterschieden, Farbe ausschließlich für Zustände wie Fokus/Ausfall/VLAN-Hervorhebung).
+Cytoscapes Stylesheet-DSL versteht kein CSS `var()` — `buildStylesheet(tokens)` löst alle
+Bechtle-Design-Tokens einmalig zu echten Farbwerten auf (`resolveToken()`/`liveTokens()`) und wird
+bei jedem Theme-Wechsel (`theme:changed`-Event, siehe `js/core/theme.js`) neu aufgerufen.
+
+**Detail-Panel/Suche/Export** (Teil derselben Portierung): Klick auf einen Knoten ruft weiterhin
+`KLU.state.selectSwitchFocus(id)` auf (unverändertes State-Feld/Event aus `js/core/state.js`,
+jetzt zusätzlich Grundlage für das Detail-Panel statt nur des Nachbarschafts-Fokus-Filters) —
+`fillDetail()` befüllt Kopf/Stammdaten/Nachbarliste. Die globale Suche (`js/views/global-search.js`)
+ruft bei Klick auf einen Treffer denselben State-Setter auf und wechselt in die Netzwerk-Ansicht.
+Export (PNG/CSV/JSON) arbeitet auf `cy.nodes(':visible')`/`cy.edges(':visible')`, respektiert also
+aktive Geräte-Typ-Filter. Der Report-Export (`js/views/report-export.js`) nutzt für seinen
+Topologie-Abschnitt `KLU.views.topology.snapshotLightPng()` — ein einmaliger PNG-Snapshot mit
+fest verdrahteten Light-Theme-Werten (der Report ist immer hell/druckfreundlich), da ein simples
+`outerHTML`-Snapshot des Canvas-Containers (anders als früher beim SVG) keine Pixel liefern würde.
 
 ## 7. Wiederverwendbare UI-Bausteine
 
@@ -81,8 +117,8 @@ Bedienelemente ohne weiteres Zutun aufgebläht. Deshalb wurde jeder Button einze
 eigentlichen Optionen, ein beschrifteter 40px-Pill-Button hätte die ohnehin volle Toolbar-Zeile
 gesprengt. Tooltip (`title`) bleibt für Zugänglichkeit erhalten.
 
-**Icon-Sprite:** Nur die tatsächlich verwendeten 5 Symbole (`ic-settings`, `ic-menu`,
-`ic-light-mode`, `ic-dark-mode`, `ic-auto-mode`) sind inline im `<body>` eingebettet, nicht
+**Icon-Sprite:** Nur die tatsächlich verwendeten 6 Symbole (`ic-settings`, `ic-menu`,
+`ic-light-mode`, `ic-dark-mode`, `ic-auto-mode`, `ic-download`) sind inline im `<body>` eingebettet, nicht
 der komplette 24-Symbol-Sprite aus `icons/icon-sprite-inline.html` — bei Bedarf für neue
 Icons dort nachschauen und ergänzen (Referenzquelle bleibt `icons/icon-sprite.svg`).
 

@@ -1,7 +1,9 @@
 // L2-L3 Kommunikationsmatrix — Report-Export (Backlog-Feature "PDF/HTML-Report-Export"): erzeugt einen
 // eigenständigen, versandfähigen HTML-Report (keine Abhängigkeit von den App-Dateien, kein
 // externes Nachladen) durch Snapshotten der bereits gerenderten DOM-Abschnitte (Versionsübersicht,
-// Topologie-SVG, VLAN-Tabelle, Kommunikationsmatrix, Trunk-Warnungen, STP). Bewusst kein
+// VLAN-Tabelle, Kommunikationsmatrix, Trunk-Warnungen, STP) — die Topologie kommt als eigener
+// PNG-Snapshot (siehe KLU.views.topology.snapshotLightPng), da Cytoscape seit der
+// dora-the-explorer-Portierung in ein <canvas> statt eines DOM-Baums rendert. Bewusst kein
 // PDF-Generator-Vendor-Paket — der Kunde/User erzeugt bei Bedarf selbst ein PDF über die
 // Browser-Druckfunktion (Cmd/Strg+P → Als PDF sichern), das genügt für Kundenlieferung und
 // vermeidet eine schwere zusätzliche Abhängigkeit.
@@ -29,20 +31,7 @@ const REPORT_CSS = `
   .switch-warning { color: #b4690e; font-size: 12px; }
   .error-line { color: #b3261e; background: #fbe9e8; border-radius: 6px; padding: 6px 10px; font-size: 12px; margin-bottom: 6px; }
   .report-topology { border: 1px solid #d8dce2; border-radius: 8px; padding: 8px; margin-bottom: 8px; }
-  .report-topology svg { width: 100%; height: auto; display: block; }
-  .topology-link { stroke: #d8dce2; stroke-width: 2; }
-  .topology-link.dimmed { opacity: 0.15; }
-  .topology-node circle, .topology-node polygon, .topology-node rect { fill: #fff; stroke-width: 2; stroke: #6b7480; }
-  .topology-node.dimmed { opacity: 0.25; }
-  .topology-node.highlighted circle, .topology-node.highlighted polygon, .topology-node.highlighted rect { stroke-width: 4; }
-  .topology-node.platform-catalyst circle { stroke: #2e7d32; }
-  .topology-node.platform-nexus circle { stroke: #6a1b9a; }
-  .topology-node.type-firewall polygon { stroke: #b3261e; }
-  .topology-node.type-wlc polygon { stroke: #005f9e; }
-  .topology-node.type-ap polygon { stroke: #b4690e; }
-  .topology-node.type-unknown rect { stroke: #6b7480; }
-  .topology-node-label { fill: #1c2126; font-size: 12px; text-anchor: middle; }
-  .edge-port-label { fill: #6b7480; font-size: 10px; text-anchor: middle; }
+  .report-topology img { width: 100%; height: auto; display: block; }
   @media print { body { margin: 1cm; } h2 { page-break-after: avoid; } table { page-break-inside: avoid; } }
 `;
 
@@ -55,7 +44,14 @@ function domHtml(id, emptyHint) {
 function buildReportHtml() {
   const switches = KLU.state.getSwitches();
   const dateStr = new Date().toLocaleString('de-DE');
-  const topologySvg = document.getElementById('topology-canvas')?.outerHTML || '';
+  // Cytoscape rendert die Topologie in ein internes <canvas> statt eines DOM-Baums — ein
+  // outerHTML-Snapshot wie frueher beim SVG waere leer (Canvas-Pixel sind nicht Teil der
+  // DOM-Serialisierung). KLU.views.topology.snapshotLightPng() liefert stattdessen ein
+  // fertiges Light-Theme-PNG (siehe js/views/topology.js).
+  const topologyPng = KLU.views.topology?.snapshotLightPng?.();
+  const topologyBlock = topologyPng
+    ? `<img src="${topologyPng}" alt="Topologie">`
+    : '<p class="hint">Keine Topologie verfügbar.</p>';
 
   return `<!doctype html>
 <html lang="de">
@@ -72,7 +68,7 @@ function buildReportHtml() {
   ${domHtml('version-table-wrapper', 'Keine Switches importiert.')}
 
   <h2>Topologie</h2>
-  <div class="report-topology">${topologySvg}</div>
+  <div class="report-topology">${topologyBlock}</div>
 
   <h2>VLAN-Tabelle</h2>
   ${domHtml('vlan-table-wrapper', 'Keine Switches importiert.')}

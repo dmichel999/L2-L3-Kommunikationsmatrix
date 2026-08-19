@@ -16,6 +16,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
   <symbol id="ic-settings" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61zM12 15.6A3.6 3.6 0 1115.6 12 3.61 3.61 0 0112 15.6"/></symbol>
   <symbol id="ic-menu" viewBox="0 0 24 24"><path d="M3 18h18v-2H3zm0-5h18v-2H3zm0-7v2h18V6z"/></symbol>
+  <symbol id="ic-download" viewBox="0 0 24 24"><path d="M5 20h14v-2H5zM19 9h-4V3H9v6H5l7 7z"/></symbol>
   <symbol id="ic-light-mode" viewBox="0 0 24 24"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5M2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1m18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1M11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1m0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1M5.99 4.58a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41zm12.37 12.37a.996.996 0 00-1.41 0 .996.996 0 000 1.41l1.06 1.06c.39.39 1.03.39 1.41 0a.996.996 0 000-1.41zm1.06-10.96a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0zM7.05 18.36a.996.996 0 000-1.41.996.996 0 00-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0z"/></symbol>
   <symbol id="ic-dark-mode" viewBox="0 0 24 24"><path d="M12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 01-4.4 2.26 5.403 5.403 0 01-3.14-9.8c-.44-.06-.9-.1-1.36-.1"/></symbol>
   <symbol id="ic-auto-mode" viewBox="0 0 24 24"><path d="M12 2C6.49 2 2 6.49 2 12s4.49 10 10 10 10-4.49 10-10S17.51 2 12 2m0 18V4c4.41 0 8 3.59 8 8s-3.59 8-8 8"/></symbol>
@@ -85,13 +86,26 @@
             <h2>Topologie</h2>
             <span class="topology-zoom-controls">
               <button id="topology-zoom-out" class="icon" title="Herauszoomen">−</button>
-              <button id="topology-zoom-reset" class="icon" title="Zoom zurücksetzen">100%</button>
+              <button id="topology-zoom-reset" class="icon" title="Ansicht einpassen">⤢</button>
               <button id="topology-zoom-in" class="icon" title="Hineinzoomen">+</button>
               <button id="topology-fullscreen-toggle" class="icon" title="Vollbild">⛶</button>
             </span>
+            <div class="topology-export">
+              <button id="topology-export-toggle" class="icon" aria-expanded="false" title="Exportieren"><svg class="i"><use href="#ic-download"></use></svg></button>
+              <div class="topology-export-menu" id="topology-export-menu">
+                <button type="button" data-export="png">PNG-Bild</button>
+                <button type="button" data-export="csv">CSV (Geräteliste)</button>
+                <button type="button" data-export="json">JSON (Graph)</button>
+              </div>
+            </div>
             <div class="topology-settings">
               <button id="topology-settings-toggle" class="icon" aria-expanded="false" title="Ansichtsoptionen"><svg class="i"><use href="#ic-settings"></use></svg></button>
               <div class="topology-settings-popover" id="topology-settings-popover">
+                <div class="topology-layout-toggle" id="topology-layout-toggle">
+                  <button type="button" data-layout="tree" class="active">Baum</button>
+                  <button type="button" data-layout="force">Kräfte</button>
+                </div>
+                <hr>
                 <label class="toggle-switch">
                   <input type="checkbox" id="link-mode-toggle">
                   Einzelne Verbindungen statt Port-Channel-Bündel anzeigen
@@ -115,10 +129,26 @@
             </div>
           </div>
           <div class="topology-wrapper">
-            <svg id="topology-canvas"></svg>
+            <div id="topology-canvas"></div>
+            <p class="hint topology-empty-hint" id="topology-empty-hint">Noch keine Switches importiert.</p>
             <div class="failure-sim-result" id="failure-sim-result"></div>
+            <aside class="topology-detail-panel" id="topology-detail-panel">
+              <div class="topology-detail-header">
+                <img class="topology-detail-icon" id="topology-detail-icon" alt="">
+                <div class="topology-detail-heading">
+                  <span class="topology-detail-type" id="topology-detail-type"></span>
+                  <strong id="topology-detail-name"></strong>
+                </div>
+                <button class="icon" id="topology-detail-close" title="Schließen">✕</button>
+              </div>
+              <div class="topology-detail-body" id="topology-detail-body"></div>
+              <div class="topology-detail-neighbors">
+                <h4 id="topology-detail-neighbor-count"></h4>
+                <div id="topology-detail-neighbor-list"></div>
+              </div>
+            </aside>
           </div>
-          <p class="hint">Knoten verschiebbar (Drag), Mausrad zum Zoomen. Klick auf einen Switch-Knoten filtert auf dessen Verbindungen, Klick auf eine VLAN-Zeile hebt die zugehörigen Switches hervor.</p>
+          <p class="hint">Knoten verschiebbar (Drag), Mausrad zum Zoomen. Klick auf einen Switch-Knoten zeigt Details und filtert auf dessen Verbindungen, Klick auf eine VLAN-Zeile hebt die zugehörigen Switches hervor.</p>
         </div>
         <div class="split-resizer" id="network-split-resizer"></div>
         <div class="split-pane-right">
@@ -242,6 +272,10 @@
 <script src="js/core/failure-sim-model.js"></script>
 <script src="js/core/site-group-model.js"></script>
 <script src="js/views/import.js"></script>
+<script src="lib/layout-base.js"></script>
+<script src="lib/cose-base.js"></script>
+<script src="lib/cytoscape.min.js"></script>
+<script src="lib/cytoscape-fcose.js"></script>
 <script src="js/views/topology.js"></script>
 <script src="js/views/vlan-table.js"></script>
 <script src="js/views/mac-detail.js"></script>

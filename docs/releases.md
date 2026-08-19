@@ -4,6 +4,45 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/), Versionierun
 
 > Versionshistorie beginnt bei `0.1.0`, passend zum bereits im Code vorhandenen `KLU.version` (`js/core/namespace.js`) — dieses Dokument wurde nachträglich für ein bereits laufendes Projekt angelegt.
 
+## [0.13.0] - 2026-08-19
+
+### Changed
+- Topologie-Rendering komplett auf Cytoscape.js + cytoscape-fcose umgestellt (portiert aus dem
+  Kollegen-Referenzprojekt "dora-the-explorer"), statt der bisherigen handgebauten SVG-Kraft-
+  Simulation. Löst die verbliebenen Layout-Probleme (Ring-Bildung, Überlappung, Resize) durch eine
+  ausgereifte, zweckgebaute Bibliothek statt weiterer Physik-Feintunings. Zwei wählbare Layouts:
+  "Baum" (`breadthfirst`, Standard) und "Kräfte" (`fcose`).
+- Standort-Gruppierung nutzt jetzt echte Cytoscape-Compound-Knoten (sichtbare gestrichelte Gruppen-
+  Box mit Label) statt einer weichen Anziehungskraft + Text-Suffix am Knoten-Label.
+- Geräte-Icons bleiben die bisherigen handgezeichneten Symbole (Switch/Firewall/WLC/Access Point),
+  jetzt als aufgelöste SVG-Data-URIs im Cytoscape-Stylesheet statt als DOM-`<g>`-Elemente.
+- Report-Export (`js/views/report-export.js`): Topologie-Abschnitt ist jetzt ein PNG-Snapshot
+  (`KLU.views.topology.snapshotLightPng()`) statt eines DOM-Outerhtml-Snapshots — Cytoscape
+  rendert in ein internes `<canvas>`, dessen Pixel nicht Teil der DOM-Serialisierung sind.
+
+### Added
+- Detail-Panel: Klick auf einen Knoten zeigt Icon/Typ/Hostname, bei importierten Switches Plattform/
+  Modell/OS-Version, sowie die vollständige Nachbarliste mit Portbezeichnungen je Verbindung (Klick
+  auf einen Nachbarn springt direkt dorthin).
+- Export-Menü in der Topologie-Toolbar: PNG-Bild, CSV (Geräteliste) und JSON (Graph) der aktuell
+  sichtbaren Topologie.
+- Globale Suche springt bei Klick auf einen Treffer jetzt in die Netzwerk-Ansicht und fokussiert
+  den betroffenen Switch (Detail-Panel + Nachbarschafts-Hervorhebung).
+
+## [0.12.1] - 2026-08-19
+
+### Fixed
+- Topologie-Layout: Geräte auf derselben Ebene konnten sich trotz des geschichteten Layouts
+  überlappen, weil die Kraft-Simulation innerhalb einer Ebene keinen garantierten Mindestabstand
+  einhielt. Jede Ebene wird jetzt zusätzlich mit einem Mindestabstand (deckt Icon + typische
+  Beschriftung ab) durchgesetzt — sowohl direkt nach der Layout-Berechnung als auch nach einer
+  Fenstergrößenänderung (das reine proportionale Skalieren dabei konnte denselben Mindestabstand
+  wieder unterschreiten).
+- Neue Ansicht zoomt jetzt automatisch so weit heraus, dass alle Geräte auf Anhieb sichtbar sind,
+  falls der erzwungene Mindestabstand die Ebene breiter macht als der sichtbare Ausschnitt.
+- Geschütztes Rand-Clamping bei sehr kleinem Topologie-Panel (z. B. sehr schmales Fenster): vorher
+  konnten invertierte Grenzen dazu führen, dass alle Ebenen auf eine Position kollabierten.
+
 ## [0.12.0] - 2026-08-18
 
 ### Fixed

@@ -8,12 +8,15 @@ function normalizeMacForSearch(str) {
   return str.replace(/[^0-9a-fA-F]/g, '').toLowerCase();
 }
 
+// nodeId je Treffer = die Topologie-Knoten-ID des SWITCHES, auf dem der Treffer gefunden wurde
+// (nicht des ggf. gemeinten Endgeräts/Nachbarn) — reicht, um per Klick in die Topologie zu
+// springen und dessen Nachbarschaft zu zeigen (siehe js/views/topology.js, selectSwitchFocus).
 function searchByMac(switches, needle) {
   const results = [];
   for (const sw of switches) {
     for (const entry of sw.parsed?.macTable || []) {
       if (normalizeMacForSearch(entry.macAddress).includes(needle)) {
-        results.push({ type: 'MAC', hostname: KLU.anonymize.hostname(sw.hostname), detail: `VLAN ${entry.vlanId}, Port ${entry.port}, ${KLU.anonymize.mac(entry.macAddress)}` });
+        results.push({ type: 'MAC', hostname: KLU.anonymize.hostname(sw.hostname), nodeId: sw.id, detail: `VLAN ${entry.vlanId}, Port ${entry.port}, ${KLU.anonymize.mac(entry.macAddress)}` });
       }
     }
   }
@@ -24,7 +27,7 @@ function searchByIp(switches, query) {
   const results = [];
   for (const sw of switches) {
     for (const ib of sw.parsed?.ipInterfaceBrief || []) {
-      if (ib.ipAddress === query) results.push({ type: 'IP (VLAN-Interface)', hostname: KLU.anonymize.hostname(sw.hostname), detail: `${ib.interface}, ${KLU.anonymize.ip(ib.ipAddress)}` });
+      if (ib.ipAddress === query) results.push({ type: 'IP (VLAN-Interface)', hostname: KLU.anonymize.hostname(sw.hostname), nodeId: sw.id, detail: `${ib.interface}, ${KLU.anonymize.ip(ib.ipAddress)}` });
     }
     for (const arp of sw.parsed?.arpEntries || []) {
       if (arp.ipAddress !== query) continue;
@@ -33,6 +36,7 @@ function searchByIp(switches, query) {
       results.push({
         type: 'IP (via ARP)',
         hostname: KLU.anonymize.hostname(sw.hostname),
+        nodeId: sw.id,
         detail: macEntry ? `${anonMac}, VLAN ${macEntry.vlanId}, Port ${macEntry.port}` : `${anonMac}, Interface ${arp.interface}`
       });
     }
@@ -44,10 +48,10 @@ function searchByHostname(switches, query) {
   const needle = query.toLowerCase();
   const results = [];
   for (const sw of switches) {
-    if (sw.hostname.toLowerCase().includes(needle)) results.push({ type: 'Switch', hostname: KLU.anonymize.hostname(sw.hostname), detail: `${sw.platform}, ${sw.model || '–'}` });
+    if (sw.hostname.toLowerCase().includes(needle)) results.push({ type: 'Switch', hostname: KLU.anonymize.hostname(sw.hostname), nodeId: sw.id, detail: `${sw.platform}, ${sw.model || '–'}` });
     for (const nb of sw.parsed?.cdpNeighbors || []) {
       if ((nb.neighborDeviceId || '').toLowerCase().includes(needle)) {
-        results.push({ type: 'CDP-Nachbar', hostname: KLU.anonymize.hostname(sw.hostname), detail: `${KLU.anonymize.hostname(nb.neighborDeviceId)} an ${nb.localPort}` });
+        results.push({ type: 'CDP-Nachbar', hostname: KLU.anonymize.hostname(sw.hostname), nodeId: sw.id, detail: `${KLU.anonymize.hostname(nb.neighborDeviceId)} an ${nb.localPort}` });
       }
     }
   }
@@ -76,8 +80,18 @@ function renderSearchResults(results, query) {
   if (!query.trim()) { box.innerHTML = ''; box.classList.remove('open'); return; }
   box.classList.add('open');
   box.innerHTML = results.length
-    ? results.map(r => `<div class="global-search-result"><span class="badge badge-neutral">${KLU.dom.escapeHtml(r.type)}</span> <strong>${KLU.dom.escapeHtml(r.hostname)}</strong> — ${KLU.dom.escapeHtml(r.detail)}</div>`).join('')
+    ? results.map(r => `<div class="global-search-result" data-node-id="${KLU.dom.escapeHtml(r.nodeId)}"><span class="badge badge-neutral">${KLU.dom.escapeHtml(r.type)}</span> <strong>${KLU.dom.escapeHtml(r.hostname)}</strong> — ${KLU.dom.escapeHtml(r.detail)}</div>`).join('')
     : '<p class="hint">Keine Treffer.</p>';
+}
+
+// Klick auf einen Treffer springt in die Topologie-Ansicht und fokussiert den betroffenen Switch
+// (Detail-Panel + Nachbarschafts-Hervorhebung, siehe js/views/topology.js) — Teil der
+// dora-the-explorer-Portierung ("Suche uebernehmen").
+function focusResultNode(nodeId) {
+  if (!nodeId) return;
+  document.querySelector('.view-tab[data-view="network"]')?.click();
+  KLU.state.selectSwitchFocus(nodeId);
+  document.getElementById('global-search-results')?.classList.remove('open');
 }
 
 KLU.views.globalSearch = {
@@ -88,6 +102,10 @@ KLU.views.globalSearch = {
     // während ein Suchergebnis offen ist (sonst blieben die alten, unanonymisierten Werte stehen).
     KLU.on('switches:changed', () => {
       if (input?.value.trim()) renderSearchResults(runSearch(input.value), input.value);
+    });
+    document.getElementById('global-search-results')?.addEventListener('click', e => {
+      const row = e.target.closest('.global-search-result');
+      if (row) focusResultNode(row.dataset.nodeId);
     });
     document.addEventListener('click', e => {
       if (e.target.closest('.global-search')) return;
