@@ -1,32 +1,38 @@
-ACC8#show version
-Cisco IOS Software, WS-C2960X-48TS-L Software (WS-C2960X-48TS-L-UNIVERSALK9-M), Version 16.9.8, RELEASE SOFTWARE (fc1)
+FRA-ACC8#show version
+Cisco IOS Software [Cupertino], Catalyst L3 Switch Software (C9300-24T - IOSXE), Version 17.9.4a, RELEASE SOFTWARE (fc3)
 Technical Support: http://www.cisco.com/techsupport
-Copyright (c) 1986-2022 by Cisco Systems, Inc.
-Compiled Tue 12-Jul-22 14:22 by mcpre
+Copyright (c) 1986-2023 by Cisco Systems, Inc.
+Compiled Thu 18-May-23 09:11 by mcpre
 
-ROM: Bootstrap program is WS-C2960X-48TS-L boot loader
+ROM: IOS-XE ROMMON
 
-ACC8 uptime is 33 weeks, 5 days, 2 hours, 18 minutes
-System returned to ROM by power-on
-System image file is "flash:ws-c2960x-48ts-l-universalk9.16.09.08.SPA.bin"
+FRA-ACC8 uptime is 33 weeks, 5 days, 2 hours, 18 minutes
+Uptime for this control processor is 33 weeks, 5 days, 2 hours, 18 minutes
+System returned to ROM by Reload Command
+System image file is "flash:cat9k_iosxe.17.09.04a.SPA.bin"
 
-cisco WS-C2960X-48TS-L (ARM) processor with 524288K bytes of memory.
-Processor board ID FOC2115B008
-Base ethernet MAC Address       : 00:1A:08:00:01:00
+cisco C9300-24T (X86) processor with 524288K bytes of memory.
+Processor board ID FCW2114013
+Base ethernet MAC Address       : 00:1A:0D:00:01:00
 Configuration register is 0xF
 
-ACC8#show cdp neighbor
+FRA-ACC8#show cdp neighbor
 Capability Codes: R - Router, T - Trans Bridge, B - Source Route Bridge
                   S - Switch, H - Host, I - IGMP, r - Repeater, P - Phone,
                   D - Remote, C - CVTA, M - Two-port Mac Relay
 
 Device ID         Local Intrfce      Holdtme    Capability   Platform  Port ID
-CORE2.customer.local
-                  Gig 1/0/1          160        S I          N9K-C9318 Eth1/6
 
-Total cdp entries displayed : 1
+MUC-DIST3.customer.local
+                  Gi1/0/1            160        S I          N9K-C9216 Eth1/11
+AP-108.customer.local
+                  Gi1/0/5            160        S I          C9130AXI  GigabitEthernet0
+CAM-801
+                  Gi1/0/6            160        S I          AXIS P324 eth0
 
-ACC8#show etherchannel summary
+Total cdp entries displayed : 3
+
+FRA-ACC8#show etherchannel summary
 Flags:  D - down        P - bundled in port-channel
         I - stand-alone s - suspended
         H - Hot-standby (LACP only)
@@ -43,14 +49,14 @@ Number of aggregators:            0
 Group  Port-channel  Protocol    Ports
 ------+-------------+-----------+-----------------------------------------------
 
-ACC8#show vlan
+FRA-ACC8#show vlan
 VLAN Name                              Status    Ports
 ---- --------------------------------- --------- ------------------------------
-1    default                           active
-10   Users                             active    Gi1/0/18, Gi1/0/19
-30   Voice                             active    Gi1/0/21
-40   WiFi                              active    Gi1/0/22
-99   Mgmt                              active
+1    default                             active
+10   Users                               active    Gi1/0/2, Gi1/0/3, Gi1/0/6
+30   Voice                               active    Gi1/0/4
+40   WiFi                                active    Gi1/0/5
+99   Mgmt                                active
 
 VLAN Type  SAID       MTU   Parent RingNo BridgeNo Stp  BrdgMode Trans1 Trans2
 ---- ----- ---------- ----- ------ ------ -------- ---- -------- ------ ------
@@ -60,28 +66,28 @@ VLAN Type  SAID       MTU   Parent RingNo BridgeNo Stp  BrdgMode Trans1 Trans2
 40   enet  100040
 99   enet  100099
 
-ACC8#show mac address-table
+FRA-ACC8#show mac address-table
           Mac Address Table
 -------------------------------------------
 
 Vlan    Mac Address       Type        Ports
 ----    -----------       --------    -----
-  10    aaaa.bbbb.06e8    DYNAMIC     Gi1/0/18
-  10    aaaa.bbbb.06e9    DYNAMIC     Gi1/0/19
-  30    aaaa.bbbb.0738    DYNAMIC     Gi1/0/21
-  40    aaaa.bbbb.0760    DYNAMIC     Gi1/0/22
-  10    aaaa.bbbb.0723    DYNAMIC     Gi1/0/1
-   1    aaaa.bbbb.0000    STATIC      CPU
+  10    aaaa.bbbb.0d01    DYNAMIC     Gi1/0/2
+  10    aaaa.bbbb.0d02    DYNAMIC     Gi1/0/3
+  30    aaaa.bbbb.0d03    DYNAMIC     Gi1/0/4
+  40    aaaa.bbbb.0d04    DYNAMIC     Gi1/0/5
+  10    aaaa.bbbb.0d05    DYNAMIC     Gi1/0/6
+  99    aaaa.bbbb.0000    STATIC      CPU
 
-ACC8#show ip interface brief
+FRA-ACC8#show ip interface brief
 Interface              IP-Address      OK? Method Status                Protocol
 Vlan99                 10.10.99.18     YES manual up                    up
 
-ACC8#show arp
+FRA-ACC8#show arp
 Protocol  Address          Age (min)  Hardware Addr   Type   Interface
-Internet  10.10.99.18              8   0011.2233.4400  ARPA   Vlan99
+Internet  10.10.99.18              8          0011.2233.4400  ARPA   Vlan99
 
-ACC8#show ip route
+FRA-ACC8#show ip route
 Codes: L - local, C - connected, S - static
 Gateway of last resort is not set
 

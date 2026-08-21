@@ -1,34 +1,38 @@
-ACC2#show version
-Cisco IOS Software, WS-C3850-24T Software (WS-C3850-24T-UNIVERSALK9-M), Version 16.9.8, RELEASE SOFTWARE (fc1)
+MUC-ACC2#show version
+Cisco IOS Software [Cupertino], Catalyst L3 Switch Software (C9300-24T - IOSXE), Version 17.9.4a, RELEASE SOFTWARE (fc3)
 Technical Support: http://www.cisco.com/techsupport
-Copyright (c) 1986-2022 by Cisco Systems, Inc.
-Compiled Tue 12-Jul-22 14:22 by mcpre
+Copyright (c) 1986-2023 by Cisco Systems, Inc.
+Compiled Thu 18-May-23 09:11 by mcpre
 
-ROM: Bootstrap program is WS-C3850-24T boot loader
+ROM: IOS-XE ROMMON
 
-ACC2 uptime is 33 weeks, 5 days, 2 hours, 18 minutes
-System returned to ROM by power-on
-System image file is "flash:ws-c3850-24t-universalk9.16.09.08.SPA.bin"
+MUC-ACC2 uptime is 33 weeks, 5 days, 2 hours, 18 minutes
+Uptime for this control processor is 33 weeks, 5 days, 2 hours, 18 minutes
+System returned to ROM by Reload Command
+System image file is "flash:cat9k_iosxe.17.09.04a.SPA.bin"
 
-cisco WS-C3850-24T (ARM) processor with 524288K bytes of memory.
-Processor board ID FCW2114A002
-Base ethernet MAC Address       : 00:1A:02:00:01:00
+cisco C9300-24T (X86) processor with 524288K bytes of memory.
+Processor board ID FCW2114007
+Base ethernet MAC Address       : 00:1A:07:00:01:00
 Configuration register is 0xF
 
-ACC2#show cdp neighbor
+MUC-ACC2#show cdp neighbor
 Capability Codes: R - Router, T - Trans Bridge, B - Source Route Bridge
                   S - Switch, H - Host, I - IGMP, r - Repeater, P - Phone,
                   D - Remote, C - CVTA, M - Two-port Mac Relay
 
 Device ID         Local Intrfce      Holdtme    Capability   Platform  Port ID
-CORE1.customer.local
-                  Gig 1/0/1          160        S I          N9K-C9318 Eth1/4
-AP-101.customer.local
-                  Gig 1/0/24         160        S I          AIR-AP280 GigabitEthernet0
 
-Total cdp entries displayed : 2
+MUC-DIST1.customer.local
+                  Gi1/0/1            160        S I          N9K-C9216 Eth1/11
+AP-102.customer.local
+                  Gi1/0/5            160        S I          C9130AXI  GigabitEthernet0
+PRINTER-201
+                  Gi1/0/6            160        S I          HP LaserJ eth0
 
-ACC2#show etherchannel summary
+Total cdp entries displayed : 3
+
+MUC-ACC2#show etherchannel summary
 Flags:  D - down        P - bundled in port-channel
         I - stand-alone s - suspended
         H - Hot-standby (LACP only)
@@ -45,14 +49,14 @@ Number of aggregators:            0
 Group  Port-channel  Protocol    Ports
 ------+-------------+-----------+-----------------------------------------------
 
-ACC2#show vlan
+MUC-ACC2#show vlan
 VLAN Name                              Status    Ports
 ---- --------------------------------- --------- ------------------------------
-1    default                           active
-10   Users                             active    Gi1/0/12, Gi1/0/13
-30   Voice                             active    Gi1/0/15
-40   WiFi                              active    Gi1/0/16
-99   Mgmt                              active
+1    default                             active
+10   Users                               active    Gi1/0/2, Gi1/0/3, Gi1/0/6
+30   Voice                               active    Gi1/0/4, Gi1/0/7
+40   WiFi                                active    Gi1/0/5
+99   Mgmt                                active
 
 VLAN Type  SAID       MTU   Parent RingNo BridgeNo Stp  BrdgMode Trans1 Trans2
 ---- ----- ---------- ----- ------ ------ -------- ---- -------- ------ ------
@@ -62,29 +66,29 @@ VLAN Type  SAID       MTU   Parent RingNo BridgeNo Stp  BrdgMode Trans1 Trans2
 40   enet  100040
 99   enet  100099
 
-ACC2#show mac address-table
+MUC-ACC2#show mac address-table
           Mac Address Table
 -------------------------------------------
 
 Vlan    Mac Address       Type        Ports
 ----    -----------       --------    -----
-  10    aaaa.bbbb.0688    DYNAMIC     Gi1/0/12
-  10    aaaa.bbbb.0689    DYNAMIC     Gi1/0/13
-  30    aaaa.bbbb.06d8    DYNAMIC     Gi1/0/15
-  40    aaaa.bbbb.0700    DYNAMIC     Gi1/0/16
-  10    aaaa.bbbb.06c3    DYNAMIC     Gi1/0/1
-  30    aaaa.bbbb.9999    DYNAMIC     Gi1/0/21
-   1    aaaa.bbbb.0000    STATIC      CPU
+  10    aaaa.bbbb.0701    DYNAMIC     Gi1/0/2
+  10    aaaa.bbbb.0702    DYNAMIC     Gi1/0/3
+  30    aaaa.bbbb.0703    DYNAMIC     Gi1/0/4
+  40    aaaa.bbbb.0704    DYNAMIC     Gi1/0/5
+  10    aaaa.bbbb.0705    DYNAMIC     Gi1/0/6
+  30    aaaa.bbbb.9999    DYNAMIC     Gi1/0/7
+  99    aaaa.bbbb.0000    STATIC      CPU
 
-ACC2#show ip interface brief
+MUC-ACC2#show ip interface brief
 Interface              IP-Address      OK? Method Status                Protocol
 Vlan99                 10.10.99.12     YES manual up                    up
 
-ACC2#show arp
+MUC-ACC2#show arp
 Protocol  Address          Age (min)  Hardware Addr   Type   Interface
-Internet  10.10.99.12              8   0011.2233.4400  ARPA   Vlan99
+Internet  10.10.99.12              8          0011.2233.4400  ARPA   Vlan99
 
-ACC2#show ip route
+MUC-ACC2#show ip route
 Codes: L - local, C - connected, S - static
 Gateway of last resort is not set
 

@@ -1,0 +1,101 @@
+MUC-ACC3#show version
+Cisco IOS Software [Cupertino], Catalyst L3 Switch Software (C9300-24T - IOSXE), Version 17.9.4a, RELEASE SOFTWARE (fc3)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2023 by Cisco Systems, Inc.
+Compiled Thu 18-May-23 09:11 by mcpre
+
+ROM: IOS-XE ROMMON
+
+MUC-ACC3 uptime is 33 weeks, 5 days, 2 hours, 18 minutes
+Uptime for this control processor is 33 weeks, 5 days, 2 hours, 18 minutes
+System returned to ROM by Reload Command
+System image file is "flash:cat9k_iosxe.17.09.04a.SPA.bin"
+
+cisco C9300-24T (X86) processor with 524288K bytes of memory.
+Processor board ID FCW2114008
+Base ethernet MAC Address       : 00:1A:08:00:01:00
+Configuration register is 0xF
+
+MUC-ACC3#show cdp neighbor
+Capability Codes: R - Router, T - Trans Bridge, B - Source Route Bridge
+                  S - Switch, H - Host, I - IGMP, r - Repeater, P - Phone,
+                  D - Remote, C - CVTA, M - Two-port Mac Relay
+
+Device ID         Local Intrfce      Holdtme    Capability   Platform  Port ID
+
+MUC-DIST1.customer.local
+                  Gi1/0/1            160        S I          N9K-C9216 Eth1/12
+MUC-DIST1.customer.local
+                  Gi1/0/2            160        S I          N9K-C9216 Eth1/13
+AP-103.customer.local
+                  Gi1/0/6            160        S I          C9130AXI  GigabitEthernet0
+CAM-301
+                  Gi1/0/7            160        S I          AXIS M305 eth0
+
+Total cdp entries displayed : 4
+
+MUC-ACC3#show etherchannel summary
+Flags:  D - down        P - bundled in port-channel
+        I - stand-alone s - suspended
+        H - Hot-standby (LACP only)
+        R - Layer3      S - Layer2
+        U - in use      f - failed to allocate aggregator
+        M - not in use, minimum links not met
+        u - unsuitable for bundling
+        w - waiting to be aggregated
+        d - default port
+
+Number of channel-groups in use: 1
+Number of aggregators:            1
+
+Group  Port-channel  Protocol    Ports
+------+-------------+-----------+-----------------------------------------------
+1      Po1(SU)         LACP        Gi1/0/1(P)  Gi1/0/2(P)
+
+MUC-ACC3#show vlan
+VLAN Name                              Status    Ports
+---- --------------------------------- --------- ------------------------------
+1    default                             active
+10   Users                               active    Gi1/0/3, Gi1/0/4, Gi1/0/7
+20   Servers                             active    Gi1/0/8
+30   Voice                               active    Gi1/0/5
+40   WiFi                                active    Gi1/0/6
+99   Mgmt                                active
+
+VLAN Type  SAID       MTU   Parent RingNo BridgeNo Stp  BrdgMode Trans1 Trans2
+---- ----- ---------- ----- ------ ------ -------- ---- -------- ------ ------
+1    enet  100001
+10   enet  100010
+20   enet  100020
+30   enet  100030
+40   enet  100040
+99   enet  100099
+
+MUC-ACC3#show mac address-table
+          Mac Address Table
+-------------------------------------------
+
+Vlan    Mac Address       Type        Ports
+----    -----------       --------    -----
+  10    aaaa.bbbb.0801    DYNAMIC     Gi1/0/3
+  10    aaaa.bbbb.0802    DYNAMIC     Gi1/0/4
+  30    aaaa.bbbb.0803    DYNAMIC     Gi1/0/5
+  40    aaaa.bbbb.0804    DYNAMIC     Gi1/0/6
+  10    aaaa.bbbb.0805    DYNAMIC     Gi1/0/7
+  20    aaaa.bbbb.0806    DYNAMIC     Gi1/0/8
+  99    aaaa.bbbb.0000    STATIC      CPU
+
+MUC-ACC3#show ip interface brief
+Interface              IP-Address      OK? Method Status                Protocol
+Vlan99                 10.10.99.13     YES manual up                    up
+
+MUC-ACC3#show arp
+Protocol  Address          Age (min)  Hardware Addr   Type   Interface
+Internet  10.10.99.13              8          0011.2233.4400  ARPA   Vlan99
+
+MUC-ACC3#show ip route
+Codes: L - local, C - connected, S - static
+Gateway of last resort is not set
+
+C        10.10.99.0/24 is directly connected, Vlan99
+L        10.10.99.13/32 is directly connected, Vlan99

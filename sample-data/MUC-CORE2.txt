@@ -1,0 +1,139 @@
+MUC-CORE2# show version
+Cisco Nexus Operating System (NX-OS) Software
+TAC support: http://www.cisco.com/tac
+Copyright (C) 2002-2023, Cisco and/or its affiliates.
+
+Software
+  BIOS: version 07.69
+  NXOS: version 9.3(11)
+  BIOS compile time:  03/09/2022
+  NXOS image file is: bootflash:///nxos.9.3.11.bin
+  NXOS compile time:   8/3/2022
+
+Hardware
+  cisco Nexus9000 N9K-C93180YC-EX Chassis
+  Intel(R) Xeon(R) CPU with 24571888 kB of memory.
+  Processor Board ID FDO24110AAB
+
+  Device name:        MUC-CORE2
+  bootflash:          53298520 kB
+
+Kernel uptime is 102 day(s), 4 hour(s), 51 minute(s), 9 second(s)
+
+MUC-CORE2# show cdp neighbor
+Capability Codes: R - Router, T - Trans Bridge, B - Source Route Bridge
+                  S - Switch, H - Host, I - IGMP, r - Repeater, P - Phone,
+                  D - Remote, C - CVTA, M - Two-port Mac Relay
+
+Device ID         Local Intrfce      Holdtme    Capability   Platform  Port ID
+
+MUC-CORE1.customer.local
+                  Eth1/1             160        S I          N9K-C9318 Eth1/1
+MUC-CORE1.customer.local
+                  Eth1/2             160        S I          N9K-C9318 Eth1/2
+MUC-DIST1.customer.local
+                  Eth1/3             160        S I          N9K-C9216 Eth1/2
+MUC-DIST2.customer.local
+                  Eth1/4             160        S I          N9K-C9216 Eth1/2
+MUC-DIST3.customer.local
+                  Eth1/5             160        S I          N9K-C9216 Eth1/2
+FW1.customer.local
+                  Eth1/20            160        S I          Firepower Gi0/1
+FW2.customer.local
+                  Eth1/21            160        S I          Firepower Gi0/1
+WLC1.customer.local
+                  Eth1/22            160        S I          C9800-40  GigabitEthernet0/1
+WLC2.customer.local
+                  Eth1/23            160        S I          C9800-40  GigabitEthernet0/1
+
+Total cdp entries displayed : 9
+
+MUC-CORE2# show port-channel summary
+Flags:  D - Down        P - Up in port-channel (members)
+        I - Individual  H - Hot-standby (LACP only)
+        s - Suspended   r - Module-removed
+        S - Switched    R - Routed
+        U - Up (port-channel)
+        M - Not-in-use. Min-links not met
+
+--------------------------------------------------------------------------------
+Group Port-       Type     Protocol  Member Ports
+      Channel
+--------------------------------------------------------------------------------
+1     Po1(SU)     Eth      LACP      Eth1/1(P)   Eth1/2(P)
+
+MUC-CORE2# show vlan
+VLAN Name                              Status    Ports
+---- --------------------------------- --------- ------------------------------
+1    default                             active
+10   Users                               active
+20   Servers                             active
+30   Voice                               active
+40   WiFi                                active
+50   Guest                               active
+99   Mgmt                                active
+
+VLAN Type  SAID       MTU   Parent RingNo BridgeNo Stp  BrdgMode Trans1 Trans2
+---- ----- ---------- ----- ------ ------ -------- ---- -------- ------ ------
+1    enet  100001
+10   enet  100010
+20   enet  100020
+30   enet  100030
+40   enet  100040
+50   enet  100050
+99   enet  100099
+
+MUC-CORE2# show mac address-table
+Legend:
+        * - primary entry, G - Gateway MAC, (R) - Routed MAC, O - Overlay MAC
+   VLAN     MAC Address      Type      age     Secure NTFY Ports
+---------+-----------------+--------+---------+------+----+------------------
+G  99      0011.2233.2044    dynamic  0         F      F    sup-eth1(R)
+
+MUC-CORE2# show ip interface brief
+IP Interface Status for VRF "default"
+Interface            IP Address      Interface Status
+Vlan10                10.10.10.2      protocol-up/link-up/admin-up
+Vlan50                10.10.50.1      protocol-up/link-up/admin-up
+Vlan99                10.10.99.2      protocol-up/link-up/admin-up
+
+MUC-CORE2# show ip arp
+IP ARP Table
+Total number of entries: 1
+Address         Age       MAC Address     Interface
+10.10.99.2       00:05:23  0011.2233.4400  vlan99
+
+MUC-CORE2# show ip route
+IP Route Table for VRF "default"
+'*' denotes best ucast next-hop
+
+10.10.10.0/24, ubest/mbest: 1/0, attached
+    *via 10.10.10.2, Vlan10, [0/0], direct
+10.10.50.0/24, ubest/mbest: 1/0, attached
+    *via 10.10.50.1, Vlan50, [0/0], direct
+10.10.99.0/24, ubest/mbest: 1/0, attached
+    *via 10.10.99.2, Vlan99, [0/0], direct
+
+MUC-CORE2# show ip interface
+Vlan50, Interface status: protocol-up/link-up/admin-up, iod: 90
+  IP address: 10.10.50.1, IP subnet: 10.10.50.0/24
+  IP broadcast address: 255.255.255.255
+  IP access list ACL_GUEST_ISOLATION
+
+MUC-CORE2# show ip access-lists
+IP access list ACL_GUEST_ISOLATION
+  10 deny ip 10.10.50.0/24 10.10.0.0/16
+  20 permit ip 10.10.50.0/24 any
+
+
+MUC-CORE2# show hsrp
+Vlan10 - Group 10 (HSRP-V1)  (Vlan10)
+  Local state is Standby, priority 100 (Cfged 100)
+  Forwarding threshold(for vPC), lower: 1  upper: 100
+  Hellotime 3 sec, holdtime 10 sec
+  Virtual IP address is 10.10.10.254 (Cfged)
+  Active router is 10.10.10.1, priority 110
+  Standby router is local
+  Virtual mac address is 0000.0c07.ac0a (Default MAC)
+  2 state changes, last state change 3d02h
+  IP redundancy name is hsrp-Vl10-10 (default)

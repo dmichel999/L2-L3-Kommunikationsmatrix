@@ -1,34 +1,40 @@
-ACC5#show version
-Cisco IOS Software, WS-C2960X-48TS-L Software (WS-C2960X-48TS-L-UNIVERSALK9-M), Version 16.9.8, RELEASE SOFTWARE (fc1)
+MUC-ACC5#show version
+Cisco IOS Software [Cupertino], Catalyst L3 Switch Software (C9300-48P - IOSXE), Version 17.9.4a, RELEASE SOFTWARE (fc3)
 Technical Support: http://www.cisco.com/techsupport
-Copyright (c) 1986-2022 by Cisco Systems, Inc.
-Compiled Tue 12-Jul-22 14:22 by mcpre
+Copyright (c) 1986-2023 by Cisco Systems, Inc.
+Compiled Thu 18-May-23 09:11 by mcpre
 
-ROM: Bootstrap program is WS-C2960X-48TS-L boot loader
+ROM: IOS-XE ROMMON
 
-ACC5 uptime is 33 weeks, 5 days, 2 hours, 18 minutes
-System returned to ROM by power-on
-System image file is "flash:ws-c2960x-48ts-l-universalk9.16.09.08.SPA.bin"
+MUC-ACC5 uptime is 33 weeks, 5 days, 2 hours, 18 minutes
+Uptime for this control processor is 33 weeks, 5 days, 2 hours, 18 minutes
+System returned to ROM by Reload Command
+System image file is "flash:cat9k_iosxe.17.09.04a.SPA.bin"
 
-cisco WS-C2960X-48TS-L (ARM) processor with 524288K bytes of memory.
-Processor board ID FOC2115B005
-Base ethernet MAC Address       : 00:1A:05:00:01:00
+cisco C9300-48P (X86) processor with 524288K bytes of memory.
+Processor board ID FCW2114010
+Base ethernet MAC Address       : 00:1A:0A:00:01:00
 Configuration register is 0xF
 
-ACC5#show cdp neighbor
+MUC-ACC5#show cdp neighbor
 Capability Codes: R - Router, T - Trans Bridge, B - Source Route Bridge
                   S - Switch, H - Host, I - IGMP, r - Repeater, P - Phone,
                   D - Remote, C - CVTA, M - Two-port Mac Relay
 
 Device ID         Local Intrfce      Holdtme    Capability   Platform  Port ID
-CORE1.customer.local
-                  Gig 1/0/1          160        S I          N9K-C9318 Eth1/9
-CORE2.customer.local
-                  Gig 1/0/2          160        S I          N9K-C9318 Eth1/3
 
-Total cdp entries displayed : 2
+MUC-DIST1.customer.local
+                  Gi1/0/1            160        S I          N9K-C9216 Eth1/14
+MUC-DIST2.customer.local
+                  Gi1/0/2            160        S I          N9K-C9216 Eth1/12
+AP-105.customer.local
+                  Gi1/0/6            160        S I          C9130AXI  GigabitEthernet0
+IPPHONE-501
+                  Gi1/0/7            160        S I          CP-7841   Port 1
 
-ACC5#show etherchannel summary
+Total cdp entries displayed : 4
+
+MUC-ACC5#show etherchannel summary
 Flags:  D - down        P - bundled in port-channel
         I - stand-alone s - suspended
         H - Hot-standby (LACP only)
@@ -45,14 +51,14 @@ Number of aggregators:            0
 Group  Port-channel  Protocol    Ports
 ------+-------------+-----------+-----------------------------------------------
 
-ACC5#show vlan
+MUC-ACC5#show vlan
 VLAN Name                              Status    Ports
 ---- --------------------------------- --------- ------------------------------
-1    default                           active
-10   Users                             active    Gi1/0/15, Gi1/0/16
-30   Voice                             active    Gi1/0/18
-40   WiFi                              active    Gi1/0/19
-99   Mgmt                              active
+1    default                             active
+10   Users                               active    Gi1/0/3, Gi1/0/4
+30   Voice                               active    Gi1/0/5, Gi1/0/7
+40   WiFi                                active    Gi1/0/6
+99   Mgmt                                active
 
 VLAN Type  SAID       MTU   Parent RingNo BridgeNo Stp  BrdgMode Trans1 Trans2
 ---- ----- ---------- ----- ------ ------ -------- ---- -------- ------ ------
@@ -62,46 +68,46 @@ VLAN Type  SAID       MTU   Parent RingNo BridgeNo Stp  BrdgMode Trans1 Trans2
 40   enet  100040
 99   enet  100099
 
-ACC5#show mac address-table
+MUC-ACC5#show mac address-table
           Mac Address Table
 -------------------------------------------
 
 Vlan    Mac Address       Type        Ports
 ----    -----------       --------    -----
-  10    aaaa.bbbb.06b8    DYNAMIC     Gi1/0/15
-  10    aaaa.bbbb.06b9    DYNAMIC     Gi1/0/16
-  30    aaaa.bbbb.0708    DYNAMIC     Gi1/0/18
-  40    aaaa.bbbb.0730    DYNAMIC     Gi1/0/19
-  10    aaaa.bbbb.06f3    DYNAMIC     Gi1/0/1
-   1    aaaa.bbbb.0000    STATIC      CPU
+  10    aaaa.bbbb.0a01    DYNAMIC     Gi1/0/3
+  10    aaaa.bbbb.0a02    DYNAMIC     Gi1/0/4
+  30    aaaa.bbbb.0a03    DYNAMIC     Gi1/0/5
+  40    aaaa.bbbb.0a04    DYNAMIC     Gi1/0/6
+  30    aaaa.bbbb.0a05    DYNAMIC     Gi1/0/7
+  99    aaaa.bbbb.0000    STATIC      CPU
 
-ACC5#show ip interface brief
+MUC-ACC5#show ip interface brief
 Interface              IP-Address      OK? Method Status                Protocol
 Vlan99                 10.10.99.15     YES manual up                    up
 
-ACC5#show arp
+MUC-ACC5#show arp
 Protocol  Address          Age (min)  Hardware Addr   Type   Interface
-Internet  10.10.99.15              8   0011.2233.4400  ARPA   Vlan99
-Internet  10.10.50.50              3   0011.2233.9902  ARPA   Vlan10
+Internet  10.10.99.15              8          0011.2233.4400  ARPA   Vlan99
+Internet  10.10.50.50              3          0011.2233.9902  ARPA   Vlan10
 
-ACC5#show ip route
+MUC-ACC5#show ip route
 Codes: L - local, C - connected, S - static
 Gateway of last resort is not set
 
 C        10.10.99.0/24 is directly connected, Vlan99
 L        10.10.99.15/32 is directly connected, Vlan99
 
-ACC5#show spanning-tree
+MUC-ACC5#show spanning-tree
 VLAN0001
   Spanning tree enabled protocol rstp
   Root ID    Priority    24577
              Address     0011.2233.0001
              Cost        4
              Port        1 (GigabitEthernet1/0/1)
-             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+
 
   Bridge ID  Priority    32769  (priority 32768 sys-id-ext 1)
-             Address     0011.2233.0055
+             Address     0011.2233.0010
 
 Interface        Role Sts Cost      Prio.Nbr Type
 ---------------- ---- --- --------- -------- --------------------------------
@@ -115,15 +121,16 @@ VLAN0010
              Cost        4
              Port        1 (GigabitEthernet1/0/1)
 
+
   Bridge ID  Priority    32778  (priority 32768 sys-id-ext 10)
-             Address     0011.2233.0055
+             Address     0011.2233.0010
 
 Interface        Role Sts Cost      Prio.Nbr Type
 ---------------- ---- --- --------- -------- --------------------------------
 Gi1/0/1          Root FWD 4         128.1    P2p
 Gi1/0/2          Altn BLK 4         128.2    P2p
-Gi1/0/15         Desg FWD 4         128.15   P2p Edge
-Gi1/0/16         Desg FWD 4         128.16   P2p Edge
+Gi1/0/3          Desg FWD 4         128.3    P2p Edge
+Gi1/0/4          Desg FWD 4         128.4    P2p Edge
 
 VLAN0030
   Spanning tree enabled protocol rstp
@@ -132,14 +139,15 @@ VLAN0030
              Cost        4
              Port        1 (GigabitEthernet1/0/1)
 
+
   Bridge ID  Priority    32798  (priority 32768 sys-id-ext 30)
-             Address     0011.2233.0055
+             Address     0011.2233.0010
 
 Interface        Role Sts Cost      Prio.Nbr Type
 ---------------- ---- --- --------- -------- --------------------------------
 Gi1/0/1          Root FWD 4         128.1    P2p
 Gi1/0/2          Altn BLK 4         128.2    P2p
-Gi1/0/18         Desg FWD 4         128.18   P2p Edge
+Gi1/0/5          Desg FWD 4         128.5    P2p Edge
 
 VLAN0040
   Spanning tree enabled protocol rstp
@@ -148,14 +156,15 @@ VLAN0040
              Cost        4
              Port        1 (GigabitEthernet1/0/1)
 
+
   Bridge ID  Priority    32808  (priority 32768 sys-id-ext 40)
-             Address     0011.2233.0055
+             Address     0011.2233.0010
 
 Interface        Role Sts Cost      Prio.Nbr Type
 ---------------- ---- --- --------- -------- --------------------------------
 Gi1/0/1          Root FWD 4         128.1    P2p
 Gi1/0/2          Altn BLK 4         128.2    P2p
-Gi1/0/19         Desg FWD 4         128.19   P2p Edge
+Gi1/0/6          Desg FWD 4         128.6    P2p Edge
 
 VLAN0099
   Spanning tree enabled protocol rstp
@@ -164,10 +173,12 @@ VLAN0099
              Cost        4
              Port        1 (GigabitEthernet1/0/1)
 
+
   Bridge ID  Priority    32867  (priority 32768 sys-id-ext 99)
-             Address     0011.2233.0055
+             Address     0011.2233.0010
 
 Interface        Role Sts Cost      Prio.Nbr Type
 ---------------- ---- --- --------- -------- --------------------------------
 Gi1/0/1          Root FWD 4         128.1    P2p
 Gi1/0/2          Altn BLK 4         128.2    P2p
+

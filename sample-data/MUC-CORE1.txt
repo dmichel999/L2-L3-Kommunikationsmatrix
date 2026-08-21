@@ -1,4 +1,4 @@
-CORE1# show version
+MUC-CORE1# show version
 Cisco Nexus Operating System (NX-OS) Software
 TAC support: http://www.cisco.com/tac
 Copyright (C) 2002-2023, Cisco and/or its affiliates.
@@ -15,45 +15,40 @@ Hardware
   Intel(R) Xeon(R) CPU with 24571888 kB of memory.
   Processor Board ID FDO24110AAA
 
-  Device name:        CORE1
+  Device name:        MUC-CORE1
   bootflash:          53298520 kB
 
 Kernel uptime is 102 day(s), 4 hour(s), 51 minute(s), 9 second(s)
 
-CORE1# show cdp neighbor
+MUC-CORE1# show cdp neighbor
 Capability Codes: R - Router, T - Trans Bridge, B - Source Route Bridge
                   S - Switch, H - Host, I - IGMP, r - Repeater, P - Phone,
                   D - Remote, C - CVTA, M - Two-port Mac Relay
 
 Device ID         Local Intrfce      Holdtme    Capability   Platform  Port ID
-CORE2.customer.local
+
+MUC-CORE2.customer.local
                   Eth1/1             160        S I          N9K-C9318 Eth1/1
-CORE2.customer.local
+MUC-CORE2.customer.local
                   Eth1/2             160        S I          N9K-C9318 Eth1/2
-ACC1.customer.local
-                  Eth1/3             160        S I          WS-C3850- Gig 1/0/1
-ACC2.customer.local
-                  Eth1/4             160        S I          WS-C3850- Gig 1/0/1
-ACC3.customer.local
-                  Eth1/5             160        S I          WS-C3850- Gig 1/0/1
-ACC3.customer.local
-                  Eth1/6             160        S I          WS-C3850- Gig 1/0/2
-ACC4.customer.local
-                  Eth1/7             160        S I          WS-C3850- Gig 1/0/1
-ACC4.customer.local
-                  Eth1/8             160        S I          WS-C3850- Gig 1/0/2
-ACC5.customer.local
-                  Eth1/9             160        S I          WS-C2960X Gig 1/0/1
-ACC6.customer.local
-                  Eth1/10            160        S I          WS-C2960X Gig 1/0/1
+MUC-DIST1.customer.local
+                  Eth1/3             160        S I          N9K-C9216 Eth1/1
+MUC-DIST2.customer.local
+                  Eth1/4             160        S I          N9K-C9216 Eth1/1
+MUC-DIST3.customer.local
+                  Eth1/5             160        S I          N9K-C9216 Eth1/1
 FW1.customer.local
-                  Eth1/20            160        S I          ASA5525-X Gi0/0
+                  Eth1/20            160        S I          Firepower Gi0/0
+FW2.customer.local
+                  Eth1/21            160        S I          Firepower Gi0/0
 WLC1.customer.local
-                  Eth1/21            160        S I          AIR-CT552 GigabitEthernet0/0
+                  Eth1/22            160        S I          C9800-40  GigabitEthernet0/0
+WLC2.customer.local
+                  Eth1/23            160        S I          C9800-40  GigabitEthernet0/0
 
-Total cdp entries displayed : 12
+Total cdp entries displayed : 9
 
-CORE1# show port-channel summary
+MUC-CORE1# show port-channel summary
 Flags:  D - Down        P - Up in port-channel (members)
         I - Individual  H - Hot-standby (LACP only)
         s - Suspended   r - Module-removed
@@ -66,18 +61,16 @@ Group Port-       Type     Protocol  Member Ports
       Channel
 --------------------------------------------------------------------------------
 1     Po1(SU)     Eth      LACP      Eth1/1(P)   Eth1/2(P)
-2     Po2(SU)     Eth      LACP      Eth1/5(P)   Eth1/6(P)
-3     Po3(SU)     Eth      LACP      Eth1/7(P)   Eth1/8(P)
 
-CORE1# show vlan
+MUC-CORE1# show vlan
 VLAN Name                              Status    Ports
 ---- --------------------------------- --------- ------------------------------
-1    default                           active
-10   Users                             active
-20   Servers                           active
-30   Voice                             active
-40   WiFi                              active
-99   Mgmt                              active
+1    default                             active
+10   Users                               active
+20   Servers                             active
+30   Voice                               active
+40   WiFi                                active
+99   Mgmt                                active
 
 VLAN Type  SAID       MTU   Parent RingNo BridgeNo Stp  BrdgMode Trans1 Trans2
 ---- ----- ---------- ----- ------ ------ -------- ---- -------- ------ ------
@@ -88,30 +81,30 @@ VLAN Type  SAID       MTU   Parent RingNo BridgeNo Stp  BrdgMode Trans1 Trans2
 40   enet  100040
 99   enet  100099
 
-CORE1# show mac address-table
+MUC-CORE1# show mac address-table
 Legend:
         * - primary entry, G - Gateway MAC, (R) - Routed MAC, O - Overlay MAC
    VLAN     MAC Address      Type      age     Secure NTFY Ports
 ---------+-----------------+--------+---------+------+----+------------------
 G  99      0011.2233.1044    dynamic  0         F      F    sup-eth1(R)
 
-CORE1# show ip interface brief
+MUC-CORE1# show ip interface brief
 IP Interface Status for VRF "default"
 Interface            IP Address      Interface Status
-Vlan10               10.10.10.1      protocol-up/link-up/admin-up
-Vlan20               10.10.20.1      protocol-up/link-up/admin-up
-Vlan30               10.10.30.1      protocol-up/link-up/admin-up
-Vlan40               10.10.40.1      protocol-up/link-up/admin-up
-Vlan99               10.10.99.1      protocol-up/link-up/admin-up
+Vlan10                10.10.10.1      protocol-up/link-up/admin-up
+Vlan20                10.10.20.1      protocol-up/link-up/admin-up
+Vlan30                10.10.30.1      protocol-up/link-up/admin-up
+Vlan40                10.10.40.1      protocol-up/link-up/admin-up
+Vlan99                10.10.99.1      protocol-up/link-up/admin-up
 
-CORE1# show ip arp
+MUC-CORE1# show ip arp
 IP ARP Table
 Total number of entries: 2
 Address         Age       MAC Address     Interface
 10.10.99.1       00:05:23  0011.2233.4400  vlan99
 10.10.50.50      00:02:11  0011.2233.9901  vlan10
 
-CORE1# show ip route
+MUC-CORE1# show ip route
 IP Route Table for VRF "default"
 '*' denotes best ucast next-hop
 
@@ -124,19 +117,14 @@ IP Route Table for VRF "default"
 10.10.99.0/24, ubest/mbest: 1/0, attached
     *via 10.10.99.1, Vlan99, [0/0], direct
 
-CORE1# show interfaces trunk
+MUC-CORE1# show interfaces trunk
 Port          Native  Status        Port
               Vlan                  Channel
 Eth1/1        1       trunking      Po1
 Eth1/2        1       trunking      Po1
 Eth1/3        1       trunking      --
 Eth1/4        1       trunking      --
-Eth1/5        1       trunking      Po2
-Eth1/6        1       trunking      Po2
-Eth1/7        1       trunking      Po3
-Eth1/8        1       trunking      Po3
-Eth1/9        1       trunking      --
-Eth1/10       1       trunking      --
+Eth1/5        1       trunking      --
 
 Port          Vlans Allowed on Trunk
 Eth1/1        1-4094
@@ -144,13 +132,8 @@ Eth1/2        1-4094
 Eth1/3        1,10,20,30,40,99
 Eth1/4        1,10,20,30,40,99
 Eth1/5        1,10,20,30,40,99
-Eth1/6        1,10,20,30,40,99
-Eth1/7        1,10,20,30,40,99
-Eth1/8        1,10,20,30,40,99
-Eth1/9        1,10,20,30,40,99
-Eth1/10       1,10,20,30,40,99
 
-CORE1# show ip interface
+MUC-CORE1# show ip interface
 Vlan10, Interface status: protocol-up/link-up/admin-up, iod: 84
   IP address: 10.10.10.1, IP subnet: 10.10.10.0/24
   IP broadcast address: 255.255.255.255
@@ -168,18 +151,24 @@ Vlan99, Interface status: protocol-up/link-up/admin-up, iod: 88
   IP address: 10.10.99.1, IP subnet: 10.10.99.0/24
   IP broadcast address: 255.255.255.255
 
-CORE1# show spanning-tree
+MUC-CORE1# show ip access-lists
+IP access list ACL_WIFI_GUEST
+  10 deny ip any 10.10.10.0/24
+  20 deny ip any 10.10.20.0/24
+  30 deny ip any 10.10.99.0/24
+  40 permit ip any any
+
+
+MUC-CORE1# show spanning-tree
 VLAN0010
   Spanning tree enabled protocol rstp
   Root ID    Priority    24586
              Address     0011.2233.0001
              This bridge is the root
-             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
+  Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
 
   Bridge ID  Priority    24586  (priority 24576 sys-id-ext 10)
              Address     0011.2233.0001
-             Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
-             Aging Time  300 sec
 
 Interface        Role Sts Cost      Prio.Nbr Type
 ---------------- ---- --- --------- -------- --------------------------------
@@ -192,6 +181,7 @@ VLAN0020
   Root ID    Priority    24596
              Address     0011.2233.0001
              This bridge is the root
+  Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
 
   Bridge ID  Priority    24596  (priority 24576 sys-id-ext 20)
              Address     0011.2233.0001
@@ -199,12 +189,15 @@ VLAN0020
 Interface        Role Sts Cost      Prio.Nbr Type
 ---------------- ---- --- --------- -------- --------------------------------
 Eth1/1           Desg FWD 2         128.1    P2p
+Eth1/3           Desg FWD 4         128.3    P2p
+Eth1/9           Desg FWD 4         128.9    P2p
 
 VLAN0030
   Spanning tree enabled protocol rstp
   Root ID    Priority    24606
              Address     0011.2233.0001
              This bridge is the root
+  Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
 
   Bridge ID  Priority    24606  (priority 24576 sys-id-ext 30)
              Address     0011.2233.0001
@@ -212,6 +205,7 @@ VLAN0030
 Interface        Role Sts Cost      Prio.Nbr Type
 ---------------- ---- --- --------- -------- --------------------------------
 Eth1/1           Desg FWD 2         128.1    P2p
+Eth1/3           Desg FWD 4         128.3    P2p
 Eth1/9           Desg FWD 4         128.9    P2p
 
 VLAN0040
@@ -219,6 +213,7 @@ VLAN0040
   Root ID    Priority    24616
              Address     0011.2233.0001
              This bridge is the root
+  Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
 
   Bridge ID  Priority    24616  (priority 24576 sys-id-ext 40)
              Address     0011.2233.0001
@@ -226,6 +221,7 @@ VLAN0040
 Interface        Role Sts Cost      Prio.Nbr Type
 ---------------- ---- --- --------- -------- --------------------------------
 Eth1/1           Desg FWD 2         128.1    P2p
+Eth1/3           Desg FWD 4         128.3    P2p
 Eth1/9           Desg FWD 4         128.9    P2p
 
 VLAN0099
@@ -233,6 +229,7 @@ VLAN0099
   Root ID    Priority    24675
              Address     0011.2233.0001
              This bridge is the root
+  Hello Time   2 sec  Max Age 20 sec  Forward Delay 15 sec
 
   Bridge ID  Priority    24675  (priority 24576 sys-id-ext 99)
              Address     0011.2233.0001
@@ -240,9 +237,11 @@ VLAN0099
 Interface        Role Sts Cost      Prio.Nbr Type
 ---------------- ---- --- --------- -------- --------------------------------
 Eth1/1           Desg FWD 2         128.1    P2p
+Eth1/3           Desg FWD 4         128.3    P2p
 Eth1/9           Desg FWD 4         128.9    P2p
 
-CORE1# show hsrp
+
+MUC-CORE1# show hsrp
 Vlan10 - Group 10 (HSRP-V1)  (Vlan10)
   Local state is Active, priority 110 (Cfged 110)
   Forwarding threshold(for vPC), lower: 1  upper: 110

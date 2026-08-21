@@ -1,43 +1,49 @@
-ACC7#show version
-Cisco IOS Software, WS-C2960X-48TS-L Software (WS-C2960X-48TS-L-UNIVERSALK9-M), Version 16.9.8, RELEASE SOFTWARE (fc1)
+MUC-ACC7#show version
+Cisco IOS Software [Cupertino], Catalyst L3 Switch Software (C9300-48P - IOSXE), Version 17.9.4a, RELEASE SOFTWARE (fc3)
 Technical Support: http://www.cisco.com/techsupport
-Copyright (c) 1986-2022 by Cisco Systems, Inc.
-Compiled Tue 12-Jul-22 14:22 by mcpre
+Copyright (c) 1986-2023 by Cisco Systems, Inc.
+Compiled Thu 18-May-23 09:11 by mcpre
 
-ROM: Bootstrap program is WS-C2960X-48TS-L boot loader
+ROM: IOS-XE ROMMON
 
-ACC7 uptime is 33 weeks, 5 days, 2 hours, 18 minutes
-System returned to ROM by power-on
-System image file is "flash:ws-c2960x-48ts-l-universalk9.16.09.08.SPA.bin"
+MUC-ACC7 uptime is 33 weeks, 5 days, 2 hours, 18 minutes
+Uptime for this control processor is 33 weeks, 5 days, 2 hours, 18 minutes
+System returned to ROM by Reload Command
+System image file is "flash:cat9k_iosxe.17.09.04a.SPA.bin"
 
-cisco WS-C2960X-48TS-L (ARM) processor with 524288K bytes of memory.
-Processor board ID FOC2115B007
-Base ethernet MAC Address       : 00:1A:07:00:01:00
+cisco C9300-48P (X86) processor with 524288K bytes of memory.
+Processor board ID FCW2114012
+Base ethernet MAC Address       : 00:1A:0C:00:01:00
 Configuration register is 0xF
 
-ACC7#show cdp neighbor
+MUC-ACC7#show cdp neighbor
 Capability Codes: R - Router, T - Trans Bridge, B - Source Route Bridge
                   S - Switch, H - Host, I - IGMP, r - Repeater, P - Phone,
                   D - Remote, C - CVTA, M - Two-port Mac Relay
 
 Device ID         Local Intrfce      Holdtme    Capability   Platform  Port ID
-CORE2.customer.local
-                  Gig 1/0/1          160        S I          N9K-C9318 Eth1/5
 
-Total cdp entries displayed : 1
+MUC-DIST3.customer.local
+                  Gi1/0/1            160        S I          N9K-C9216 Eth1/10
+IPPHONE-701
+                  Gi1/0/5            160        S I          Poly VVX4 Port 1
 
-ACC7#show lldp neighbor
+Total cdp entries displayed : 2
+
+MUC-ACC7#show lldp neighbor
 Capability codes:
     (R) Router, (B) Bridge, (T) Telephone, (C) DOCSIS Cable Device
     (W) WLAN Access Point, (P) Repeater, (S) Station, (O) Other
 
 Device ID           Local Intf     Hold-time  Capability      Port ID
-CORE2.customer.local Gig 1/0/1      120        B,R             Eth1/5
-ArubaAP-215          Gig 1/0/24     120        W               1
+MUC-DIST3.customer.local
+                    Gig 1/0/1      120        B,R             Eth1/10
+ArubaAP-215
+                    Gig 1/0/24     120        W               1
 
 Total entries displayed: 2
 
-ACC7#show etherchannel summary
+MUC-ACC7#show etherchannel summary
 Flags:  D - down        P - bundled in port-channel
         I - stand-alone s - suspended
         H - Hot-standby (LACP only)
@@ -54,14 +60,14 @@ Number of aggregators:            0
 Group  Port-channel  Protocol    Ports
 ------+-------------+-----------+-----------------------------------------------
 
-ACC7#show vlan
+MUC-ACC7#show vlan
 VLAN Name                              Status    Ports
 ---- --------------------------------- --------- ------------------------------
-1    default                           active
-10   Users                             active    Gi1/0/17, Gi1/0/18
-30   Voice                             active    Gi1/0/20
-40   WiFi                              active    Gi1/0/21
-99   Mgmt                              active
+1    default                             active
+10   Users                               active    Gi1/0/2, Gi1/0/3
+30   Voice                               active    Gi1/0/4, Gi1/0/5
+40   WiFi                                active    Gi1/0/24
+99   Mgmt                                active
 
 VLAN Type  SAID       MTU   Parent RingNo BridgeNo Stp  BrdgMode Trans1 Trans2
 ---- ----- ---------- ----- ------ ------ -------- ---- -------- ------ ------
@@ -71,28 +77,28 @@ VLAN Type  SAID       MTU   Parent RingNo BridgeNo Stp  BrdgMode Trans1 Trans2
 40   enet  100040
 99   enet  100099
 
-ACC7#show mac address-table
+MUC-ACC7#show mac address-table
           Mac Address Table
 -------------------------------------------
 
 Vlan    Mac Address       Type        Ports
 ----    -----------       --------    -----
-  10    aaaa.bbbb.06d8    DYNAMIC     Gi1/0/17
-  10    aaaa.bbbb.06d9    DYNAMIC     Gi1/0/18
-  30    aaaa.bbbb.0728    DYNAMIC     Gi1/0/20
-  40    aaaa.bbbb.0750    DYNAMIC     Gi1/0/21
-  10    aaaa.bbbb.0713    DYNAMIC     Gi1/0/1
-   1    aaaa.bbbb.0000    STATIC      CPU
+  10    aaaa.bbbb.0c01    DYNAMIC     Gi1/0/2
+  10    aaaa.bbbb.0c02    DYNAMIC     Gi1/0/3
+  30    aaaa.bbbb.0c03    DYNAMIC     Gi1/0/4
+  30    aaaa.bbbb.0c04    DYNAMIC     Gi1/0/5
+  40    aaaa.bbbb.0c05    DYNAMIC     Gi1/0/24
+  99    aaaa.bbbb.0000    STATIC      CPU
 
-ACC7#show ip interface brief
+MUC-ACC7#show ip interface brief
 Interface              IP-Address      OK? Method Status                Protocol
 Vlan99                 10.10.99.17     YES manual up                    up
 
-ACC7#show arp
+MUC-ACC7#show arp
 Protocol  Address          Age (min)  Hardware Addr   Type   Interface
-Internet  10.10.99.17              8   0011.2233.4400  ARPA   Vlan99
+Internet  10.10.99.17              8          0011.2233.4400  ARPA   Vlan99
 
-ACC7#show ip route
+MUC-ACC7#show ip route
 Codes: L - local, C - connected, S - static
 Gateway of last resort is not set
 

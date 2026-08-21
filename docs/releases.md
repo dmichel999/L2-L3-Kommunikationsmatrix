@@ -4,6 +4,11 @@ Format basiert auf [Keep a Changelog](https://keepachangelog.com/), Versionierun
 
 > Versionshistorie beginnt bei `0.1.0`, passend zum bereits im Code vorhandenen `KLU.version` (`js/core/namespace.js`) — dieses Dokument wurde nachträglich für ein bereits laufendes Projekt angelegt.
 
+## [0.15.0] - 2026-08-21
+
+### Changed
+- `sample-data/` ersetzt: bisheriger 10-Switch-Datensatz (ACC1–8, CORE1–2) durch den 15-Switch-Zwei-Standorte-Campus "Musterkunde-Campus" (MUC Core/Dist/Access + FRA-Access) ausgetauscht — Standard-Demodatensatz für die Cisco-TechChamps-Präsentation. Bisheriger Datensatz bleibt über die Git-Historie dieses Ordners verfügbar (gezielt auf einzelne Feature-Tests zugeschnitten, siehe `sample-data/README.md`).
+
 ## [0.14.0] - 2026-08-19
 
 ### Fixed
